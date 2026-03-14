@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Olger Díaz — Método GEM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:      #4A8FC2;
+      --blue-dark: #2D6A96;
+      --slate:     #2C3A47;
+      --grey-bg:   #F2F3F5;
+      --grey-line: #E0E3E8;
+      --grey-text: #7A8694;
+      --white:     #FFFFFF;
+      --black:     #111418;
+      --radius:    14px;
+      --ease:      0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.93);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--grey-line);
+      height: 62px;
+      display: flex; align-items: center;
+      padding: 0 6%;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 11px;
+      text-decoration: none;
+    }
+    .brand-text {
+      font-size: 15px; font-weight: 600;
+      color: var(--slate); letter-spacing: -0.2px;
+    }
+    .brand-text span { color: var(--blue); }
+    .nav-right { display: flex; gap: 24px; align-items: center; }
+    .nav-link {
+      font-size: 14px; color: var(--grey-text);
+      text-decoration: none; font-weight: 400;
+      transition: color var(--ease);
+    }
+    .nav-link:hover { color: var(--black); }
+    .nav-cta {
+      background: var(--blue); color: white;
+      padding: 9px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      text-decoration: none;
+      transition: background var(--ease);
+    }
+    .nav-cta:hover { background: var(--blue-dark); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 88px 6% 72px;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #EAF3FB; color: var(--blue-dark);
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 5px; height: 5px;
+      background: var(--blue); border-radius: 50%;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(38px, 5vw, 62px);
+      line-height: 1.05; letter-spacing: -1.5px;
+      color: var(--slate); margin-bottom: 10px;
+    }
+    .hero h1 .gem { color: var(--blue); }
+    .hero-sub {
+      font-size: 17px; color: var(--grey-text);
+      font-weight: 300; max-width: 480px;
+      margin: 0 auto 56px; line-height: 1.65;
+    }
+
+    /* TILES */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 860px; margin: 0 auto;
+    }
+    .tile {
+      background: var(--grey-bg);
+      border: 1.5px solid var(--grey-line);
+      border-radius: var(--radius);
+      padding: 32px 28px 40px;
+      text-align: left;
+      text-decoration: none;
+      display: block;
+      transition: border-color var(--ease), transform var(--ease), background var(--ease);
+      position: relative; overflow: hidden;
+    }
+    .tile:hover {
+      border-color: var(--blue);
+      transform: translateY(-3px);
+      background: var(--white);
+    }
+    .tile-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px; font-size: 20px;
+    }
+    .icon-blue  { background: #D6EAF8; }
+    .icon-slate { background: #D8DDE3; }
+    .icon-teal  { background: #D5EEE9; }
+    .icon-free  { background: #FEF3CD; }
+    .tile h3 {
+      font-size: 16px; font-weight: 600;
+      color: var(--slate); margin-bottom: 8px; line-height: 1.3;
+    }
+    .tile p {
+      font-size: 13px; color: var(--grey-text);
+      line-height: 1.6; font-weight: 300;
+    }
+    .tile-arrow {
+      position: absolute; bottom: 18px; right: 22px;
+      font-size: 18px; color: var(--grey-line);
+      transition: color var(--ease), transform var(--ease);
+    }
+    .tile:hover .tile-arrow { color: var(--blue); transform: translate(3px,-3px); }
+
+    /* TABS SECTION */
+    .tabs-section {
+      background: var(--grey-bg);
+      border-top: 1px solid var(--grey-line);
+      padding: 72px 6%;
+    }
+    .tabs-inner { max-width: 860px; margin: 0 auto; }
+
+    .tab-nav {
+      display: flex; gap: 4px;
+      background: white; border: 1px solid var(--grey-line);
+      border-radius: 10px; padding: 4px;
+      margin-bottom: 36px; width: fit-content;
+    }
+    .tab-btn {
+      padding: 10px 24px; border-radius: 7px;
+      font-size: 14px; font-weight: 500;
+      border: none; background: transparent;
+      color: var(--grey-text); cursor: pointer;
+      transition: all var(--ease);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .tab-btn.active {
+      background: var(--blue); color: white;
+      box-shadow: 0 2px 10px rgba(74,143,194,0.3);
+    }
+    .tab-btn:not(.active):hover { color: var(--black); background: var(--grey-bg); }
+    .tab-panel { display: none; animation: fadeUp 0.22s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* TAB: PROGRAMAS */
+    .programs-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+    }
+    .prog-card {
+      background: white; border: 1.5px solid var(--grey-line);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color var(--ease), transform var(--ease);
+      position: relative;
+    }
+    .prog-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .prog-card.featured { background: var(--slate); border-color: var(--slate); }
+    .feat-badge {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: white;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; padding: 3px 12px;
+      border-radius: 100px; white-space: nowrap;
+    }
+    .prog-months {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--blue); margin-bottom: 8px;
+    }
+    .prog-card.featured .prog-months { color: #7EC8E3; }
+    .prog-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 19px; color: var(--black); margin-bottom: 6px; line-height: 1.2;
+    }
+    .prog-card.featured .prog-name { color: white; }
+    .prog-price { font-size: 24px; font-weight: 600; color: var(--black); margin-bottom: 2px; }
+    .prog-card.featured .prog-price { color: white; }
+    .prog-pair { font-size: 12px; color: var(--grey-text); margin-bottom: 20px; }
+    .prog-card.featured .prog-pair { color: rgba(255,255,255,0.5); }
+    .prog-divider { height: 1px; background: var(--grey-line); margin: 16px 0; }
+    .prog-card.featured .prog-divider { background: rgba(255,255,255,0.15); }
+    .prog-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .prog-item {
+      font-size: 13px; color: var(--grey-text);
+      display: flex; gap: 9px; align-items: flex-start; line-height: 1.4;
+    }
+    .prog-card.featured .prog-item { color: rgba(255,255,255,0.65); }
+    .prog-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--blue); margin-top: 6px; flex-shrink: 0;
+    }
+    .prog-card.featured .prog-dot { background: #7EC8E3; }
+    .prog-btn {
+      display: block; text-align: center; margin-top: 24px; padding: 11px;
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      text-decoration: none; transition: all var(--ease);
+      font-family: 'DM Sans', sans-serif; cursor: pointer; border: none;
+    }
+    .btn-outline {
+      background: var(--grey-bg); color: var(--black); border: 1px solid var(--grey-line);
+    }
+    .btn-outline:hover { background: var(--blue); color: white; border-color: var(--blue); }
+    .btn-fill { background: var(--blue); color: white; }
+    .btn-fill:hover { background: var(--blue-dark); }
+
+    /* TAB: RECURSOS */
+    .recursos-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px;
+    }
+    .recurso-card {
+      background: white; border: 1.5px solid var(--grey-line);
+      border-radius: var(--radius); padding: 24px;
+      transition: border-color var(--ease), transform var(--ease);
+    }
+    .recurso-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .rec-tag {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.6px; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 4px; margin-bottom: 14px;
+    }
+    .tag-live { background: #D6EAF8; color: var(--blue-dark); }
+    .tag-soon { background: var(--grey-bg); color: var(--grey-text); }
+    .recurso-card h4 { font-size: 15px; font-weight: 600; color: var(--black); margin-bottom: 7px; line-height: 1.35; }
+    .recurso-card p { font-size: 13px; color: var(--grey-text); line-height: 1.6; margin-bottom: 16px; }
+    .rec-link { font-size: 13px; font-weight: 500; color: var(--blue); text-decoration: none; }
+    .rec-link:hover { text-decoration: underline; }
+    .rec-soon { font-size: 13px; color: var(--grey-text); font-style: italic; }
+
+    /* FOOTER */
+    .footer-wrap { border-top: 1px solid var(--grey-line); }
+    footer {
+      max-width: 860px; margin: 0 auto; padding: 32px 6%;
+    }
+    .footer-content { display: flex; flex-direction: column; gap: 20px; }
+    .footer-top {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-copy { font-size: 13px; color: var(--grey-text); }
+    .footer-copy strong { color: var(--black); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 13px; color: var(--grey-text); text-decoration: none; transition: color var(--ease); }
+    .footer-links a:hover { color: var(--blue); }
+    .disclosure {
+      font-size: 12px; color: var(--grey-text);
+      line-height: 1.6; padding-top: 16px;
+      border-top: 1px solid var(--grey-line);
+    }
+    .disclosure strong { color: var(--slate); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(17,20,24,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+    }
+    .modal-overlay.active { display: block; }
+    .modal {
+      display: none; position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -48%);
+      background: white; border-radius: 20px;
+      padding: 36px; width: 90%; max-width: 480px;
+      z-index: 201;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+      animation: modalIn 0.25s ease;
+    }
+    .modal.active { display: block; }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translate(-50%, -45%); }
+      to   { opacity: 1; transform: translate(-50%, -50%); }
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--grey-bg); border: none;
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 13px; cursor: pointer; color: var(--grey-text);
+      transition: background var(--ease);
+    }
+    .modal-close:hover { background: var(--grey-line); }
+    .modal-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: var(--slate); margin-bottom: 4px;
+    }
+    .modal-divider { height: 1px; background: var(--grey-line); margin: 16px 0; }
+    .modal-list {
+      list-style: none; display: flex; flex-direction: column; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .modal-list li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 14px; color: var(--slate-mid, #3D5166); line-height: 1.5;
+    }
+    .modal-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue); margin-top: 6px; flex-shrink: 0;
+    }
+    .modal-cta {
+      display: block; text-align: center;
+      background: var(--blue); color: white;
+      padding: 13px; border-radius: 10px;
+      font-size: 15px; font-weight: 500;
+      text-decoration: none;
+      transition: background var(--ease);
+    }
+    .modal-cta:hover { background: var(--blue-dark); }
+
+    @media (max-width: 700px) {
+      .tiles { grid-template-columns: 1fr; }
+      .nav-right .nav-link { display: none; }
+      .modal { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="8" fill="#F2F3F5"/>
+      <rect x="6" y="9" width="14" height="17" rx="3" fill="#4A8FC2" transform="rotate(-8 6 9)"/>
+      <rect x="18" y="15" width="8" height="8" rx="2" fill="#2C3A47"/>
+    </svg>
+    <span class="brand-text">Olger Díaz <span>· GEM</span></span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="#" onclick="openModal('finanzas'); return false;">Programas</a>
+    <a class="nav-link" href="#tabs" onclick="openTab('recursos'); return false;">Recursos</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Finanzas e Inversiones</div>
+  <h1>Olger Díaz<br><span class="gem">Método GEM</span></h1>
+  <p class="hero-sub">Un Sistema para Profesionales que quieren tomar el control de su dinero e invertir en Bolsa con claridad.</p>
+
+  <div class="tiles">
+    <a class="tile" href="#" onclick="openModal('finanzas'); return false;">
+      <div class="tile-icon icon-blue">💼</div>
+      <h3>Acompañamiento de Finanzas</h3>
+      <p>Implementá el sistema GEM completo: presupuesto, deudas, ahorro e inversión en un solo plan.</p>
+      <span class="tile-arrow">↗</span>
+    </a>
+    <a class="tile" href="#" onclick="openModal('inversiones'); return false;">
+      <div class="tile-icon icon-slate">📈</div>
+      <h3>Acompañamiento de Inversiones</h3>
+      <p>Creá y abrí tu portafolio de inversión en bolsa con gestión pasiva. Desde cero, sin complicaciones.</p>
+      <span class="tile-arrow">↗</span>
+    </a>
+    <a class="tile" href="#" onclick="openModal('pareja'); return false;">
+      <div class="tile-icon icon-teal">💑</div>
+      <h3>Finanzas en Pareja</h3>
+      <p>El mismo sistema GEM diseñado para parejas que quieren construir su patrimonio juntos.</p>
+      <span class="tile-arrow">↗</span>
+    </a>
+    <a class="tile" href="#tabs" onclick="openTab('recursos'); return false;">
+      <div class="tile-icon icon-free">🎁</div>
+      <h3>Recursos Gratuitos</h3>
+      <p>Calculadoras, perfil de riesgo para inversiones y herramientas para que empecés a entender tu situación hoy.</p>
+      <span class="tile-arrow">↗</span>
+    </a>
+  </div>
+</section>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+
+<div class="modal" id="modal-finanzas">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <div class="tile-icon icon-blue" style="margin-bottom:16px; font-size:22px;">💼</div>
+  <h2 class="modal-title">Acompañamiento de Finanzas</h2>
+  <div class="modal-divider"></div>
+  <ul class="modal-list">
+    <li><span class="modal-dot"></span>Implementación completa del Sistema GEM en tu estilo de vida</li>
+    <li><span class="modal-dot"></span>Presupuestos, control de gastos y planes para deudas</li>
+    <li><span class="modal-dot"></span>Estructura de ahorros, metas financieras e inversiones en Bolsa</li>
+    <li><span class="modal-dot"></span>Sesiones 1-1 personalizadas</li>
+    <li><span class="modal-dot"></span>Seguimiento de gastos de forma automática con nuestra propia IA para gastos</li>
+    <li><span class="modal-dot"></span>Acceso a herramientas y plantillas</li>
+  </ul>
+  <a href="https://www.instagram.com/olger.diaze" target="_blank" class="modal-cta">Aplicar al programa →</a>
+</div>
+
+<div class="modal" id="modal-inversiones">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <div class="tile-icon icon-slate" style="margin-bottom:16px; font-size:22px;">📈</div>
+  <h2 class="modal-title">Acompañamiento de Inversiones</h2>
+  <div class="modal-divider"></div>
+  <ul class="modal-list">
+    <li><span class="modal-dot"></span>Implementación completa del Sistema GEM para Inversiones en tu estilo de vida</li>
+    <li><span class="modal-dot"></span>Análisis de tu situación patrimonial actual</li>
+    <li><span class="modal-dot"></span>Creación de portafolio de inversión en Bolsa (gestión pasiva)</li>
+    <li><span class="modal-dot"></span>Apertura de cuenta y seguimiento del portafolio</li>
+  </ul>
+  <a href="https://www.instagram.com/olger.diaze" target="_blank" class="modal-cta">Aplicar al programa →</a>
+</div>
+
+<div class="modal" id="modal-pareja">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <div class="tile-icon icon-teal" style="margin-bottom:16px; font-size:22px;">💑</div>
+  <h2 class="modal-title">Finanzas en Pareja</h2>
+  <div class="modal-divider"></div>
+  <ul class="modal-list">
+    <li><span class="modal-dot"></span>Implementación completa del Sistema GEM para dos personas</li>
+    <li><span class="modal-dot"></span>Finanzas compartidas y metas de pareja</li>
+    <li><span class="modal-dot"></span>Cuentas de inversión en conjunto o individuales</li>
+    <li><span class="modal-dot"></span>Acompañamiento personalizado para ambos</li>
+  </ul>
+  <a href="https://www.instagram.com/olger.diaze" target="_blank" class="modal-cta">Aplicar al programa →</a>
+</div>
+
+<!-- TABS -->
+<section class="tabs-section" id="tabs">
+  <div class="tabs-inner">
+
+    <!-- RECURSOS -->
+    <div id="tab-recursos">
+      <div class="recursos-grid">
+
+        <div class="recurso-card">
+          <span class="rec-tag tag-live">Disponible</span>
+          <h4>Perfil de Riesgo de Inversionista</h4>
+          <p>Descubrí si sos conservador, moderado o agresivo antes de invertir un solo dólar. 5 minutos.</p>
+          <a href="perfil-riesgo.html" class="rec-link">Hacer el cuestionario →</a>
+        </div>
+
+
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer-wrap">
+  <footer>
+    <div class="footer-content">
+      <div class="footer-top">
+        <div class="footer-copy">
+          <strong>Olger Díaz</strong> · Método GEM · Costa Rica
+        </div>
+        <div class="footer-links">
+          <a href="https://www.instagram.com/olger.diaze" target="_blank">Instagram</a>
+          <a href="https://www.linkedin.com/in/olger-d%C3%ADaz-espinoza-2ab31b174/" target="_blank">LinkedIn</a>
+          <a href="https://www.youtube.com/@olgerdiaze" target="_blank">YouTube</a>
+        </div>
+      </div>
+      <div class="disclosure">
+        <strong>Aviso Legal:</strong> Todo el contenido publicado por Olger Díaz — Método GEM tiene fines exclusivamente educativos e informativos. No constituye asesoramiento financiero, de inversión ni recomendación individual de ningún tipo. Cada persona es responsable de sus propias decisiones financieras. Olger Díaz no asume responsabilidad por decisiones tomadas a partir de este contenido. Si deseás orientación personalizada, podés aplicar a uno de los programas de acompañamiento.
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  function openModal(id) {
+    document.getElementById('modal-overlay').classList.add('active');
+    document.getElementById('modal-' + id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function openTab(id) {
+    setTimeout(() => document.getElementById('tabs').scrollIntoView({ behavior: 'smooth' }), 10);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

@@ -960,10 +960,10 @@
                 plazoMeses
             };
             
-            mostrarResultados(resultados);
+            mostrarResultados(resultados, idMenorCuota, idMasEstable);
         }
 
-        function mostrarResultados(resultados) {
+        function mostrarResultados(resultados, idMenorCuota, idMasEstable) {
             const container = document.getElementById('resultadosContainer');
             
             if (resultados.length === 0) {

@@ -843,6 +843,7 @@
         }
 
         function ejecutarCalculo() {
+          try {
             const valorPropiedad = parseFloat(document.getElementById('valorPropiedad').value);
             const prima = parseFloat(document.getElementById('prima').value);
             const plazo = parseInt(document.getElementById('plazo').value);
@@ -855,7 +856,7 @@
             ENTIDADES.forEach(entidad => {
                 const opciones = monedaActual === 'colones' ? entidad.tasasColones : entidad.tasasDolares;
                 
-                if (opciones.length === 0) return;
+                if (!opciones || opciones.length === 0) return;
                 
                 // Validar plazo máximo para BCR en dólares (25 años = 300 meses)
                 if (entidad.id === 'bcr' && monedaActual === 'dolares' && plazoMeses > 300) {
@@ -945,6 +946,11 @@
             // Ordenar por score combinado
             resultados.sort((a, b) => a.mejorOpcion.scoreFinal - b.mejorOpcion.scoreFinal);
 
+            if (resultados.length === 0) {
+                mostrarResultados([], null, null);
+                return;
+            }
+
             // Identificar ganador por menor cuota y por mayor estabilidad por separado
             const idMenorCuota = resultados.reduce((min, r) => 
                 r.mejorOpcion.cuotaConSeguros < min.mejorOpcion.cuotaConSeguros ? r : min
@@ -961,6 +967,12 @@
             };
             
             mostrarResultados(resultados, idMenorCuota, idMasEstable);
+          } catch(err) {
+            console.error('Error en ejecutarCalculo:', err);
+            const container = document.getElementById('resultadosContainer');
+            container.innerHTML = '<div style="padding:2rem;color:#f87171;">Error al calcular: ' + err.message + '</div>';
+            document.getElementById('resultadosSection').classList.remove('hidden');
+          }
         }
 
         function mostrarResultados(resultados, idMenorCuota, idMasEstable) {

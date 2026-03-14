@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descubre Tu Perfil de Inversionista | Método GEM · Olger Díaz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1E2A38;
+    --navy-mid: #263444;
+    --blue: #3A7FCC;
+    --blue-light: #5A9FE0;
+    --gold: #2D3F52;
+    --gold-light: #4A90D9;
+    --cream: #F0F4F8;
+    --cream-dark: #E2EAF2;
+    --white: #FFFFFF;
+    --text-main: #1E2A38;
+    --text-muted: #5A6A7E;
+    --green: #1A7A4A;
+    --green-light: #D4EDDA;
+    --orange: #C45E00;
+    --orange-light: #FDE8CC;
+    --red: #8B1A1A;
+    --red-light: #FADCDC;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+  }
+  .bg-canvas::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%, #2A4A6B 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, #1A2D42 0%, transparent 60%),
+                var(--navy);
+  }
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .bg-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: 0.15; pointer-events: none;
+  }
+  .bg-orb-1 { width: 500px; height: 500px; background: #3A7FCC; top: -100px; right: -100px; animation: drift 12s ease-in-out infinite; }
+  .bg-orb-2 { width: 400px; height: 400px; background: #2D5A8C; bottom: -100px; left: -100px; animation: drift 16s ease-in-out infinite reverse; }
+  @keyframes drift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+
+  /* ── LAYOUT ── */
+  .container { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── HEADER ── */
+  header {
+    padding: 26px 0 0;
+    display: flex;
+    justify-content: center;
+  }
+  .header-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+  .logo-text {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: rgba(255,255,255,0.82);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 60px 0 40px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(58, 127, 204, 0.15);
+    border: 1px solid rgba(58, 127, 204, 0.35);
+    border-radius: 100px; padding: 6px 14px;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.08em;
+    color: #7DBDF0; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #7DBDF0; animation: pulse 2s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.1; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  h1 span { color: #7DBDF0; }
+
+  .hero-sub {
+    font-size: 17px; font-weight: 300; color: rgba(255,255,255,0.65);
+    line-height: 1.7; max-width: 560px; margin-bottom: 36px;
+  }
+
+  .hero-stats {
+    display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 48px;
+  }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-num { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 24px; color: #7DBDF0; }
+  .stat-label { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.04em; }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin-bottom: 32px; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; letter-spacing: 0.04em;
+  }
+  .progress-track {
+    height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, #3A7FCC, #7DBDF0);
+    border-radius: 2px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* ── QUIZ CARD ── */
+  .quiz-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 40px;
+    backdrop-filter: blur(20px);
+    animation: fadeUp 0.6s ease both;
+    margin-bottom: 24px;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .question-num {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #7DBDF0; font-weight: 600; margin-bottom: 12px;
+  }
+  .question-text {
+    font-family: 'Nunito', sans-serif; font-weight: 600;
+    font-size: clamp(18px, 2.5vw, 22px); line-height: 1.4;
+    margin-bottom: 28px; color: var(--white);
+  }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+  }
+  .option:hover {
+    border-color: rgba(58,127,204,0.6);
+    background: rgba(58,127,204,0.08);
+    transform: translateX(4px);
+  }
+  .option.selected {
+    border-color: #5A9FE0;
+    background: rgba(58,127,204,0.14);
+  }
+  .option-marker {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 11px; font-weight: 700; color: transparent;
+  }
+  .option.selected .option-marker {
+    background: #3A7FCC; border-color: #3A7FCC; color: var(--white);
+  }
+  .option-text { font-size: 15px; line-height: 1.5; color: rgba(255,255,255,0.8); }
+  .option.selected .option-text { color: var(--white); }
+
+  /* ── NAVIGATION ── */
+  .nav-row {
+    display: flex; gap: 12px; margin-top: 28px;
+  }
+  .btn {
+    font-family: 'Nunito', sans-serif; font-weight: 600;
+    font-size: 15px; letter-spacing: 0.02em;
+    padding: 14px 28px; border-radius: 10px;
+    cursor: pointer; border: none; transition: all 0.2s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #3A7FCC, #5A9FE0);
+    color: var(--white); flex: 1; justify-content: center;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(58,127,204,0.35); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost {
+    background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.12); color: white; }
+
+  /* ── EMAIL GATE ── */
+  .email-gate { animation: fadeUp 0.5s ease both; }
+  .email-gate h2 {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 26px;
+    margin-bottom: 10px;
+  }
+  .email-gate p { color: rgba(255,255,255,0.6); font-size: 15px; margin-bottom: 24px; line-height: 1.6; }
+  .input-group { display: flex; flex-direction: column; gap: 10px; }
+  .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .field-wrap { flex: 1; min-width: 200px; }
+  input[type="text"], input[type="email"] {
+    width: 100%; padding: 14px 18px;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 10px; color: white; font-size: 15px;
+    font-family: 'Open Sans', sans-serif;
+    outline: none; transition: border-color 0.2s;
+  }
+  input::placeholder { color: rgba(255,255,255,0.3); }
+  input:focus { border-color: var(--gold); background: rgba(255,255,255,0.09); }
+  .privacy-note {
+    font-size: 12px; color: rgba(255,255,255,0.35); display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ── RESULT ── */
+  .result-wrap { animation: fadeUp 0.6s ease both; }
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 20px; border-radius: 100px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .result-title {
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: clamp(28px, 4vw, 40px); line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .result-desc {
+    font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.7);
+    max-width: 580px; margin-bottom: 32px;
+  }
+  .result-traits {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin-bottom: 32px;
+  }
+  .trait-card {
+    padding: 16px 20px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+  }
+  .trait-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+  .trait-value { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 16px; }
+
+  .score-bar-wrap { margin-bottom: 32px; }
+  .score-bar-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+  .score-bar-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s; width: 0; }
+
+  .cta-section { display: flex; flex-direction: column; gap: 12px; }
+  .btn-whatsapp {
+    background: #25D366; color: white;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+    font-size: 16px; padding: 18px 28px;
+    border-radius: 12px; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.2s ease; text-decoration: none;
+  }
+  .btn-whatsapp:hover { background: #1ebe5a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
+  .btn-calendar {
+    background: rgba(255,255,255,0.08); color: white;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    font-family: 'Nunito', sans-serif; font-weight: 600;
+    font-size: 15px; padding: 16px 28px;
+    border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.2s ease; text-decoration: none;
+  }
+  .btn-calendar:hover { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.3); }
+
+  .restart-link {
+    text-align: center; margin-top: 16px;
+    font-size: 13px; color: rgba(255,255,255,0.35); cursor: pointer;
+    transition: color 0.2s;
+  }
+  .restart-link:hover { color: rgba(255,255,255,0.6); text-decoration: underline; }
+
+  /* ── MENTOR FOOTER ── */
+  .mentor-bar {
+    margin: 40px 0;
+    padding: 22px 26px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.035));
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 24px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  }
+  .mentor-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .mentor-kicker {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(125,189,240,0.85);
+    font-weight: 600;
+  }
+  .mentor-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 21px;
+    color: rgba(255,255,255,0.95);
+  }
+  .mentor-role {
+    font-size: 14px;
+    color: rgba(255,255,255,0.52);
+    margin-top: 2px;
+  }
+
+  .disclosure {
+    margin: 0 0 32px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .disclosure-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; opacity: 0.7; }
+  .disclosure-text {
+    font-size: 11.5px; line-height: 1.6;
+    color: rgba(255,255,255,0.38);
+    font-style: italic;
+  }
+  .disclosure-text strong { color: rgba(255,255,255,0.55); font-style: normal; }
+
+  /* ── UTILS ── */
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeUp 0.5s ease both; }
+
+  @media (max-width: 600px) {
+    .quiz-card { padding: 24px 20px; }
+    .hero { padding: 40px 0 24px; }
+    .btn { padding: 13px 20px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+</div>
+
+<div class="container">
+  <header>
+    <div class="header-chip">
+      <span class="logo-text">Método GEM · Olger Díaz</span>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="eyebrow"><span class="eyebrow-dot"></span>Test gratuito · 3 minutos</div>
+    <h1>Descubre tu <span>perfil de<br>inversionista</span></h1>
+    <p class="hero-sub">Un cuestionario diseñado para profesionales que quieren invertir en Bolsa con claridad — sin adivinar cuánto riesgo pueden asumir.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label">Preguntas clave</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Perfiles posibles</span></div>
+      <div class="stat"><span class="stat-num">~3</span><span class="stat-label">Minutos</span></div>
+    </div>
+    <button class="btn btn-primary" onclick="startQuiz()" style="max-width:280px">
+      Comenzar ahora →
+    </button>
+  </section>
+
+  <!-- QUIZ SECTION -->
+  <section id="quizSection" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progressText">Pregunta 1 de 10</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="quiz-card" id="questionCard">
+      <div class="question-num" id="questionNum">PREGUNTA 01</div>
+      <div class="question-text" id="questionText"></div>
+      <div class="options" id="optionsContainer"></div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="btnBack" onclick="prevQuestion()" style="width:100px">← Atrás</button>
+        <button class="btn btn-primary" id="btnNext" onclick="nextQuestion()" disabled>Siguiente →</button>
+      </div>
+    </div>
+    <div class="disclosure">
+      <span class="disclosure-icon">⚠️</span>
+      <p class="disclosure-text"><strong>Aviso importante:</strong> Este test fue desarrollado con apoyo de inteligencia artificial y tiene un propósito exclusivamente educativo. Los resultados no constituyen una recomendación financiera personalizada ni una indicación de inversión de parte de Olger Díaz o Método GEM. Invertir en mercados financieros implica riesgos, incluyendo la posible pérdida del capital invertido. Olger Díaz no se hace responsable por las decisiones financieras que tome el usuario a partir de este test.</p>
+    </div>
+  </section>
+
+  <!-- NETLIFY FORM (hidden - captures leads silently) -->
+  <form name="perfil-inversionista" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="nombre" />
+    <input type="email" name="email" />
+    <input type="text" name="perfil" />
+    <input type="text" name="puntuacion" />
+    <input name="bot-field" />
+  </form>
+
+  <!-- EMAIL GATE -->
+  <section id="emailSection" class="hidden">
+    <div class="quiz-card email-gate">
+      <div class="question-num">ÚLTIMO PASO</div>
+      <h2>¡Su perfil está listo!</h2>
+      <p>Ingrese su nombre y correo para ver su resultado personalizado. También recibirá recursos gratuitos de inversión para su perfil.</p>
+      <div class="input-group">
+        <div class="input-row">
+          <div class="field-wrap">
+            <input type="text" id="inputName" placeholder="Su nombre" />
+          </div>
+          <div class="field-wrap">
+            <input type="email" id="inputEmail" placeholder="Su correo electrónico" />
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="showResult()" style="justify-content:center">
+          Ver mi perfil de inversionista →
+        </button>
+        <p class="privacy-note">🔒 Su información es privada. Sin spam, solo contenido de valor.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT SECTION -->
+  <section id="resultSection" class="hidden">
+    <div class="quiz-card result-wrap" id="resultCard">
+      <!-- filled dynamically -->
+    </div>
+    <div class="disclosure">
+      <span class="disclosure-icon">⚠️</span>
+      <p class="disclosure-text"><strong>Aviso importante:</strong> Este test fue desarrollado con apoyo de inteligencia artificial y tiene un propósito exclusivamente educativo. Los resultados no constituyen una recomendación financiera personalizada ni una indicación de inversión de parte de Olger Díaz o Método GEM. Invertir en mercados financieros implica riesgos, incluyendo la posible pérdida del capital invertido. Olger Díaz no se hace responsable por las decisiones financieras que tome el usuario a partir de este test.</p>
+    </div>
+    <p class="restart-link" onclick="restartQuiz()">← Hacer el test de nuevo</p>
+  </section>
+
+  <!-- MENTOR BAR -->
+  <div class="mentor-bar" id="mentorBar">
+    <div class="mentor-content">
+      <div class="mentor-kicker">Método GEM</div>
+      <div class="mentor-name">Olger Díaz</div>
+      <div class="mentor-role">Mentor Financiero · +50 clientes activos en Costa Rica</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIGURATION ── (cambia estos valores)
+const CONFIG = {
+  whatsappNumber: "50689797481",
+  calendarLink: "https://calendly.com/finanzasconolger/30min",
+  mentorName: "Olger Díaz",
+};
+
+// ── QUESTIONS ──────────────────────────────────────────────────────
+const questions = [
+  {
+    text: "¿Cuál es su principal objetivo al invertir?",
+    options: [
+      { text: "Proteger mi dinero de la inflación, aunque el rendimiento sea bajo.", score: 1 },
+      { text: "Hacer crecer mi dinero de forma constante, con riesgo moderado.", score: 2 },
+      { text: "Maximizar el crecimiento a largo plazo, aunque haya altibajos.", score: 3 },
+    ]
+  },
+  {
+    text: "Si su portafolio cae un 20% en un mes por volatilidad del mercado, ¿qué hace?",
+    options: [
+      { text: "Vendo todo o parte. Me preocupa demasiado ver mi dinero bajar.", score: 1 },
+      { text: "Me preocupa, pero espero a que se recupere sin tomar acción.", score: 2 },
+      { text: "Veo una oportunidad y compro más a precio bajo.", score: 3 },
+    ]
+  },
+  {
+    text: "¿En cuánto tiempo planea necesitar el dinero que va a invertir?",
+    options: [
+      { text: "Menos de 2 años — podría necesitarlo pronto.", score: 1 },
+      { text: "Entre 3 y 7 años — mediano plazo.", score: 2 },
+      { text: "De 10 años o más — es una inversión de largo plazo en Bolsa.", score: 3 },
+    ]
+  },
+  {
+    text: "¿Cuánto de sus ingresos mensuales podría destinar a inversiones sin afectar su estabilidad?",
+    options: [
+      { text: "Menos del 10% — mis gastos son ajustados.", score: 1 },
+      { text: "Entre 10% y 25% — tengo algo de margen.", score: 2 },
+      { text: "Más del 25% — tengo ingresos estables y gastos controlados.", score: 3 },
+    ]
+  },
+  {
+    text: "¿Tiene ya un fondo de emergencia equivalente a 3–6 meses de gastos?",
+    options: [
+      { text: "No, todavía no tengo ese colchón.", score: 1 },
+      { text: "Tengo algo, pero no cubre los 3 meses completos.", score: 2 },
+      { text: "Sí, tengo mi fondo de emergencia completamente formado.", score: 3 },
+    ]
+  },
+  {
+    text: "¿Cuál es su situación actual con deudas de consumo (tarjetas, préstamos personales)?",
+    options: [
+      { text: "Tengo deudas activas que me generan intereses altos.", score: 1 },
+      { text: "Tengo alguna deuda pero con tasas bajas y bajo control.", score: 2 },
+      { text: "No tengo deudas de consumo.", score: 3 },
+    ]
+  },
+  {
+    text: "¿Qué tan familiarizado/a está con instrumentos como ETFs, acciones, CDPs o fondos de índice?",
+    options: [
+      { text: "Poco o nada — me suena el tema pero nunca he invertido.", score: 1 },
+      { text: "Conozco los conceptos básicos y he tenido alguna experiencia.", score: 2 },
+      { text: "Tengo conocimiento sólido y ya manejo o he manejado un portafolio.", score: 3 },
+    ]
+  },
+  {
+    text: "Imagina dos opciones: la A da 6% anual con poca variación; la B puede dar entre -10% y +30% según el año. ¿Cuál elige?",
+    options: [
+      { text: "La opción A sin duda — prefiero la estabilidad.", score: 1 },
+      { text: "Una mezcla de ambas — algo de estabilidad y algo de crecimiento.", score: 2 },
+      { text: "La opción B — entiendo la volatilidad y busco mayor retorno.", score: 3 },
+    ]
+  },
+  {
+    text: "Cuando piensa en invertir en Bolsa, ¿qué tipo de estrategia le atrae más?",
+    options: [
+      { text: "Inversión pasiva: fondos de índice o ETFs que siguen el mercado automáticamente, sin gestión activa.", score: 1 },
+      { text: "Una combinación de inversión pasiva con algo de inversión activa selectiva.", score: 2 },
+      { text: "Inversión activa: selección directa de acciones, ETFs temáticos y manejo propio del portafolio.", score: 3 },
+    ]
+  },
+  {
+    text: "¿Cómo describiría su situación financiera actual fuera de las inversiones?",
+    options: [
+      { text: "Estoy trabajando en ordenar mis finanzas — presupuesto, ahorros y gastos.", score: 1 },
+      { text: "Tengo orden básico pero me falta optimizar mi sistema financiero completo.", score: 2 },
+      { text: "Mis finanzas personales están ordenadas y tengo claridad sobre mis ingresos, gastos y ahorro.", score: 3 },
+    ]
+  },
+];
+
+// ── PROFILES ───────────────────────────────────────────────────────
+const profiles = {
+  cimientos: {
+    label: "Cimientos",
+    emoji: "🏗️",
+    badgeColor: "#5B2D8E",
+    badgeBg: "rgba(91,45,142,0.25)",
+    accentColor: "#A78BFA",
+    scoreRange: "Perfil especial",
+    traits: [
+      { label: "Prioridad #1", value: "Ordenar finanzas" },
+      { label: "Prioridad #2", value: "Salir de deudas" },
+      { label: "Enfoque", value: "Base financiera sólida" },
+      { label: "Próximo paso", value: "Diagnóstico gratuito" },
+    ],
+    description: "Antes de hablar de inversiones, hay algo más urgente: construir la base. Sus respuestas indican que tiene deudas activas o que su sistema financiero aún está en proceso — y eso es completamente normal. La mayoría de profesionales llegan aquí en la misma situación.",
+    recommendation: "Invertir sin orden financiero es como construir sobre arena. El primer paso no es elegir una plataforma de inversión — es instalar el sistema que le va a permitir invertir con tranquilidad y consistencia. Eso es exactamente lo que hacemos juntos en el Método GEM desde el inicio.",
+  },
+  conservador: {
+    label: "Conservador",
+    emoji: "🛡️",
+    badgeColor: "#1A5C3A",
+    badgeBg: "rgba(26,92,58,0.25)",
+    accentColor: "#4CAF82",
+    scoreRange: "10–16 puntos",
+    traits: [
+      { label: "Tolerancia al riesgo", value: "Baja" },
+      { label: "Horizonte ideal", value: "2–7 años" },
+      { label: "Enfoque", value: "Protección del capital" },
+      { label: "Estrategia", value: "Inversión pasiva" },
+    ],
+    description: "Su prioridad es la seguridad y la estabilidad. Prefiere rendimientos moderados con poco riesgo antes que grandes ganancias con incertidumbre. Esto es completamente válido — la clave está en construir primero una base financiera sólida (presupuesto, fondo de emergencia, cero deudas) antes de enfocarse en invertir.",
+    recommendation: "El primer paso es instalar un sistema financiero completo. Con orden y un fondo de emergencia formado, puede empezar a invertir con confianza en instrumentos de bajo riesgo: ETFs de renta fija, estrategias de inversión pasiva con baja volatilidad y vehículos de ahorro a corto plazo.",
+  },
+  moderado: {
+    label: "Moderado",
+    emoji: "⚖️",
+    badgeColor: "#1A4A8C",
+    badgeBg: "rgba(26,74,140,0.25)",
+    accentColor: "#5BA3F5",
+    scoreRange: "17–23 puntos",
+    traits: [
+      { label: "Tolerancia al riesgo", value: "Media" },
+      { label: "Horizonte ideal", value: "10+ años" },
+      { label: "Enfoque", value: "Crecimiento balanceado" },
+      { label: "Estrategia", value: "Pasiva + algo activa" },
+    ],
+    description: "Busca un balance entre seguridad y crecimiento. Entiende que el mercado fluctúa y está dispuesto/a a asumir riesgo moderado a cambio de mejores rendimientos a largo plazo. Tiene buenas bases financieras o está en proceso de construirlas.",
+    recommendation: "Para su perfil, una estrategia de largo plazo (10 años o más) en inversión pasiva mediante ETFs de índice global funciona muy bien, complementada con algo de gestión activa selectiva. El siguiente paso es estructurar su estrategia y definir su asignación de activos.",
+  },
+  agresivo: {
+    label: "Agresivo",
+    emoji: "🚀",
+    badgeColor: "#7A3C00",
+    badgeBg: "rgba(122,60,0,0.25)",
+    accentColor: "#F5A623",
+    scoreRange: "24–30 puntos",
+    traits: [
+      { label: "Tolerancia al riesgo", value: "Alta" },
+      { label: "Horizonte ideal", value: "10+ años" },
+      { label: "Enfoque", value: "Máximo crecimiento" },
+      { label: "Estrategia", value: "Activa + pasiva" },
+    ],
+    description: "Tiene una base financiera sólida, ingresos estables y un horizonte de largo plazo. Entiende la volatilidad como parte del proceso y busca maximizar el crecimiento de su patrimonio con estrategias activas. Está listo/a para portafolios de alta exposición al mercado de acciones y activos alternativos.",
+    recommendation: "Su portafolio puede tener mayor exposición a acciones de crecimiento, ETFs temáticos y estrategias de inversión activa. Dado su perfil, también puede considerar una pequeña exposición a criptomonedas como activo alternativo de alto riesgo/retorno. La disciplina y un plan claro son la clave para no reaccionar emocionalmente ante la volatilidad.",
+  },
+};
+
+// ── STATE ──────────────────────────────────────────────────────────
+let currentQ = 0;
+let answers = [];
+let selectedOption = null;
+
+// ── FUNCTIONS ──────────────────────────────────────────────────────
+function startQuiz() {
+  document.getElementById('heroSection').classList.add('hidden');
+  document.getElementById('quizSection').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('questionNum').textContent = `PREGUNTA ${String(currentQ+1).padStart(2,'0')}`;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('progressText').textContent = `Pregunta ${currentQ+1} de ${questions.length}`;
+  const pct = Math.round((currentQ / questions.length) * 100);
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('btnBack').style.display = currentQ === 0 ? 'none' : '';
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  selectedOption = answers[currentQ] !== undefined ? answers[currentQ] : null;
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('button');
+    div.className = 'option' + (selectedOption === i ? ' selected' : '');
+    div.innerHTML = `
+      <div class="option-marker">${selectedOption === i ? '✓' : ''}</div>
+      <div class="option-text">${opt.text}</div>
+    `;
+    div.onclick = () => selectOption(i);
+    container.appendChild(div);
+  });
+
+  document.getElementById('btnNext').disabled = selectedOption === null;
+
+  // Animate card
+  const card = document.getElementById('questionCard');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'fadeUp 0.4s ease both';
+}
+
+function selectOption(i) {
+  selectedOption = i;
+  answers[currentQ] = i;
+  document.querySelectorAll('.option').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+    el.querySelector('.option-marker').textContent = idx === i ? '✓' : '';
+  });
+  document.getElementById('btnNext').disabled = false;
+}
+
+function nextQuestion() {
+  if (selectedOption === null) return;
+  if (currentQ < questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showEmailGate();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+function showEmailGate() {
+  document.getElementById('quizSection').classList.add('hidden');
+  document.getElementById('emailSection').classList.remove('hidden');
+  // Update progress to 100%
+  document.getElementById('progressFill').style.width = '100%';
+}
+
+function calcScore() {
+  return answers.reduce((sum, answerIdx, qIdx) => {
+    return sum + questions[qIdx].options[answerIdx].score;
+  }, 0);
+}
+
+function getProfile(score) {
+  // Perfil Cimientos: se activa si tiene deudas activas (P6, opción 0)
+  // O si no tiene orden financiero (P10, opción 0) — cualquiera de las dos
+  const tieneDeudas = answers[5] === 0;
+  const sinOrden = answers[9] === 0;
+  if (tieneDeudas || sinOrden) return profiles.cimientos;
+
+  if (score <= 16) return profiles.conservador;
+  if (score <= 23) return profiles.moderado;
+  return profiles.agresivo;
+}
+
+function showResult() {
+  const name = document.getElementById('inputName').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  if (!name || !email || !email.includes('@')) {
+    alert('Por favor ingrese su nombre y correo válido.');
+    return;
+  }
+
+  const score = calcScore();
+  const profile = getProfile(score);
+  const scorePct = Math.round(((score - 10) / 20) * 100);
+  const isCimientos = profile === profiles.cimientos;
+
+  // ── Submit to Formspree ──
+  // REEMPLAZÁ 'YOUR_FORM_ID' con tu ID de Formspree (gratis en formspree.io)
+  fetch('https://formspree.io/f/xlgpwdde', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre: name, email: email, perfil: profile.label, puntuacion: isCimientos ? 'Perfil especial' : `${score}/30` })
+  }).catch(() => {});
+  // ─────────────────────────────────────
+
+  document.getElementById('emailSection').classList.add('hidden');
+  document.getElementById('resultSection').classList.remove('hidden');
+
+  const waMsgText = encodeURIComponent(`Hola Olger, acabo de hacer el test de perfil de inversionista y obtuve el perfil ${profile.label}. Me gustaría agendar una llamada de diagnóstico gratuita.`);
+  const waLink = `https://wa.me/${CONFIG.whatsappNumber}?text=${waMsgText}`;
+
+  const ctaHTML = isCimientos ? `
+    <div class="cta-section">
+      <a class="btn-calendar" href="${CONFIG.calendarLink}" target="_blank" style="background:linear-gradient(135deg,#5B2D8E,#7C3AED);border:none;color:white;font-size:16px;padding:18px 28px;">
+        📅 Agendar mi llamada de diagnóstico gratuita
+      </a>
+      <a class="btn-whatsapp" href="${waLink}" target="_blank">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        También puede escribirme por WhatsApp
+      </a>
+    </div>
+  ` : `
+    <div class="cta-section">
+      <a class="btn-whatsapp" href="${waLink}" target="_blank">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Escribirme por WhatsApp
+      </a>
+      <a class="btn-calendar" href="${CONFIG.calendarLink}" target="_blank">
+        📅 Agendar llamada de diagnóstico gratuita
+      </a>
+    </div>
+  `;
+
+  const card = document.getElementById('resultCard');
+  card.innerHTML = `
+    <div class="result-wrap">
+      <div class="result-badge" style="background:${profile.badgeBg};color:${profile.accentColor};border:1px solid ${profile.accentColor}40">
+        ${profile.emoji} Perfil ${profile.label}
+      </div>
+      <div class="result-title">
+        ${isCimientos
+          ? `${name}, su próximo paso<br>es construir sus <span style="color:${profile.accentColor}">Cimientos financieros</span>`
+          : `${name}, usted es un<br><span style="color:${profile.accentColor}">inversionista ${profile.label}</span>`
+        }
+      </div>
+      <p class="result-desc">${profile.description}</p>
+
+      <div class="score-bar-wrap">
+        <div class="score-bar-label">Su puntuación: ${score}/30 · ${profile.scoreRange}</div>
+        <div class="score-bar-track">
+          <div class="score-bar-fill" id="scoreBarFill" style="background:linear-gradient(90deg,${profile.badgeColor},${profile.accentColor})"></div>
+        </div>
+      </div>
+
+      <div class="result-traits">
+        ${profile.traits.map(t => `
+          <div class="trait-card">
+            <div class="trait-label">${t.label}</div>
+            <div class="trait-value" style="color:${profile.accentColor}">${t.value}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:28px">
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:${profile.accentColor};font-weight:600;margin-bottom:8px">¿Qué sigue para usted?</div>
+        <p style="font-size:14px;line-height:1.7;color:rgba(255,255,255,0.65)">${profile.recommendation}</p>
+      </div>
+
+      ${ctaHTML}
+    </div>
+  `;
+
+  // Animate score bar
+  setTimeout(() => {
+    const fill = document.getElementById('scoreBarFill');
+    if (fill) fill.style.width = Math.max(scorePct, 10) + '%';
+  }, 100);
+}
+
+function restartQuiz() {
+  currentQ = 0; answers = []; selectedOption = null;
+  document.getElementById('resultSection').classList.add('hidden');
+  document.getElementById('heroSection').classList.remove('hidden');
+  document.getElementById('progressFill').style.width = '0%';
+}
+</script>
+</body>
+</html>

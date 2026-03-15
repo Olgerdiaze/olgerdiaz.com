@@ -446,18 +446,29 @@
                         <span>30 años</span>
                     </div>
                 </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Ingreso mensual líquido <span style="font-weight:400; color:#94a3b8;">(opcional — para calcular tu capacidad de pago)</span></label>
+                    <input type="number" id="ingresoMensual" placeholder="Ej: 2500000" min="0" step="100000" oninput="actualizarResumen()">
+                    <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.375rem;">Tu ingreso <strong>no se guarda ni se reporta</strong> — solo se usa para el cálculo en pantalla.</p>
+                </div>
             </div>
 
             <div class="summary-box">
                 <div class="grid grid-2">
                     <div>
                         <p style="color: #94a3b8; font-size: 0.875rem;">Monto a financiar</p>
-                        <p style="font-size: 1.5rem; font-weight: 700; color: #6AABD6;" class="mono" id="montoFinanciar"></p>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #6AABD6;" class="mono" id="montoFinanciar">—</p>
                     </div>
                     <div>
                         <p style="color: #94a3b8; font-size: 0.875rem;">Prima a pagar</p>
-                        <p style="font-size: 1.5rem; font-weight: 700; color: #22c55e;" class="mono" id="primaPagar"></p>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #22c55e;" class="mono" id="primaPagar">—</p>
                     </div>
+                </div>
+                <div id="capacidadBox" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.08);">
+                    <p style="color:#94a3b8; font-size:0.875rem; margin-bottom:0.25rem;">Cuota máxima recomendada (30% de tu ingreso)</p>
+                    <p style="font-size:1.5rem; font-weight:700;" class="mono" id="cuotaMaxima">—</p>
+                    <p style="font-size:0.8125rem; margin-top:0.375rem;" id="capacidadMensaje"></p>
                 </div>
             </div>
 
@@ -756,21 +767,50 @@
         function actualizarResumen() {
             const valorPropiedad = parseFloat(document.getElementById('valorPropiedad').value);
             const prima = parseFloat(document.getElementById('prima').value);
+            const ingreso = parseFloat(document.getElementById('ingresoMensual').value);
             
             if (!valorPropiedad || isNaN(valorPropiedad)) {
                 document.getElementById('valorPropiedadDisplay').textContent = 'Ingresá el valor de la propiedad para comenzar';
+                document.getElementById('valorPropiedadDisplay').style.color = '#94a3b8';
                 document.getElementById('montoFinanciar').textContent = '—';
                 document.getElementById('primaPagar').textContent = '—';
+                document.getElementById('capacidadBox').style.display = 'none';
                 return;
             }
             
             document.getElementById('valorPropiedadDisplay').textContent = formatearMoneda(valorPropiedad);
+            document.getElementById('valorPropiedadDisplay').style.color = '#94a3b8';
             
             const montoFinanciar = valorPropiedad * (1 - prima / 100);
             const primaPagar = valorPropiedad * prima / 100;
             
             document.getElementById('montoFinanciar').textContent = formatearMoneda(montoFinanciar);
             document.getElementById('primaPagar').textContent = formatearMoneda(primaPagar);
+
+            // Capacidad de pago (30%)
+            if (ingreso && !isNaN(ingreso) && ingreso > 0) {
+                const cuotaMax = ingreso * 0.30;
+                document.getElementById('capacidadBox').style.display = 'block';
+                document.getElementById('cuotaMaxima').textContent = formatearMoneda(cuotaMax);
+
+                // Estimación rápida con tasa promedio 8.5% a 20 años para orientación
+                const tasaRef = 8.5 / 100 / 12;
+                const mesesRef = 240;
+                const cuotaEstimada = montoFinanciar * (tasaRef * Math.pow(1 + tasaRef, mesesRef)) / (Math.pow(1 + tasaRef, mesesRef) - 1);
+
+                const msgEl = document.getElementById('capacidadMensaje');
+                if (cuotaEstimada <= cuotaMax) {
+                    msgEl.textContent = '✅ Con tu ingreso, tu cuota estimada estaría dentro del límite recomendado del 30%.';
+                    msgEl.style.color = '#4ade80';
+                    document.getElementById('cuotaMaxima').style.color = '#4ade80';
+                } else {
+                    msgEl.textContent = '⚠️ La cuota estimada podría superar el 30% de tu ingreso. Considerá aumentar la prima o el plazo.';
+                    msgEl.style.color = '#f87171';
+                    document.getElementById('cuotaMaxima').style.color = '#f87171';
+                }
+            } else {
+                document.getElementById('capacidadBox').style.display = 'none';
+            }
         }
 
         function cambiarMoneda(moneda) {
@@ -1037,7 +1077,8 @@
             let html = `
                 <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
                     <p style="font-size: 0.8125rem; color: #fbbf24; line-height: 1.6;">
-                        <strong>⚠️ Importante:</strong> Estas estimaciones son únicamente de referencia, basadas en información recolectada durante la ExpoConstrucción 2026. Las condiciones pueden variar según el perfil del solicitante y cambios de cada entidad. Esto <strong>no constituye asesoría financiera</strong>. Consultá directamente con cada institución antes de tomar una decisión.
+                        <strong>⚠️ Importante:</strong> Estas estimaciones son únicamente de referencia, basadas en información recolectada durante la ExpoConstrucción 2026. Las condiciones pueden variar según el perfil del solicitante y cambios de cada entidad. Esto <strong>no constituye asesoría financiera</strong>. Consultá directamente con cada institución antes de tomar una decisión.<br><br>
+                        <strong>🔒 Privacidad:</strong> Los montos e ingresos que ingresás en esta calculadora <strong>no son recolectados ni almacenados</strong> por Olger Díaz. Los cálculos se hacen únicamente en tu pantalla.
                     </p>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
@@ -1129,6 +1170,22 @@
                                 </p>
                             </div>
                         </div>
+
+                        ${(() => {
+                            const ingreso = parseFloat(document.getElementById('ingresoMensual').value);
+                            if (!ingreso || isNaN(ingreso) || ingreso <= 0) return '';
+                            const cuotaMax = ingreso * 0.30;
+                            const cuotaTotal = mejorOpcion.cuotaFija + mejorOpcion.segurosMensuales;
+                            const pct = ((cuotaTotal / ingreso) * 100).toFixed(1);
+                            const ok = cuotaTotal <= cuotaMax;
+                            return `
+                                <div style="background:${ok ? 'rgba(74,222,128,0.08)' : 'rgba(239,68,68,0.08)'}; border:1px solid ${ok ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.3)'}; border-radius:0.5rem; padding:0.75rem 1rem; margin-bottom:1rem;">
+                                    <p style="font-size:0.8125rem; color:${ok ? '#4ade80' : '#f87171'}; line-height:1.5;">
+                                        ${ok ? '✅' : '⚠️'} Esta cuota representa el <strong>${pct}%</strong> de tu ingreso mensual.
+                                        ${ok ? 'Está dentro del límite recomendado del 30%.' : 'Supera el 30% recomendado — considerá aumentar la prima o el plazo.'}
+                                    </p>
+                                </div>`;
+                        })()}
                         
                         <div style="background: rgba(74, 143, 194, 0.1); border: 1px solid rgba(74, 143, 194, 0.2); border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 1rem;">
                             <p style="font-size: 0.8125rem; color: #A8CDE8; margin-bottom: 0.25rem; font-weight: 600;">

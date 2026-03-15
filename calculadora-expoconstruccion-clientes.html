@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora ExpoConstrucción 2026 - Método GEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1C2B38 0%, #2C3A47 50%, #1C2B38 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6AABD6 0%, #6AABD6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .branding {
+            border: 2px solid rgba(74, 143, 194, 0.3);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .card {
+            margin-bottom: 2rem;
+            padding: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            background: rgba(28, 43, 56, 0.5);
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4A8FC2;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(106, 171, 214, 0.2);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #6AABD6;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(106, 171, 214, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #6AABD6;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(106, 171, 214, 0.5);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-currency {
+            background: rgba(28, 43, 56, 0.5);
+            color: #94a3b8;
+        }
+
+        .btn-currency.active {
+            background: #4A8FC2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(74, 143, 194, 0.5);
+        }
+
+        .btn-primary {
+            background: #4A8FC2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2D6A96;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+
+        .summary-box {
+            background: rgba(74, 143, 194, 0.1);
+            border: 1px solid rgba(74, 143, 194, 0.3);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .resultado-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .resultado-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .resultado-card.mejor {
+            border: 2px solid rgba(34, 197, 94, 0.5);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);
+        }
+
+        .badge-mejor {
+            display: inline-block;
+            background: #22c55e;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-box {
+            background: rgba(28, 43, 56, 0.5);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: rgba(28, 43, 56, 0.5);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            color: #94a3b8;
+            font-weight: 600;
+            border-bottom: 1px solid #475569;
+        }
+
+        td {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        tr:hover {
+            background: rgba(28, 43, 56, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .contact-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            max-width: 800px;
+            margin: 2rem auto 0;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .contact-btn.whatsapp {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+        }
+
+        .contact-btn.whatsapp:hover {
+            background: linear-gradient(45deg, #d87e2e 0%, #ca5a34 25%, #c21f3a 50%, #b11d5b 75%, #a11477 100%);
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(188, 24, 136, 0.5);
+        }
+
+        .contact-btn.calendly {
+            background: #4A8FC2;
+            color: white;
+        }
+
+        .contact-btn.calendly:hover {
+            background: #2D6A96;
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(74, 143, 194, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .grid-2, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-list {
+            list-style: disc;
+            padding-left: 1.5rem;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .info-list li {
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+
+        .info-list li.highlight {
+            color: #A8CDE8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    <span class="gradient-text">🏗️ ExpoConstrucción 2026</span>
+                </h1>
+                <p style="color: #cbd5e1; font-size: 1.125rem;">Calculadora de Financiamientos - Condiciones Especiales</p>
+            </div>
+            <div class="glass branding">
+                <p style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.25rem;">Presentado por</p>
+                <p style="font-size: 1.5rem; font-weight: 700;" class="gradient-text">Método GEM</p>
+                <p style="font-size: 1.125rem; color: #6AABD6; font-weight: 600;">Olger Díaz</p>
+            </div>
+        </div>
+
+        <!-- Mensaje intro -->
+        <div class="glass card" style="margin-bottom: 1.5rem; border-left: 3px solid #4A8FC2;">
+            <div style="display:flex; gap:1rem; align-items:flex-start;">
+                <span style="font-size:1.75rem; flex-shrink:0;">👋</span>
+                <p style="font-size:0.9375rem; color:#cbd5e1; line-height:1.75;">
+                    Hice esta calculadora basada en la información que yo mismo recolecté el día que fui a la Expo. Claramente entiendo que las condiciones pueden variar y solamente sirve como un punto de referencia para simular escenarios. Para información válida de cada entidad financiera, lo mejor siempre será cotizar directamente con ellos.
+                </p>
+            </div>
+        </div>
+
+        <!-- Configuración -->
+        <div class="glass card">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">
+                🧮 Configura tu préstamo
+            </h2>
+
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label>Valor de la propiedad</label>
+                    <input type="number" id="valorPropiedad" placeholder="Ej: 50000000" min="1000000" step="1000000" oninput="actualizarResumen()">
+                    <p style="font-size: 0.875rem; color: #94a3b8; margin-top: 0.25rem;" id="valorPropiedadDisplay">Ingresá el valor de la propiedad para comenzar</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Moneda</label>
+                    <div class="btn-group">
+                        <button class="btn btn-currency active" onclick="cambiarMoneda('colones')">₡ Colones</button>
+                        <button class="btn btn-currency" onclick="cambiarMoneda('dolares')">$ Dólares</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Prima inicial: <span id="primaDisplay">10</span>%</label>
+                    <input type="range" id="prima" min="5" max="50" step="5" value="10" oninput="actualizarPrima()">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">
+                        <span>5%</span>
+                        <span>50%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Plazo: <span id="plazoDisplay">20</span> años (<span id="plazoMesesDisplay">240</span> meses)</label>
+                    <input type="range" id="plazo" min="10" max="30" step="5" value="20" oninput="actualizarPlazo()">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">
+                        <span>10 años</span>
+                        <span>15 años</span>
+                        <span>20 años</span>
+                        <span>25 años</span>
+                        <span>30 años</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Ingreso mensual líquido <span style="font-weight:400; color:#94a3b8;">(opcional — para calcular tu capacidad de pago)</span></label>
+                    <input type="number" id="ingresoMensual" placeholder="Ej: 2500000" min="0" step="100000" oninput="actualizarResumen()">
+                    <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.375rem;">Tu ingreso <strong>no se guarda ni se reporta</strong> — solo se usa para el cálculo en pantalla.</p>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <div class="grid grid-2">
+                    <div>
+                        <p style="color: #94a3b8; font-size: 0.875rem;">Monto a financiar</p>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #6AABD6;" class="mono" id="montoFinanciar">—</p>
+                    </div>
+                    <div>
+                        <p style="color: #94a3b8; font-size: 0.875rem;">Prima a pagar</p>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #22c55e;" class="mono" id="primaPagar">—</p>
+                    </div>
+                </div>
+                <div id="capacidadBox" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.08);">
+                    <p style="color:#94a3b8; font-size:0.875rem; margin-bottom:0.25rem;">Cuota máxima recomendada (30% de tu ingreso)</p>
+                    <p style="font-size:1.5rem; font-weight:700;" class="mono" id="cuotaMaxima">—</p>
+                    <p style="font-size:0.8125rem; margin-top:0.375rem;" id="capacidadMensaje"></p>
+                </div>
+            </div>
+
+            <div id="montoWarning" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:0.5rem; padding:0.75rem 1rem; margin-top:1rem;">
+                <p id="montoWarningMsg" style="font-size:0.8125rem; color:#f87171; line-height:1.5;"></p>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;" onclick="calcular()">
+                Calcular Comparativa
+            </button>
+        </div>
+
+        <!-- Resultados -->
+        <div id="resultadosSection" class="hidden">
+            <div class="glass card">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">
+                    📊 Comparativa de Entidades
+                </h2>
+                <div id="resultadosContainer"></div>
+            </div>
+        </div>
+
+        <!-- Tabla de Amortización -->
+        <div id="amortizacionSection" class="hidden">
+            <div class="glass card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 700;">
+                        💰 Tabla de Amortización - <span id="entidadAmortizacion"></span>
+                    </h2>
+                    <button class="btn" style="background: #475569;" onclick="cerrarAmortizacion()">Cerrar</button>
+                </div>
+                <div class="table-container">
+                    <table id="tablaAmortizacion"></table>
+                </div>
+                <div class="summary-box" style="margin-top: 1.5rem;">
+                    <div class="grid grid-4">
+                        <div>
+                            <p class="stat-label">Total Pagado en Cuotas</p>
+                            <p class="stat-value mono" id="totalCuotas"></p>
+                        </div>
+                        <div>
+                            <p class="stat-label">Total Capital</p>
+                            <p class="stat-value mono" style="color: #22c55e;" id="totalCapital"></p>
+                        </div>
+                        <div>
+                            <p class="stat-label">Total Intereses</p>
+                            <p class="stat-value mono" style="color: #ef4444;" id="totalIntereses"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Importantes -->
+        <div class="glass card">
+            <div style="display: flex; gap: 1rem;">
+                <div style="color: #6AABD6; flex-shrink: 0;">ℹ️</div>
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 1rem;">Notas Importantes:</p>
+                    <ul class="info-list">
+                        <li class="highlight"><strong>Fuentes de información:</strong> Condiciones especiales recolectadas personalmente en ExpoConstrucción 2026 (4-8 marzo), validadas con cotizaciones oficiales de: Banco Nacional (08/03/2026), BCR (07/03/2026), Banco Popular (screenshot oficial), MUCAP, COOPECAJA, y Davivienda. Adicionalmente validado con noticias de El Financiero, Delfino.cr y comunicados oficiales de bancos.</li>
+                        <li><strong>Vigencia:</strong> Las condiciones de ExpoConstrucción 2026 aplican para solicitudes realizadas entre el 23 de febrero y 30 de junio de 2026. Algunas entidades tienen límites (BCR: primeras 600 solicitudes sin avalúo).</li>
+                        <li><strong>Tasas de referencia marzo 2026:</strong> TBP=5.80%, SOFR 3M=3.66%, US PRIME=6.75%, TRI=5.50%, NYPR=6.50%. Las tasas variables se proyectan con estos valores actuales y pueden cambiar trimestralmente según el mercado.</li>
+                        <li><strong>Condiciones especiales por entidad:</strong>
+                            <ul style="margin-top: 0.5rem; margin-left: 1.5rem; list-style-type: disc;">
+                                <li><strong>Banco Nacional:</strong> Las cuotas mostradas YA INCLUYEN seguros de vida y construcción (sin costo adicional según oferta Expo 2026).</li>
+                                <li><strong>BCR:</strong> Plazo máximo en dólares 25 años (300 meses), en colones hasta 30 años. Financiamiento hasta 95% del avalúo.</li>
+                                <li><strong>Banco Popular:</strong> Tasa variable TRI 6M + 2.95pp por TODO el plazo del crédito (confirmado por cotización oficial ExpoConstrucción 2026).</li>
+                                <li><strong>BAC:</strong> Tasa fija hasta 8 años en colones (condición especial Expo). Exoneración de comisión, gastos legales y avalúo en proyectos precalificados.</li>
+                                <li><strong>Davivienda:</strong> 0% comisión en fideicomiso para proyectos precalificados. Reintegro de avalúo hasta $300. Tipo de cambio preferencial durante el plazo.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Seguros:</strong> Montos estimados pueden variar según edad, salud y perfil del cliente. COOPECAJA seguros reales: Vida ₡46,332/mes, Desempleo ₡23,356/mes.</li>
+                        <li><strong>Gastos no incluidos:</strong> Avalúo (típicamente $200-$400), honorarios notariales, gastos de registro, timbres e impuestos de traspaso. El rango estimado de costos totales se muestra por entidad.</li>
+                        <li><strong>Múltiples opciones:</strong> Algunas entidades ofrecen varios esquemas de tasa (fija 2/5/8 años). Esta calculadora muestra las opciones más competitivas según plazo seleccionado.</li>
+                        <li style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(148, 163, 184, 0.2);"><strong>⚠️ Disclaimer:</strong> Los cálculos son estimados para comparación. Aunque la información fue validada con fuentes oficiales, esta calculadora puede contener errores o información desactualizada. Siempre consulte directamente con la entidad financiera para condiciones finales. Si encuentras datos incorrectos, repórtalo por Instagram (@olger.diaze).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="glass card">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;" class="gradient-text">
+                    ¿Listo para dar el siguiente paso?
+                </h3>
+                <p style="color: #cbd5e1;">Te ayudo a encontrar el mejor financiamiento para tu proyecto</p>
+            </div>
+
+            <div class="contact-section">
+                <a href="https://www.instagram.com/olger.diaze" target="_blank" class="contact-btn whatsapp">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    Sígueme en Instagram
+                </a>
+
+                <a href="https://calendly.com/finanzasconolger/30min" target="_blank" class="contact-btn calendly">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Agendar Llamada
+                </a>
+            </div>
+
+            <p style="text-align: center; font-size: 0.875rem; color: #94a3b8; margin-top: 1.5rem;">
+                Método GEM • Ayudo a Ingenieros y Profesionales en Tech a mejorar sus finanzas y tomar decisiones financieras informadas
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Tasas de referencia
+        const TASAS_REF = {
+            TBP: 5.80,
+            SOFR3M: 3.66,
+            PRIME: 6.75,
+            TRI: 5.50,
+            NYPR: 6.50
+        };
+
+        // Base de datos de entidades
+        const ENTIDADES = [
+            {
+                id: 'popular',
+                nombre: 'POPULAR',
+                maxFinanciamiento: 90,
+                tasasColones: [
+                    { nombre: 'TRI 6M + 2.95pp (Variable)', tasaInicial: 7.58, mesesFijos: 0, tasaVariable: 7.58 }
+                ],
+                tasasDolares: [
+                    { nombre: '6.75% (24m) luego TRI+4%', tasaInicial: 6.75, mesesFijos: 24, tasaVariable: TASAS_REF.TRI + 4 },
+                    { nombre: '8.11% (24m) luego TRI+4%', tasaInicial: 8.11, mesesFijos: 24, tasaVariable: TASAS_REF.TRI + 4 }
+                ],
+                comisionForm: 2.0,
+                seguros: { vida: 32300, desempleo: 16800 }
+            },
+            {
+                id: 'bac',
+                nombre: 'BAC',
+                maxFinanciamiento: 80,
+                tasasColones: [
+                    { nombre: '8.75% fijo (96m) luego TBP+4.35%', tasaInicial: 8.75, mesesFijos: 96, tasaVariable: Math.max(TASAS_REF.TBP + 4.35, 8.75) }
+                ],
+                tasasDolares: [
+                    { nombre: '7.95% fijo (36m) luego SOFR3M+4.90%', tasaInicial: 7.95, mesesFijos: 36, tasaVariable: TASAS_REF.SOFR3M + 4.90 },
+                    { nombre: '8.50% fijo (84m) luego SOFR3M+4.90%', tasaInicial: 8.50, mesesFijos: 84, tasaVariable: TASAS_REF.SOFR3M + 4.90 }
+                ],
+                comisionForm: 3.13,
+                seguros: { vida: 35000, desempleo: 18000 }
+            },
+            {
+                id: 'davibank',
+                nombre: 'DAVIBANK',
+                maxFinanciamiento: 85,
+                tasasColones: [
+                    { nombre: '7.85% fijo (24m) luego TBP+4%', tasaInicial: 7.85, mesesFijos: 24, tasaVariable: Math.max(TASAS_REF.TBP + 4.0, 8.25) }
+                ],
+                tasasDolares: [
+                    { nombre: '7.50% fijo (36m) luego NYPR+2%', tasaInicial: 7.50, mesesFijos: 36, tasaVariable: Math.max(TASAS_REF.NYPR + 2.0, 8.0) }
+                ],
+                comisionForm: 0,
+                seguros: { vida: 33000, desempleo: 17000 }
+            },
+            {
+                id: 'bn',
+                nombre: 'BN',
+                maxFinanciamiento: 90,
+                tasasColones: [
+                    { nombre: '8.80% fijo (24m) luego TBP+5.5%', tasaInicial: 8.80, mesesFijos: 24, tasaVariable: TASAS_REF.TBP + 5.5 },
+                    { nombre: 'TBP+4.80% variable', tasaInicial: TASAS_REF.TBP + 4.80, mesesFijos: 360, tasaVariable: TASAS_REF.TBP + 4.80 }
+                ],
+                tasasDolares: [
+                    { nombre: '9.70% fijo (36m) luego TRI3M+10.20%', tasaInicial: 9.70, mesesFijos: 36, tasaVariable: TASAS_REF.TRI + 10.20 },
+                    { nombre: 'TRI3M+7.80% variable', tasaInicial: TASAS_REF.TRI + 7.80, mesesFijos: 360, tasaVariable: TASAS_REF.TRI + 7.80 }
+                ],
+                comisionForm: 2.0,
+                seguros: { vida: 0, desempleo: 0 } // Seguros YA incluidos en la cuota
+            },
+            {
+                id: 'bcr',
+                nombre: 'BCR',
+                maxFinanciamiento: 90,
+                plazoMaxDolares: 300, // 25 años en dólares
+                tasasColones: [
+                    { nombre: '7.95% fijo (24m) luego TBP+4.85%', tasaInicial: 7.95, mesesFijos: 24, tasaVariable: TASAS_REF.TBP + 4.85 },
+                    { nombre: '9.35% fijo (60m) luego TBP+4.85%', tasaInicial: 9.35, mesesFijos: 60, tasaVariable: TASAS_REF.TBP + 4.85 },
+                    { nombre: '9.80% fijo (96m) luego TBP+4.85%', tasaInicial: 9.80, mesesFijos: 96, tasaVariable: TASAS_REF.TBP + 4.85 }
+                ],
+                tasasDolares: [
+                    { nombre: '7.35% fijo (24m) luego PRIME+1.75%', tasaInicial: 7.35, mesesFijos: 24, tasaVariable: TASAS_REF.PRIME + 1.75 },
+                    { nombre: 'PRIME+1.75% variable', tasaInicial: TASAS_REF.PRIME + 1.75, mesesFijos: 300, tasaVariable: TASAS_REF.PRIME + 1.75 }
+                ],
+                comisionForm: 2.0,
+                seguros: { vida: 35000, desempleo: 18000 }
+            },
+            {
+                id: 'mucap',
+                nombre: 'MUCAP',
+                maxFinanciamiento: 85,
+                tasasColones: [
+                    { nombre: '7.80% fijo (24m) luego TBP+4.95%', tasaInicial: 7.80, mesesFijos: 24, tasaVariable: TASAS_REF.TBP + 4.95 }
+                ],
+                tasasDolares: [
+                    { nombre: '7.25% fijo (24m) → SOFR+4% (24m) → SOFR+5%', tasaInicial: 7.25, mesesFijos: 24, tasaVariable: TASAS_REF.SOFR3M + 5.0 }
+                ],
+                comisionForm: 3.0,
+                seguros: { vida: 18700, desempleo: 15000 },
+                notaEspecial: '📊 Dólares: tasa escalonada — 7.25% fijo años 1-2 · SOFR3M+4% años 3-4 · SOFR3M+5% año 5 en adelante.'
+            },
+            {
+                id: 'coopecaja',
+                nombre: 'COOPECAJA',
+                maxFinanciamiento: 90,
+                tasasColones: [
+                    { nombre: '8.45% fijo (60m)', tasaInicial: 8.45, mesesFijos: 60, tasaVariable: 8.45 }
+                ],
+                tasasDolares: [],
+                comisionForm: 0.45,
+                seguros: { vida: 46332, desempleo: 23356 },
+                notaEspecial: '⚠️ Cooperativa: requiere afiliación y ahorro mensual de capital social.'
+            },
+            {
+                id: 'invu_sap',
+                nombre: 'INVU SAP',
+                maxFinanciamiento: 75,
+                tasasColones: [
+                    { nombre: '7.00% fija todo el plazo (Expo 2026)', tasaInicial: 7.00, mesesFijos: 999, tasaVariable: 7.00 }
+                ],
+                tasasDolares: [],
+                comisionForm: 0,
+                seguros: { vida: 0, desempleo: 0 },
+                notaEspecial: '⚠️ Requiere ahorro previo del 25% del valor (2-10 años). Plazo máximo 12 años en etapa préstamo. Solo colones. Aplican restricciones.'
+            },
+            {
+                id: 'invu_cred',
+                nombre: 'INVU CredINVU',
+                maxFinanciamiento: 80,
+                plazoFijo: 240, // Plazo fijo: solo 20 años (240 meses)
+                montoMaxColones: 120000000,
+                tasasColones: [
+                    { nombre: '7% fijo (36m) luego 10% fijo resto', tasaInicial: 7.00, mesesFijos: 36, tasaVariable: 10.00 }
+                ],
+                tasasDolares: [],
+                comisionForm: 0,
+                seguros: { vida: 0, desempleo: 0 },
+                notaEspecial: '⚠️ Solo a 20 años. Monto máximo ₡120,000,000. Sin penalización por abonos extraordinarios. Sin gastos de formalización. Apertura una vez al año hasta agotar presupuesto.'
+            },
+            {
+                id: 'coopeande',
+                nombre: 'COOPEANDE',
+                maxFinanciamiento: 80,
+                tasasColones: [
+                    { nombre: '8.50% fija 8 años (TITA 9.79%)', tasaInicial: 8.50, mesesFijos: 96, tasaVariable: 8.50 }
+                ],
+                tasasDolares: [
+                    { nombre: '7.25% fija 3 años (TITA 8.39%)', tasaInicial: 7.25, mesesFijos: 36, tasaVariable: 7.25 }
+                ],
+                comisionForm: 0,
+                seguros: { vida: 30000, desempleo: 15000 },
+                notaEspecial: '⚠️ Cooperativa: requiere afiliación y ahorro mensual de capital social.'
+            }
+        ];
+
+        let monedaActual = 'colones';
+        let datosCalculados = null;
+
+        function formatearMoneda(valor) {
+            const redondeado = Math.round(valor);
+            if (monedaActual === 'colones') {
+                return '₡' + redondeado.toLocaleString('es-CR');
+            } else {
+                return '$' + redondeado.toLocaleString('en-US');
+            }
+        }
+
+        function calcularCuota(monto, tasaAnual, meses) {
+            const tasaMensual = tasaAnual / 100 / 12;
+            if (tasaMensual === 0) return monto / meses;
+            return monto * (tasaMensual * Math.pow(1 + tasaMensual, meses)) / (Math.pow(1 + tasaMensual, meses) - 1);
+        }
+
+        function actualizarPrima() {
+            const prima = document.getElementById('prima').value;
+            document.getElementById('primaDisplay').textContent = prima;
+            actualizarResumen();
+        }
+
+        function actualizarPlazo() {
+            const plazo = document.getElementById('plazo').value;
+            document.getElementById('plazoDisplay').textContent = plazo;
+            document.getElementById('plazoMesesDisplay').textContent = plazo * 12;
+        }
+
+        function actualizarResumen() {
+            const valorPropiedad = parseFloat(document.getElementById('valorPropiedad').value);
+            const prima = parseFloat(document.getElementById('prima').value);
+            const ingreso = parseFloat(document.getElementById('ingresoMensual').value);
+            
+            if (!valorPropiedad || isNaN(valorPropiedad)) {
+                document.getElementById('valorPropiedadDisplay').textContent = 'Ingresá el valor de la propiedad para comenzar';
+                document.getElementById('valorPropiedadDisplay').style.color = '#94a3b8';
+                document.getElementById('montoFinanciar').textContent = '—';
+                document.getElementById('primaPagar').textContent = '—';
+                document.getElementById('capacidadBox').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('valorPropiedadDisplay').textContent = formatearMoneda(valorPropiedad);
+            document.getElementById('valorPropiedadDisplay').style.color = '#94a3b8';
+            
+            const montoFinanciar = valorPropiedad * (1 - prima / 100);
+            const primaPagar = valorPropiedad * prima / 100;
+            
+            document.getElementById('montoFinanciar').textContent = formatearMoneda(montoFinanciar);
+            document.getElementById('primaPagar').textContent = formatearMoneda(primaPagar);
+
+            // Capacidad de pago (30%)
+            if (ingreso && !isNaN(ingreso) && ingreso > 0) {
+                const cuotaMax = ingreso * 0.30;
+                document.getElementById('capacidadBox').style.display = 'block';
+                document.getElementById('cuotaMaxima').textContent = formatearMoneda(cuotaMax);
+
+                // Estimación rápida con tasa promedio 8.5% a 20 años para orientación
+                const tasaRef = 8.5 / 100 / 12;
+                const mesesRef = 240;
+                const cuotaEstimada = montoFinanciar * (tasaRef * Math.pow(1 + tasaRef, mesesRef)) / (Math.pow(1 + tasaRef, mesesRef) - 1);
+
+                const msgEl = document.getElementById('capacidadMensaje');
+                if (cuotaEstimada <= cuotaMax) {
+                    msgEl.textContent = '✅ Con tu ingreso, tu cuota estimada estaría dentro del límite recomendado del 30%.';
+                    msgEl.style.color = '#4ade80';
+                    document.getElementById('cuotaMaxima').style.color = '#4ade80';
+                } else {
+                    msgEl.textContent = '⚠️ La cuota estimada podría superar el 30% de tu ingreso. Considerá aumentar la prima o el plazo.';
+                    msgEl.style.color = '#f87171';
+                    document.getElementById('cuotaMaxima').style.color = '#f87171';
+                }
+            } else {
+                document.getElementById('capacidadBox').style.display = 'none';
+            }
+        }
+
+        function cambiarMoneda(moneda) {
+            monedaActual = moneda;
+            
+            const botones = document.querySelectorAll('.btn-currency');
+            botones.forEach(btn => btn.classList.remove('active'));
+            
+            if (moneda === 'colones') {
+                botones[0].classList.add('active');
+            } else {
+                botones[1].classList.add('active');
+            }
+            
+            actualizarResumen();
+        }
+
+        let leadCaptured = true; // Versión clientes — sin form
+
+        function calcular() {
+            const valorPropiedad = parseFloat(document.getElementById('valorPropiedad').value);
+            if (!valorPropiedad || isNaN(valorPropiedad)) {
+                document.getElementById('valorPropiedad').focus();
+                document.getElementById('valorPropiedadDisplay').textContent = '👆 Por favor ingresá el valor de la propiedad primero';
+                document.getElementById('valorPropiedadDisplay').style.color = '#f87171';
+                return;
+            }
+            ejecutarCalculo();
+        }
+
+        function validarTexto(texto) {
+            // Rechaza strings con menos de 2 chars, solo números, o patrones repetitivos tipo "aaa", "asdf", "qwerty"
+            if (!texto || texto.trim().length < 2) return false;
+            const t = texto.trim().toLowerCase();
+            if (/^\d+$/.test(t)) return false; // solo números
+            if (/^(.)\1{2,}$/.test(t)) return false; // "aaaa", "bbbb"
+            const basura = ['asdf','qwer','zxcv','test','xxxxx','nnnn','abcd','1234','aaaa','hola','nada','ffff'];
+            if (basura.some(b => t === b)) return false;
+            return true;
+        }
+
+        function validarEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            if (!re.test(email)) return false;
+            // Rechaza dominios descartables comunes
+            const descartables = ['mailinator','guerrillamail','throwam','yopmail','tempmail','fakeinbox','trashmail','sharklasers'];
+            const dominio = email.split('@')[1].toLowerCase();
+            if (descartables.some(d => dominio.includes(d))) return false;
+            return true;
+        }
+
+        function enviarLead() {
+            const nombre   = document.getElementById('leadNombre').value.trim();
+            const apellido = document.getElementById('leadApellido').value.trim();
+            const email    = document.getElementById('leadEmail').value.trim();
+            const errDiv   = document.getElementById('leadError');
+            const errMsg   = document.getElementById('leadErrorMsg');
+
+            // Validaciones
+            if (!validarTexto(nombre)) {
+                errMsg.textContent = 'Por favor ingresá tu nombre real (mínimo 2 caracteres).';
+                errDiv.style.display = 'block'; return;
+            }
+            if (!validarTexto(apellido)) {
+                errMsg.textContent = 'Por favor ingresá tu apellido real.';
+                errDiv.style.display = 'block'; return;
+            }
+            if (!validarEmail(email)) {
+                errMsg.textContent = 'Por favor ingresá un correo electrónico válido.';
+                errDiv.style.display = 'block'; return;
+            }
+            errDiv.style.display = 'none';
+
+            // Enviar a Formspree
+            fetch('https://formspree.io/f/mvzwbzpz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, apellido, email, fuente: 'Calculadora ExpoConstrucción 2026' })
+            }).catch(() => {});
+
+            leadCaptured = true;
+            document.getElementById('leadOverlay').style.display = 'none';
+            ejecutarCalculo();
+        }
+
+        function ejecutarCalculo() {
+          try {
+            const valorPropiedad = parseFloat(document.getElementById('valorPropiedad').value);
+            const prima = parseFloat(document.getElementById('prima').value);
+            const plazo = parseInt(document.getElementById('plazo').value);
+
+            // Validar rangos por moneda
+            const warningDiv = document.getElementById('montoWarning');
+            const warningMsg = document.getElementById('montoWarningMsg');
+            if (monedaActual === 'colones') {
+                if (valorPropiedad < 5000000) {
+                    warningMsg.textContent = '⚠️ El valor ingresado parece muy bajo para un crédito hipotecario en colones. El mínimo sugerido es ₡5,000,000.';
+                    warningDiv.style.display = 'block';
+                } else if (valorPropiedad > 500000000) {
+                    warningMsg.textContent = '⚠️ El valor supera los ₡500,000,000. Para montos muy altos, te recomendamos consultar directamente con cada entidad.';
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            } else {
+                if (valorPropiedad < 10000) {
+                    warningMsg.textContent = '⚠️ El valor ingresado parece muy bajo. El mínimo sugerido para créditos hipotecarios en dólares es $10,000 (BAC).';
+                    warningDiv.style.display = 'block';
+                } else if (valorPropiedad > 500000) {
+                    warningMsg.textContent = '⚠️ El valor supera los $500,000. Para montos muy altos, te recomendamos consultar directamente con cada entidad.';
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            }
+            
+            const montoFinanciar = valorPropiedad * (1 - prima / 100);
+            const plazoMeses = plazo * 12;
+            
+            const resultados = [];
+            
+            ENTIDADES.forEach(entidad => {
+                const opciones = monedaActual === 'colones' ? entidad.tasasColones : entidad.tasasDolares;
+                
+                if (!opciones || opciones.length === 0) return;
+                
+                // Validar plazo máximo para BCR en dólares (25 años = 300 meses)
+                if (entidad.id === 'bcr' && monedaActual === 'dolares' && plazoMeses > 300) {
+                    return;
+                }
+                
+                // INVU SAP: máximo 12 años (144 meses) en etapa préstamo
+                if (entidad.id === 'invu_sap' && plazoMeses > 144) {
+                    return;
+                }
+
+                // CredINVU: solo a 20 años exactos (240 meses)
+                if (entidad.id === 'invu_cred' && plazoMeses !== 240) {
+                    return;
+                }
+                
+                const primaRequerida = 100 - entidad.maxFinanciamiento;
+                if (prima < primaRequerida) return;
+                
+                const resultadosOpciones = opciones.map((opcion, idx) => {
+                    const cuotaFija = calcularCuota(montoFinanciar, opcion.tasaInicial, plazoMeses);
+                    const cuotaVariable = calcularCuota(montoFinanciar, opcion.tasaVariable, plazoMeses);
+                    
+                    let interesesTotales = 0;
+                    let saldo = montoFinanciar;
+                    
+                    for (let mes = 1; mes <= plazoMeses; mes++) {
+                        const tasaActual = mes <= opcion.mesesFijos ? opcion.tasaInicial : opcion.tasaVariable;
+                        const cuota = calcularCuota(saldo, tasaActual, plazoMeses - mes + 1);
+                        const interes = saldo * (tasaActual / 100 / 12);
+                        const capital = cuota - interes;
+                        interesesTotales += interes;
+                        saldo -= capital;
+                    }
+                    
+                    const comisionFormalizacion = montoFinanciar * (entidad.comisionForm / 100);
+                    const segurosMensuales = entidad.seguros.vida + entidad.seguros.desempleo;
+                    const segurosTotales = segurosMensuales * plazoMeses;
+                    const costoTotal = montoFinanciar + interesesTotales + comisionFormalizacion + segurosTotales;
+                    
+                    // Calcular estabilidad (% del plazo con tasa fija)
+                    // Si mesesFijos >= plazoMeses, entonces es 100% fijo
+                    const mesesFijosReales = Math.min(opcion.mesesFijos, plazoMeses);
+                    const estabilidad = (mesesFijosReales / plazoMeses) * 100;
+                    const esCompletamenteFija = opcion.mesesFijos >= plazoMeses;
+                    
+                    return {
+                        opcion,
+                        idx,
+                        cuotaFija,
+                        cuotaVariable,
+                        cuotaPromedio: (cuotaFija + cuotaVariable) / 2,
+                        cuotaConSeguros: cuotaFija + segurosMensuales,
+                        interesesTotales,
+                        comisionFormalizacion,
+                        segurosTotales,
+                        segurosMensuales,
+                        costoTotal,
+                        estabilidad: estabilidad.toFixed(1),
+                        esCompletamenteFija: esCompletamenteFija,
+                        pctEstabilidad: parseFloat(estabilidad)
+                    };
+                });
+                
+                // Mejor opción por score combinado (Opción C)
+                const mejorOpcion = resultadosOpciones.reduce((mejor, actual) => {
+                    // Normalizar: menor cuota = mejor, mayor estabilidad = mejor, menor costo = mejor
+                    // Usamos score relativo — se compara dentro de resultadosOpciones
+                    const scoreActual = (actual.cuotaConSeguros * 0.40) + (actual.costoTotal * 0.25) + ((100 - actual.pctEstabilidad) * 1000 * 0.35);
+                    const scoreMejor  = (mejor.cuotaConSeguros  * 0.40) + (mejor.costoTotal  * 0.25) + ((100 - mejor.pctEstabilidad)  * 1000 * 0.35);
+                    return scoreActual < scoreMejor ? actual : mejor;
+                });
+                
+                // Score final para ordenamiento global
+                mejorOpcion.scoreFinal = 
+                    (mejorOpcion.cuotaConSeguros * 0.40) +
+                    (mejorOpcion.costoTotal * 0.25) +
+                    ((100 - mejorOpcion.pctEstabilidad) * 1000 * 0.35);
+                
+                resultados.push({
+                    entidad,
+                    opciones: resultadosOpciones,
+                    mejorOpcion
+                });
+            });
+            
+            // Ordenar por score combinado
+            resultados.sort((a, b) => a.mejorOpcion.scoreFinal - b.mejorOpcion.scoreFinal);
+
+            if (resultados.length === 0) {
+                mostrarResultados([], null, null);
+                return;
+            }
+
+            // Identificar ganador por menor cuota y por mayor estabilidad por separado
+            const idMenorCuota = resultados.reduce((min, r) => 
+                r.mejorOpcion.cuotaConSeguros < min.mejorOpcion.cuotaConSeguros ? r : min
+            ).entidad.id;
+
+            const idMasEstable = resultados.reduce((max, r) =>
+                r.mejorOpcion.pctEstabilidad > max.mejorOpcion.pctEstabilidad ? r : max
+            ).entidad.id;
+            
+            datosCalculados = {
+                resultados,
+                montoFinanciar,
+                plazoMeses
+            };
+            
+            mostrarResultados(resultados, idMenorCuota, idMasEstable);
+          } catch(err) {
+            console.error('Error en ejecutarCalculo:', err);
+            const container = document.getElementById('resultadosContainer');
+            container.innerHTML = '<div style="padding:2rem;color:#f87171;">Error al calcular: ' + err.message + '</div>';
+            document.getElementById('resultadosSection').classList.remove('hidden');
+          }
+        }
+
+        function mostrarResultados(resultados, idMenorCuota, idMasEstable) {
+            const container = document.getElementById('resultadosContainer');
+            
+            if (resultados.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+                        <p style="font-size: 1.25rem; margin-bottom: 0.5rem;">ℹ️</p>
+                        <p>No hay entidades disponibles con tus condiciones actuales.</p>
+                        <p style="font-size: 0.875rem; margin-top: 0.5rem;">Intenta aumentar la prima o cambiar de moneda.</p>
+                    </div>
+                `;
+                document.getElementById('resultadosSection').classList.remove('hidden');
+                return;
+            }
+
+            // Disclaimer al inicio
+            let html = `
+                <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 0.75rem; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+                    <p style="font-size: 0.8125rem; color: #fbbf24; line-height: 1.6;">
+                        <strong>⚠️ Importante:</strong> Estas estimaciones son únicamente de referencia, basadas en información recolectada durante la ExpoConstrucción 2026. Las condiciones pueden variar según el perfil del solicitante y cambios de cada entidad. Esto <strong>no constituye asesoría financiera</strong>. Consultá directamente con cada institución antes de tomar una decisión.<br><br>
+                        <strong>🔒 Privacidad:</strong> Los montos e ingresos que ingresás en esta calculadora <strong>no son recolectados ni almacenados</strong> por Olger Díaz. Los cálculos se hacen únicamente en tu pantalla.
+                    </p>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
+                    <div style="background:rgba(74,143,194,0.1);border:1px solid rgba(74,143,194,0.3);border-radius:0.75rem;padding:0.875rem;">
+                        <p style="font-size:0.75rem;color:#6AABD6;font-weight:700;margin-bottom:0.25rem;">💰 MENOR CUOTA MENSUAL</p>
+                        <p style="font-size:0.8125rem;color:#cbd5e1;line-height:1.5;">Cuota inicial más baja. Útil si tu prioridad es que la cuota entre cómodo en tu presupuesto hoy.</p>
+                    </div>
+                    <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:0.75rem;padding:0.875rem;">
+                        <p style="font-size:0.75rem;color:#4ade80;font-weight:700;margin-bottom:0.25rem;">🛡️ MÁS ESTABILIDAD</p>
+                        <p style="font-size:0.8125rem;color:#cbd5e1;line-height:1.5;">Mayor % del plazo con tasa fija. Útil si tu prioridad es certeza y no te gustan las sorpresas.</p>
+                    </div>
+                </div>
+            `;
+            
+            resultados.forEach((resultado, idx) => {
+                const { entidad, mejorOpcion, opciones } = resultado;
+                const posicion = idx + 1;
+
+                const esMenorCuota = entidad.id === idMenorCuota;
+                const esMasEstable = entidad.id === idMasEstable;
+                
+                // Calcular rango de costos estimados de formalización
+                const costoAvaluoEst = monedaActual === 'colones' ? 150000 : 310;
+                const costosNotarialesEst = mejorOpcion.comisionFormalizacion * 0.5;
+                const costosRegistroEst = monedaActual === 'colones' ? 100000 : 200;
+                const rangoMin = mejorOpcion.comisionFormalizacion + costoAvaluoEst;
+                const rangoMax = mejorOpcion.comisionFormalizacion + costoAvaluoEst + costosNotarialesEst + costosRegistroEst;
+                
+                const borderStyle = esMasEstable ? 'border: 2px solid rgba(34,197,94,0.5);' : esMenorCuota ? 'border: 2px solid rgba(74,143,194,0.5);' : '';
+                const rankColor = posicion === 1 ? '#f59e0b' : posicion === 2 ? '#94a3b8' : posicion === 3 ? '#cd7f32' : '#475569';
+                const rankLabel = posicion === 1 ? '🥇' : posicion === 2 ? '🥈' : posicion === 3 ? '🥉' : `#${posicion}`;
+
+                html += `
+                    <div class="resultado-card" style="${borderStyle} margin-bottom:1rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                            <div style="display:flex; align-items:center; gap:0.625rem;">
+                                <span style="font-size:1.25rem;">${rankLabel}</span>
+                                <div>
+                                    <h3 style="font-size:1.25rem; font-weight:700; color:white; margin:0;">${entidad.nombre}</h3>
+                                    <p style="font-size:0.8125rem; color:#94a3b8; margin:0;">Financia hasta ${entidad.maxFinanciamiento}%</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                ${esMenorCuota ? `<span style="background:#4A8FC2;color:white;padding:0.2rem 0.7rem;border-radius:9999px;font-size:0.7rem;font-weight:700;">💰 Menor cuota</span>` : ''}
+                                ${esMasEstable ? `<span style="background:rgba(34,197,94,0.8);color:white;padding:0.2rem 0.7rem;border-radius:9999px;font-size:0.7rem;font-weight:700;">🛡️ Más estable</span>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-4" style="margin-bottom: 1rem;">
+                            <div class="stat-box">
+                                <p class="stat-label">Cuota Inicial</p>
+                                <p class="stat-value mono" style="color: #6AABD6;">
+                                    ${formatearMoneda(mejorOpcion.cuotaFija)}
+                                </p>
+                                <p style="font-size: 0.75rem; color: #64748b;">
+                                    ${mejorOpcion.opcion.mesesFijos >= 999 ? 'Todo el plazo' : mejorOpcion.opcion.mesesFijos + ' meses'} · ${mejorOpcion.opcion.tasaInicial.toFixed(2)}%
+                                </p>
+                            </div>
+                            
+                            ${mejorOpcion.cuotaVariable !== mejorOpcion.cuotaFija ? `
+                                <div class="stat-box">
+                                    <p class="stat-label">Cuota Variable</p>
+                                    <p class="stat-value mono" style="color: #6AABD6;">
+                                        ${formatearMoneda(mejorOpcion.cuotaVariable)}
+                                    </p>
+                                    <p style="font-size: 0.75rem; color: #64748b;">
+                                        después mes ${mejorOpcion.opcion.mesesFijos} · ${mejorOpcion.opcion.tasaVariable.toFixed(2)}%
+                                    </p>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="stat-box">
+                                <p class="stat-label">Comisión Desembolso (est.)</p>
+                                <p class="stat-value mono" style="color: #f59e0b;">
+                                    ${formatearMoneda(mejorOpcion.comisionFormalizacion)}
+                                </p>
+                                <p style="font-size: 0.75rem; color: #64748b;">
+                                    ${entidad.comisionForm}% del monto
+                                </p>
+                            </div>
+                            
+                            <div class="stat-box">
+                                <p class="stat-label">Intereses Totales</p>
+                                <p class="stat-value mono" style="color: #ef4444;">
+                                    ${formatearMoneda(mejorOpcion.interesesTotales)}
+                                </p>
+                                <p style="font-size: 0.75rem; color: #64748b;">
+                                    ${document.getElementById('plazo').value} años
+                                </p>
+                            </div>
+                        </div>
+
+                        ${(() => {
+                            const ingreso = parseFloat(document.getElementById('ingresoMensual').value);
+                            if (!ingreso || isNaN(ingreso) || ingreso <= 0) return '';
+                            const cuotaMax = ingreso * 0.30;
+                            const cuotaTotal = mejorOpcion.cuotaFija + mejorOpcion.segurosMensuales;
+                            const pct = ((cuotaTotal / ingreso) * 100).toFixed(1);
+                            const ok = cuotaTotal <= cuotaMax;
+                            return `
+                                <div style="background:${ok ? 'rgba(74,222,128,0.08)' : 'rgba(239,68,68,0.08)'}; border:1px solid ${ok ? 'rgba(74,222,128,0.3)' : 'rgba(239,68,68,0.3)'}; border-radius:0.5rem; padding:0.75rem 1rem; margin-bottom:1rem;">
+                                    <p style="font-size:0.8125rem; color:${ok ? '#4ade80' : '#f87171'}; line-height:1.5;">
+                                        ${ok ? '✅' : '⚠️'} Esta cuota representa el <strong>${pct}%</strong> de tu ingreso mensual.
+                                        ${ok ? 'Está dentro del límite recomendado del 30%.' : 'Supera el 30% recomendado — considerá aumentar la prima o el plazo.'}
+                                    </p>
+                                </div>`;
+                        })()}
+                        
+                        <div style="background: rgba(74, 143, 194, 0.1); border: 1px solid rgba(74, 143, 194, 0.2); border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 1rem;">
+                            <p style="font-size: 0.8125rem; color: #A8CDE8; margin-bottom: 0.25rem; font-weight: 600;">
+                                💰 Costos estimados al formalizar
+                            </p>
+                            <p style="font-size: 0.875rem; color: #cbd5e1;">
+                                Entre ${formatearMoneda(rangoMin)} y ${formatearMoneda(rangoMax)}
+                            </p>
+                            <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">
+                                Incluye: Comisión banco + Avalúo + Notario + Registro (aproximados)
+                            </p>
+                        </div>
+                        
+                        ${opciones.length > 1 ? `
+                            <div style="border-top: 1px solid #475569; padding-top: 1rem; margin-bottom: 1rem;">
+                                <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.5rem;">Opciones de tasa disponibles:</p>
+                                ${opciones.map((opc, opcIdx) => `
+                                    <button class="btn-ver-opcion" data-entidad="${entidad.id}" data-opcion="${opcIdx}"
+                                            style="width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: rgba(28, 43, 56, 0.3); 
+                                                   border: none; color: #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem; 
+                                                   margin-bottom: 0.5rem; cursor: pointer;">
+                                        ${opcIdx + 1}. ${opc.opcion.nombre}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <button class="btn-amortizacion btn-primary" data-entidad="${entidad.id}" data-opcion="0" style="width: 100%; border: none; cursor: pointer; padding: 0.75rem 1rem; font-size: 1rem;">
+                            Ver Tabla de Amortización ⬇️
+                        </button>
+                        
+                        ${entidad.notaEspecial ? `
+                            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 0.5rem; padding: 0.75rem; margin-top: 0.75rem;">
+                                <p style="font-size: 0.8125rem; color: #fbbf24; line-height: 1.5;">${entidad.notaEspecial}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('resultadosSection').classList.remove('hidden');
+            document.getElementById('resultadosSection').scrollIntoView({ behavior: 'smooth' });
+            
+            // Agregar event listeners a todos los botones de amortización
+            document.querySelectorAll('.btn-amortizacion').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const entidadId = this.getAttribute('data-entidad');
+                    const opcionIdx = parseInt(this.getAttribute('data-opcion'));
+                    verAmortizacion(entidadId, opcionIdx);
+                });
+            });
+            
+            // Agregar event listeners a botones de opciones
+            document.querySelectorAll('.btn-ver-opcion').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const entidadId = this.getAttribute('data-entidad');
+                    const opcionIdx = parseInt(this.getAttribute('data-opcion'));
+                    verAmortizacion(entidadId, opcionIdx);
+                });
+            });
+        }
+
+        function verAmortizacion(entidadId, opcionIdx) {
+            const resultado = datosCalculados.resultados.find(r => r.entidad.id === entidadId);
+            if (!resultado) return;
+            
+            const opcion = resultado.opciones[opcionIdx];
+            const { montoFinanciar, plazoMeses } = datosCalculados;
+            
+            document.getElementById('entidadAmortizacion').textContent = resultado.entidad.nombre;
+            
+            const tabla = [];
+            let saldoRestante = montoFinanciar;
+            
+            for (let mes = 1; mes <= plazoMeses; mes++) {
+                const tasaActual = mes <= opcion.opcion.mesesFijos ? opcion.opcion.tasaInicial : opcion.opcion.tasaVariable;
+                const cuota = calcularCuota(saldoRestante, tasaActual, plazoMeses - mes + 1);
+                const interes = saldoRestante * (tasaActual / 100 / 12);
+                const capital = cuota - interes;
+                saldoRestante -= capital;
+                
+                tabla.push({
+                    mes,
+                    cuota,
+                    capital,
+                    interes,
+                    saldo: Math.max(0, saldoRestante),
+                    tasa: tasaActual
+                });
+            }
+            
+            let htmlTabla = `
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th style="text-align: right;">Cuota</th>
+                        <th style="text-align: right;">Capital</th>
+                        <th style="text-align: right;">Interés</th>
+                        <th style="text-align: right;">Saldo</th>
+                        <th style="text-align: right;">Tasa</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            tabla.forEach(fila => {
+                htmlTabla += `
+                    <tr ${fila.mes % 12 === 0 ? 'style="background: rgba(74, 143, 194, 0.1);"' : ''}>
+                        <td class="mono" style="color: #6AABD6; font-weight: 600;">${fila.mes}</td>
+                        <td style="text-align: right;" class="mono">${formatearMoneda(fila.cuota)}</td>
+                        <td style="text-align: right; color: #22c55e;" class="mono">${formatearMoneda(fila.capital)}</td>
+                        <td style="text-align: right; color: #ef4444;" class="mono">${formatearMoneda(fila.interes)}</td>
+                        <td style="text-align: right; color: #cbd5e1;" class="mono">${formatearMoneda(fila.saldo)}</td>
+                        <td style="text-align: right; color: #6AABD6;" class="mono">${fila.tasa.toFixed(2)}%</td>
+                    </tr>
+                `;
+            });
+            
+            htmlTabla += '</tbody>';
+            
+            document.getElementById('tablaAmortizacion').innerHTML = htmlTabla;
+            
+            const totalCuotas = tabla.reduce((sum, f) => sum + f.cuota, 0);
+            const totalCapital = tabla.reduce((sum, f) => sum + f.capital, 0);
+            const totalIntereses = tabla.reduce((sum, f) => sum + f.interes, 0);
+            
+            document.getElementById('totalCuotas').textContent = formatearMoneda(totalCuotas);
+            document.getElementById('totalCapital').textContent = formatearMoneda(totalCapital);
+            document.getElementById('totalIntereses').textContent = formatearMoneda(totalIntereses);
+            
+            document.getElementById('amortizacionSection').classList.remove('hidden');
+            document.getElementById('amortizacionSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cerrarAmortizacion() {
+            document.getElementById('amortizacionSection').classList.add('hidden');
+            document.getElementById('resultadosSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Inicializar
+        document.getElementById('valorPropiedad').addEventListener('input', actualizarResumen);
+        actualizarResumen();
+        actualizarPrima();
+        actualizarPlazo();
+    </script>
+</body>
+</html>

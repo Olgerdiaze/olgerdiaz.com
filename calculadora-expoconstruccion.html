@@ -461,6 +461,10 @@
                 </div>
             </div>
 
+            <div id="montoWarning" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:0.5rem; padding:0.75rem 1rem; margin-top:1rem;">
+                <p id="montoWarningMsg" style="font-size:0.8125rem; color:#f87171; line-height:1.5;"></p>
+            </div>
+
             <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;" onclick="calcular()">
                 Calcular Comparativa
             </button>
@@ -847,6 +851,31 @@
             const valorPropiedad = parseFloat(document.getElementById('valorPropiedad').value);
             const prima = parseFloat(document.getElementById('prima').value);
             const plazo = parseInt(document.getElementById('plazo').value);
+
+            // Validar rangos por moneda
+            const warningDiv = document.getElementById('montoWarning');
+            const warningMsg = document.getElementById('montoWarningMsg');
+            if (monedaActual === 'colones') {
+                if (valorPropiedad < 5000000) {
+                    warningMsg.textContent = '⚠️ El valor ingresado parece muy bajo para un crédito hipotecario en colones. El mínimo sugerido es ₡5,000,000.';
+                    warningDiv.style.display = 'block';
+                } else if (valorPropiedad > 500000000) {
+                    warningMsg.textContent = '⚠️ El valor supera los ₡500,000,000. Para montos muy altos, te recomendamos consultar directamente con cada entidad.';
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            } else {
+                if (valorPropiedad < 10000) {
+                    warningMsg.textContent = '⚠️ El valor ingresado parece muy bajo. El mínimo sugerido para créditos hipotecarios en dólares es $10,000 (BAC).';
+                    warningDiv.style.display = 'block';
+                } else if (valorPropiedad > 500000) {
+                    warningMsg.textContent = '⚠️ El valor supera los $500,000. Para montos muy altos, te recomendamos consultar directamente con cada entidad.';
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            }
             
             const montoFinanciar = valorPropiedad * (1 - prima / 100);
             const plazoMeses = plazo * 12;
@@ -1011,6 +1040,7 @@
             
             resultados.forEach((resultado, idx) => {
                 const { entidad, mejorOpcion, opciones } = resultado;
+                const posicion = idx + 1;
 
                 const esMenorCuota = entidad.id === idMenorCuota;
                 const esMasEstable = entidad.id === idMasEstable;
@@ -1023,19 +1053,23 @@
                 const rangoMax = mejorOpcion.comisionFormalizacion + costoAvaluoEst + costosNotarialesEst + costosRegistroEst;
                 
                 const borderStyle = esMasEstable ? 'border: 2px solid rgba(34,197,94,0.5);' : esMenorCuota ? 'border: 2px solid rgba(74,143,194,0.5);' : '';
+                const rankColor = posicion === 1 ? '#f59e0b' : posicion === 2 ? '#94a3b8' : posicion === 3 ? '#cd7f32' : '#475569';
+                const rankLabel = posicion === 1 ? '🥇' : posicion === 2 ? '🥈' : posicion === 3 ? '🥉' : `#${posicion}`;
 
                 html += `
-                    <div class="resultado-card" style="${borderStyle}">
-                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:${esMenorCuota||esMasEstable?'0.75rem':'0'};">
-                            ${esMenorCuota ? `<span style="background:#4A8FC2;color:white;padding:0.2rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:700;">💰 Menor cuota mensual</span>` : ''}
-                            ${esMasEstable ? `<span style="background:rgba(34,197,94,0.8);color:white;padding:0.2rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:700;">🛡️ Más estabilidad de tasa</span>` : ''}
-                        </div>
-                        
-                        <div style="margin-bottom: 1rem;">
-                            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">${entidad.nombre}</h3>
-                            <p style="font-size: 0.875rem; color: #94a3b8;">
-                                Financia hasta ${entidad.maxFinanciamiento}% · Estabilidad: ${mejorOpcion.pctEstabilidad}% del plazo fijo
-                            </p>
+                    <div class="resultado-card" style="${borderStyle} margin-bottom:1rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+                            <div style="display:flex; align-items:center; gap:0.625rem;">
+                                <span style="font-size:1.25rem;">${rankLabel}</span>
+                                <div>
+                                    <h3 style="font-size:1.25rem; font-weight:700; color:white; margin:0;">${entidad.nombre}</h3>
+                                    <p style="font-size:0.8125rem; color:#94a3b8; margin:0;">Financia hasta ${entidad.maxFinanciamiento}% · Tasa fija ${mejorOpcion.pctEstabilidad}% del plazo</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                ${esMenorCuota ? `<span style="background:#4A8FC2;color:white;padding:0.2rem 0.7rem;border-radius:9999px;font-size:0.7rem;font-weight:700;">💰 Menor cuota</span>` : ''}
+                                ${esMasEstable ? `<span style="background:rgba(34,197,94,0.8);color:white;padding:0.2rem 0.7rem;border-radius:9999px;font-size:0.7rem;font-weight:700;">🛡️ Más estable</span>` : ''}
+                            </div>
                         </div>
                         
                         <div class="grid grid-4" style="margin-bottom: 1rem;">

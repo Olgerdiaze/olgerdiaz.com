@@ -281,10 +281,14 @@
         
         .contribution-item {
             display: grid;
-            grid-template-columns: 100px 120px 1fr 60px;
+            grid-template-columns: 120px 90px 90px 1fr 60px;
             gap: 12px;
             margin-bottom: 12px;
             align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #D3D1C7;
+            background: white;
         }
         
         .cards {
@@ -579,10 +583,8 @@
                 <br><br>
                 <span style="font-size: 12px; opacity: 0.9;">
                     <strong>Ejemplos:</strong> 
-                    <br>• Plan 5 años: Año 1 = 24.8% a EU, Año 2 = 6.2% a EU
-                    <br>• Plan 15 años: Año 1 = 74.3% a EU, Año 2 = 18.6% a EU
-                    <br>• Plan 20 años: Año 1 = 99% a EU, Año 2 = 24.8% a EU
-                    <br>• Aportes únicos: 7.8% a EU (constante en todos los plazos)
+                    <br>• Plan 20 años - Mensuales: Año 1 = 99% a EU, Año 2 = 24.8% a EU
+                    <br>• Aportes únicos: 78% a EU año 1, 6.2% a EU año 2
                     <br>• Desde año 3: 100% se invierte normalmente
                 </span>
             </div>
@@ -624,7 +626,10 @@
         <div class="contributions-container">
             <div class="contributions-header">
                 <div class="section-title">Aportes únicos (opcional)</div>
-                <button id="add-contribution">+ Agregar aporte</button>
+                <div style="display: flex; gap: 10px;">
+                    <button id="add-recurring-contribution" style="background: #2C2C2A; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px;">+ Aporte recurrente</button>
+                    <button id="add-contribution" style="background: white; color: #2C2C2A; border: 2px solid #D3D1C7; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px;">+ Aporte único</button>
+                </div>
             </div>
             <div id="contributions-list"></div>
         </div>
@@ -875,10 +880,21 @@
             let ibkrCommissions = 0;
             
             // Dominion calculation
-            // Initial investment uses Year 1 EU allocation
-            let dominionInvestedBalance = initial * (1 - getEUAllocationYear1(years));
-            let dominionEUBalance = initial * getEUAllocationYear1(years);
+            // Inversión inicial: 78% EU año 1, 6.2% EU año 2
+            const initialEUYear1 = initial * 0.78;
+            let dominionInvestedBalance = initial * 0.22; // 22% invests
+            let dominionEUBalance = initialEUYear1;
             let dominionTotalFees = 25; // Initial fee
+            
+            // Track unique contributions for next year's 6.2% EU fee
+            const uniqueContributionsTracker = [];
+            if (initial > 0) {
+                uniqueContributionsTracker.push({
+                    amount: initial,
+                    yearApplied: 1,
+                    pendingYear2Fee: initial * 0.062
+                });
+            }
             
             // BN ETF500 calculation
             let bnBalance = initial;
@@ -935,33 +951,47 @@
                     bnYearlyContributions += totalMonthlyContribution;
                     millenniumYearlyContributions += totalMonthlyContribution;
                     
-                    // Dominion contributions split by year
+                    // Dominion contributions
+                    // Aportes regulares (mensuales)
                     if (year === 1) {
                         const euPercent = getEUAllocationYear1(years);
                         const monthlyInvested = monthly * (1 - euPercent);
                         const monthlyEU = monthly * euPercent;
-                        
-                        const uniqueInvested = extraContribution * (1 - getEUAllocationUnique(years));
-                        const uniqueEU = extraContribution * getEUAllocationUnique(years);
-                        
-                        dominionInvestedYearlyContributions += monthlyInvested + uniqueInvested;
-                        dominionEUYearlyContributions += monthlyEU + uniqueEU;
-                    } 
-                    else if (year === 2) {
+                        dominionInvestedYearlyContributions += monthlyInvested;
+                        dominionEUYearlyContributions += monthlyEU;
+                    } else if (year === 2) {
                         const euPercent = getEUAllocationYear2(years);
                         const monthlyInvested = monthly * (1 - euPercent);
                         const monthlyEU = monthly * euPercent;
+                        dominionInvestedYearlyContributions += monthlyInvested;
+                        dominionEUYearlyContributions += monthlyEU;
+                    } else {
+                        // Año 3+: aportes mensuales van 100% a inversión
+                        dominionInvestedYearlyContributions += monthly;
+                    }
+                    
+                    // Aportes únicos (78% EU año 1, 6.2% EU año 2)
+                    if (extraContribution > 0) {
+                        const uniqueEUYear1 = extraContribution * 0.78;
+                        const uniqueInvested = extraContribution * 0.22;
                         
-                        const uniqueInvested = extraContribution * (1 - getEUAllocationUnique(years));
-                        const uniqueEU = extraContribution * getEUAllocationUnique(years);
+                        dominionInvestedYearlyContributions += uniqueInvested;
+                        dominionEUYearlyContributions += uniqueEUYear1;
                         
-                        dominionInvestedYearlyContributions += monthlyInvested + uniqueInvested;
-                        dominionEUYearlyContributions += monthlyEU + uniqueEU;
-                    } 
-                    else {
-                        dominionInvestedYearlyContributions += totalMonthlyContribution;
+                        uniqueContributionsTracker.push({
+                            amount: extraContribution,
+                            yearApplied: year,
+                            pendingYear2Fee: extraContribution * 0.062
+                        });
                     }
                 }
+                
+                // Aplicar 6.2% EU de aportes únicos del año anterior
+                const pendingEU = uniqueContributionsTracker
+                    .filter(t => t.yearApplied === year - 1)
+                    .reduce((sum, t) => sum + t.pendingYear2Fee, 0);
+                
+                dominionEUYearlyContributions += pendingEU;
                 
                 // Apply annual return at end of year
                 ibkrBalance = (ibkrBalance + ibkrYearlyContributions) * (1 + returnRate);
@@ -1049,9 +1079,10 @@
                 
                 const compBox = document.createElement('div');
                 compBox.className = 'highlight-box';
+                // Verde cuando ahorras con Dominion, Rojo cuando cuesta más con Dominion
                 compBox.style.background = isSaving 
-                    ? 'linear-gradient(135deg, #1A1A19 0%, #2C2C2A 100%)'
-                    : `linear-gradient(135deg, ${comp.color} 0%, ${comp.color}DD 100%)`;
+                    ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)' // Verde
+                    : 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)'; // Rojo
                 
                 compBox.innerHTML = `
                     <div class="highlight-label">${isSaving ? 'Ahorras' : 'Costo adicional'} con Dominion vs ${comp.name}</div>
@@ -1068,10 +1099,18 @@
             
             const euYear1Percent = (getEUAllocationYear1(years) * 100).toFixed(1);
             const euYear2Percent = (getEUAllocationYear2(years) * 100).toFixed(1);
-            document.getElementById('dominion-breakdown').innerHTML = 
-                `Fee inicial: $25<br>` +
+            const hasInitial = initial > 0;
+            const hasUniqueContributions = contributions.length > 0;
+            
+            let dominionBreakdownText = `Fee inicial: $25<br>` +
                 `Fee anual: ${(getDominionFee(years) * 100).toFixed(2)}% (cubierto por EU)<br>` +
-                `EU año 1: ${euYear1Percent}% | año 2: ${euYear2Percent}%`;
+                `<strong>Aportes mensuales:</strong> EU año 1: ${euYear1Percent}% | año 2: ${euYear2Percent}%`;
+            
+            if (hasInitial || hasUniqueContributions) {
+                dominionBreakdownText += `<br><strong>Inv. inicial y aportes únicos:</strong> 78% EU año 1 | 6.2% EU año 2`;
+            }
+            
+            document.getElementById('dominion-breakdown').innerHTML = dominionBreakdownText;
             
             document.getElementById('bn-breakdown').innerHTML = 
                 `Fee anual: 1.00%<br>` +
@@ -1287,7 +1326,6 @@
             div.id = 'contrib-' + id;
             div.className = 'contribution-item';
             div.innerHTML = `
-                <input type="number" placeholder="Año" min="1" max="20" value="1" data-id="${id}" data-field="year" />
                 <select data-id="${id}" data-field="month">
                     <option value="1">Enero</option>
                     <option value="2">Febrero</option>
@@ -1302,6 +1340,8 @@
                     <option value="11">Noviembre</option>
                     <option value="12">Diciembre</option>
                 </select>
+                <input type="number" placeholder="Año" min="1" max="20" value="1" data-id="${id}" data-field="year" style="width: 90px;" />
+                <div></div>
                 <input type="number" placeholder="Monto USD" min="0" step="100" value="1000" data-id="${id}" data-field="amount" />
                 <button class="btn-remove" onclick="removeContribution(${id})">×</button>
             `;
@@ -1328,6 +1368,98 @@
             document.getElementById('contrib-' + id).remove();
             calculate();
         };
+
+        // Add recurring contribution
+        document.getElementById('add-recurring-contribution').addEventListener('click', () => {
+            const id = Date.now();
+            const div = document.createElement('div');
+            div.id = 'contrib-' + id;
+            div.className = 'contribution-item';
+            div.style.background = '#F5F5F3';
+            div.style.border = '2px solid #2C2C2A';
+            div.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; grid-column: 1 / -1; padding: 4px 0; margin-bottom: 4px; border-bottom: 1px solid #D3D1C7;">
+                    <span style="font-size: 11px; font-weight: 600; color: #2C2C2A; text-transform: uppercase; letter-spacing: 0.5px;">🔁 Recurrente anual</span>
+                </div>
+                <select data-id="${id}" data-field="month">
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12" selected>Diciembre</option>
+                </select>
+                <input type="number" placeholder="Año inicio" min="1" max="20" value="1" data-id="${id}" data-field="startYear" style="width: 90px;" />
+                <input type="number" placeholder="Año fin" min="1" max="20" value="5" data-id="${id}" data-field="endYear" style="width: 90px;" />
+                <input type="number" placeholder="Monto USD" min="0" step="100" value="1000" data-id="${id}" data-field="amount" />
+                <button class="btn-remove" onclick="removeRecurringContribution(${id})">×</button>
+            `;
+            document.getElementById('contributions-list').appendChild(div);
+            
+            // Agregar el aporte recurrente a un array separado
+            if (!window.recurringContributions) {
+                window.recurringContributions = [];
+            }
+            window.recurringContributions.push({ 
+                id, 
+                month: 12, 
+                startYear: 1, 
+                endYear: 5, 
+                amount: 1000 
+            });
+            
+            // Expandir aportes recurrentes a aportes individuales
+            expandRecurringContributions();
+            
+            div.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('change', (e) => {
+                    const recurring = window.recurringContributions.find(c => c.id === parseInt(e.target.dataset.id));
+                    if (recurring) {
+                        const field = e.target.dataset.field;
+                        recurring[field] = ['amount', 'startYear', 'endYear'].includes(field) ? 
+                            parseFloat(e.target.value) : parseInt(e.target.value);
+                        expandRecurringContributions();
+                    }
+                });
+            });
+            
+            calculate();
+        });
+
+        window.removeRecurringContribution = function(id) {
+            if (window.recurringContributions) {
+                window.recurringContributions = window.recurringContributions.filter(c => c.id !== id);
+                expandRecurringContributions();
+            }
+            document.getElementById('contrib-' + id).remove();
+            calculate();
+        };
+
+        function expandRecurringContributions() {
+            // Remover todos los aportes que vienen de recurrentes
+            contributions = contributions.filter(c => !c.isFromRecurring);
+            
+            // Expandir cada aporte recurrente en aportes individuales
+            if (window.recurringContributions) {
+                window.recurringContributions.forEach(recurring => {
+                    for (let year = recurring.startYear; year <= recurring.endYear; year++) {
+                        contributions.push({
+                            id: `recurring_${recurring.id}_${year}`,
+                            year: year,
+                            month: recurring.month,
+                            amount: recurring.amount,
+                            isFromRecurring: true
+                        });
+                    }
+                });
+            }
+        }
 
         // Event listeners
         // Event listeners para inputs

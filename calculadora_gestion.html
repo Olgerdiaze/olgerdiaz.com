@@ -637,9 +637,6 @@
             const returnRate = (parseFloat(document.getElementById('return').value) || 0) / 100;
             const years = parseInt(document.getElementById('years').value) || 15;
             
-            const monthlyReturn = returnRate / 12;
-            const totalMonths = years * 12;
-            
             // IBKR calculation
             let ibkrBalance = initial;
             let ibkrTotalFees = 0;
@@ -664,9 +661,12 @@
                 let yearIbkrFees = 0;
                 let yearDominionFees = 0;
                 
+                // Track contributions for the year
+                let ibkrYearlyContributions = 0;
+                let dominionInvestedYearlyContributions = 0;
+                let dominionEUYearlyContributions = 0;
+                
                 for (let month = 1; month <= 12; month++) {
-                    const currentMonth = (year - 1) * 12 + month;
-                    
                     // Check for unique contributions
                     const uniqueContribution = contributions.find(c => c.year === year && c.month === month);
                     const extraContribution = uniqueContribution ? uniqueContribution.amount : 0;
@@ -683,42 +683,41 @@
                         ibkrTotalFees += wireFee + commission;
                     }
                     
-                    // Calculate IBKR balance
-                    const monthlyFees = (totalMonthlyContribution > 0 ? 51 : 0);
-                    ibkrBalance = ibkrBalance * (1 + monthlyReturn) + totalMonthlyContribution - monthlyFees;
+                    // Accumulate contributions (no returns applied yet)
+                    ibkrYearlyContributions += totalMonthlyContribution - (totalMonthlyContribution > 0 ? 51 : 0);
                     
-                    // Calculate Dominion balance
-                    // Year 1: Use Year 1 EU allocation
+                    // Dominion contributions split by year
                     if (year === 1) {
                         const euPercent = getEUAllocationYear1(years);
                         const monthlyInvested = monthly * (1 - euPercent);
                         const monthlyEU = monthly * euPercent;
                         
-                        // Unique contributions use different EU allocation
                         const uniqueInvested = extraContribution * (1 - getEUAllocationUnique(years));
                         const uniqueEU = extraContribution * getEUAllocationUnique(years);
                         
-                        dominionInvestedBalance = dominionInvestedBalance * (1 + monthlyReturn) + monthlyInvested + uniqueInvested;
-                        dominionEUBalance += monthlyEU + uniqueEU;
+                        dominionInvestedYearlyContributions += monthlyInvested + uniqueInvested;
+                        dominionEUYearlyContributions += monthlyEU + uniqueEU;
                     } 
-                    // Year 2: Use Year 2 EU allocation
                     else if (year === 2) {
                         const euPercent = getEUAllocationYear2(years);
                         const monthlyInvested = monthly * (1 - euPercent);
                         const monthlyEU = monthly * euPercent;
                         
-                        // Unique contributions use different EU allocation
                         const uniqueInvested = extraContribution * (1 - getEUAllocationUnique(years));
                         const uniqueEU = extraContribution * getEUAllocationUnique(years);
                         
-                        dominionInvestedBalance = dominionInvestedBalance * (1 + monthlyReturn) + monthlyInvested + uniqueInvested;
-                        dominionEUBalance += monthlyEU + uniqueEU;
+                        dominionInvestedYearlyContributions += monthlyInvested + uniqueInvested;
+                        dominionEUYearlyContributions += monthlyEU + uniqueEU;
                     } 
-                    // Year 3+: 100% gets invested
                     else {
-                        dominionInvestedBalance = dominionInvestedBalance * (1 + monthlyReturn) + totalMonthlyContribution;
+                        dominionInvestedYearlyContributions += totalMonthlyContribution;
                     }
                 }
+                
+                // Apply annual return at end of year
+                ibkrBalance = (ibkrBalance + ibkrYearlyContributions) * (1 + returnRate);
+                dominionInvestedBalance = (dominionInvestedBalance + dominionInvestedYearlyContributions) * (1 + returnRate);
+                dominionEUBalance += dominionEUYearlyContributions; // EU doesn't earn returns
                 
                 // NO annual fee deduction for Dominion - EU units cover all fees
                 // We only track the fee for display purposes

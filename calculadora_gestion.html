@@ -150,6 +150,91 @@
             cursor: pointer;
         }
         
+        .bn-toggle-container {
+            background: #F5F5F3;
+            border: 1px solid #D3D1C7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #D3D1C7;
+            transition: .3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #2D8659;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .toggle-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2C2C2A;
+        }
+        
+        .bn-disclaimer {
+            font-size: 13px;
+            color: #888780;
+            line-height: 1.5;
+            padding: 12px;
+            background: #FFF9E6;
+            border-left: 3px solid #F4B942;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .bn-disclaimer.visible {
+            display: block;
+        }
+        
+        .bn-disclaimer strong {
+            color: #D97706;
+        }
+        
         .section-title {
             font-size: 18px;
             font-weight: 600;
@@ -209,11 +294,33 @@
             margin-bottom: 30px;
         }
         
+        .cards.three-columns {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        
+        .cards.four-columns {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+        
+        @media (max-width: 900px) {
+            .cards.three-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards.four-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .card {
             background: white;
             border: 1px solid #D3D1C7;
             border-radius: 12px;
             padding: 24px;
+        }
+        
+        .card.hidden {
+            display: none;
         }
         
         .card-header {
@@ -230,11 +337,19 @@
         }
         
         .indicator-ibkr {
-            background: #D85A30;
+            background: #FF6B35; /* Naranja */
         }
         
         .indicator-dominion {
-            background: #1E6FB3;
+            background: #2C2C2A; /* Negro */
+        }
+        
+        .indicator-bn {
+            background: #2B7AB5; /* Azul */
+        }
+        
+        .indicator-millennium {
+            background: #DC3545; /* Rojo */
         }
         
         .card-title {
@@ -255,11 +370,19 @@
         }
         
         .value-ibkr {
-            color: #D85A30;
+            color: #FF6B35; /* Naranja */
         }
         
         .value-dominion {
-            color: #1E6FB3;
+            color: #2C2C2A; /* Negro */
+        }
+        
+        .value-bn {
+            color: #2B7AB5; /* Azul */
+        }
+        
+        .value-millennium {
+            color: #DC3545; /* Rojo */
         }
         
         .card-divider {
@@ -280,13 +403,25 @@
             line-height: 1.5;
         }
         
+        #comparisons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
         .highlight-box {
             background: linear-gradient(135deg, #175A91 0%, #1E6FB3 100%);
             border-radius: 12px;
             padding: 24px;
             color: white;
-            margin-bottom: 30px;
             text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            #comparisons-container {
+                grid-template-columns: 1fr;
+            }
         }
         
         .highlight-label {
@@ -453,6 +588,38 @@
             </div>
         </div>
 
+        <!-- BN Toggle -->
+        <div class="bn-toggle-container">
+            <div class="toggle-wrapper">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="bn-toggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Comparar también con BN ETF500</span>
+            </div>
+            <div class="bn-disclaimer" id="bn-disclaimer">
+                <strong>⚠️ Aviso Importante:</strong> Este fondo replica únicamente el índice S&P 500 (500 empresas USA). A diferencia de IBKR y Dominion, <strong>no permite construir un portafolio diversificado</strong> con bonos, acciones internacionales u otros activos. Es una inversión 100% en acciones estadounidenses.
+                <br><br>
+                <span style="font-size: 12px;">Fee: 1.00% anual (máximo según prospecto: 5.00%). Sin costos de wire transfer.</span>
+            </div>
+            
+            <div class="toggle-wrapper" style="margin-top: 15px;">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="millennium-toggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Comparar también con Fondo Millennium BAC</span>
+            </div>
+            <div style="margin-top: 10px; padding: 12px; background: #FFF9E6; border-left: 3px solid #F4A261; border-radius: 6px; font-size: 13px; color: #6B5B3D;">
+                <strong>Nota:</strong> El BAC requiere un primer aporte mínimo de $250 USD (ya sea como inversión inicial o primer aporte mensual).
+            </div>
+            <div class="bn-disclaimer" id="millennium-disclaimer">
+                <strong>💡 Aviso Importante:</strong> Fondo diversificado con ETFs globales (USA ~60%, Europa 16%, Emergentes 8%, Asia 13%). A diferencia del BN ETF500, SÍ permite diversificación internacional completa similar a un portafolio bien estructurado.
+                <br><br>
+                <span style="font-size: 12px;">Fee: 1.25% anual. Plazo recomendado: 5 años. Sin costos de wire transfer.</span>
+            </div>
+        </div>
+
         <!-- Unique contributions -->
         <div class="contributions-container">
             <div class="contributions-header">
@@ -504,13 +671,51 @@
                     </div>
                 </div>
             </div>
+
+            <!-- BN ETF500 Card -->
+            <div class="card hidden" id="bn-card">
+                <div class="card-header">
+                    <div class="card-indicator indicator-bn"></div>
+                    <div class="card-title">BN ETF500 (Local)</div>
+                </div>
+                <div class="card-label">Valor final del portafolio</div>
+                <div class="card-value value-bn" id="bn-final">$0</div>
+                <div class="card-divider">
+                    <div class="card-row">
+                        <span style="color: #888780;">Total en fees</span>
+                        <span style="font-weight: 600;" id="bn-fees">$0</span>
+                    </div>
+                    <div class="card-breakdown" id="bn-breakdown">
+                        Fee anual: 1.00%<br>
+                        Solo replica S&P 500
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fondo Millennium Card -->
+            <div class="card hidden" id="millennium-card">
+                <div class="card-header">
+                    <div class="card-indicator indicator-millennium"></div>
+                    <div class="card-title">Fondo Millennium BAC</div>
+                </div>
+                <div class="card-label">Valor final del portafolio</div>
+                <div class="card-value value-millennium" id="millennium-final">$0</div>
+                <div class="card-divider">
+                    <div class="card-row">
+                        <span style="color: #888780;">Total en fees</span>
+                        <span style="font-weight: 600;" id="millennium-fees">$0</span>
+                    </div>
+                    <div class="card-breakdown" id="millennium-breakdown">
+                        Fee anual: 1.25%<br>
+                        Diversificado globalmente
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Difference highlight -->
-        <div class="highlight-box">
-            <div class="highlight-label">Ahorras con gestión pasiva</div>
-            <div class="highlight-value" id="difference">$0</div>
-            <div class="highlight-text" id="difference-text">en fees acumulados durante el plazo</div>
+        <div id="comparisons-container">
+            <!-- Se llenará dinámicamente con JavaScript -->
         </div>
 
         <!-- Chart -->
@@ -636,6 +841,32 @@
             const monthly = parseFloat(document.getElementById('monthly').value) || 0;
             const returnRate = (parseFloat(document.getElementById('return').value) || 0) / 100;
             const years = parseInt(document.getElementById('years').value) || 15;
+            const bnEnabled = document.getElementById('bn-toggle').checked;
+            const millenniumToggle = document.getElementById('millennium-toggle');
+            const millenniumEnabled = millenniumToggle.checked;
+            
+            // Validación para Fondo Millennium - mínimo $250 entre inversión inicial O aporte mensual
+            const firstContribution = initial > 0 ? initial : monthly;
+            if (millenniumEnabled && firstContribution < 250) {
+                const message = initial > 0 
+                    ? '⚠️ El Fondo Millennium requiere una inversión inicial mínima de $250 USD.\n\nTu inversión inicial actual: $' + initial.toFixed(0)
+                    : '⚠️ El Fondo Millennium requiere un primer aporte mínimo de $250 USD.\n\nTu aporte mensual actual: $' + monthly.toFixed(0);
+                alert(message);
+                millenniumToggle.checked = false;
+                
+                // Ocultar card y disclaimer
+                document.getElementById('millennium-card').classList.add('hidden');
+                document.getElementById('millennium-disclaimer').classList.remove('visible');
+                const cardsContainer = document.querySelector('.cards');
+                cardsContainer.classList.remove('four-columns');
+                if (bnEnabled) {
+                    cardsContainer.classList.add('three-columns');
+                } else {
+                    cardsContainer.classList.remove('three-columns');
+                }
+                
+                return calculate(); // Recalcular sin Millennium
+            }
             
             // IBKR calculation
             let ibkrBalance = initial;
@@ -649,22 +880,38 @@
             let dominionEUBalance = initial * getEUAllocationYear1(years);
             let dominionTotalFees = 25; // Initial fee
             
+            // BN ETF500 calculation
+            let bnBalance = initial;
+            let bnTotalFees = 0;
+            
+            // Fondo Millennium calculation
+            let millenniumBalance = initial;
+            let millenniumTotalFees = 0;
+            
             const ibkrBalanceHistory = [initial];
             const dominionBalanceHistory = [dominionInvestedBalance]; // Show redemption value (invested only)
+            const bnBalanceHistory = [initial];
+            const millenniumBalanceHistory = [initial];
             const labels = ['0'];
             
             // Yearly fee tracking
             const yearlyIbkrFees = [];
             const yearlyDominionFees = [];
+            const yearlyBnFees = [];
+            const yearlyMillenniumFees = [];
             
             for (let year = 1; year <= years; year++) {
                 let yearIbkrFees = 0;
                 let yearDominionFees = 0;
+                let yearBnFees = 0;
+                let yearMillenniumFees = 0;
                 
                 // Track contributions for the year
                 let ibkrYearlyContributions = 0;
                 let dominionInvestedYearlyContributions = 0;
                 let dominionEUYearlyContributions = 0;
+                let bnYearlyContributions = 0;
+                let millenniumYearlyContributions = 0;
                 
                 for (let month = 1; month <= 12; month++) {
                     // Check for unique contributions
@@ -685,6 +932,8 @@
                     
                     // Accumulate contributions (no returns applied yet)
                     ibkrYearlyContributions += totalMonthlyContribution - (totalMonthlyContribution > 0 ? 51 : 0);
+                    bnYearlyContributions += totalMonthlyContribution;
+                    millenniumYearlyContributions += totalMonthlyContribution;
                     
                     // Dominion contributions split by year
                     if (year === 1) {
@@ -718,6 +967,8 @@
                 ibkrBalance = (ibkrBalance + ibkrYearlyContributions) * (1 + returnRate);
                 dominionInvestedBalance = (dominionInvestedBalance + dominionInvestedYearlyContributions) * (1 + returnRate);
                 dominionEUBalance += dominionEUYearlyContributions; // EU doesn't earn returns
+                bnBalance = (bnBalance + bnYearlyContributions) * (1 + returnRate);
+                millenniumBalance = (millenniumBalance + millenniumYearlyContributions) * (1 + returnRate);
                 
                 // NO annual fee deduction for Dominion - EU units cover all fees
                 // We only track the fee for display purposes
@@ -726,38 +977,90 @@
                 dominionTotalFees += dominionAnnualFee;
                 yearDominionFees += dominionAnnualFee;
                 
+                // BN ETF500 - 1% annual fee (deducted from balance)
+                const bnAnnualFee = bnBalance * 0.01;
+                bnBalance -= bnAnnualFee;
+                bnTotalFees += bnAnnualFee;
+                yearBnFees += bnAnnualFee;
+                
+                // Fondo Millennium - 1.25% annual fee (deducted from balance)
+                const millenniumAnnualFee = millenniumBalance * 0.0125;
+                millenniumBalance -= millenniumAnnualFee;
+                millenniumTotalFees += millenniumAnnualFee;
+                yearMillenniumFees += millenniumAnnualFee;
+                
                 yearlyIbkrFees.push(yearIbkrFees);
                 yearlyDominionFees.push(yearDominionFees);
+                yearlyBnFees.push(yearBnFees);
+                yearlyMillenniumFees.push(yearMillenniumFees);
                 
                 ibkrBalanceHistory.push(ibkrBalance);
                 dominionBalanceHistory.push(dominionInvestedBalance); // Redemption value = invested only
+                bnBalanceHistory.push(bnBalance);
+                millenniumBalanceHistory.push(millenniumBalance);
                 labels.push(year.toString());
             }
             
             // Update UI
             document.getElementById('ibkr-final').textContent = '$' + Math.round(ibkrBalance).toLocaleString();
             document.getElementById('dominion-final').textContent = '$' + Math.round(dominionInvestedBalance).toLocaleString();
+            document.getElementById('bn-final').textContent = '$' + Math.round(bnBalance).toLocaleString();
+            document.getElementById('millennium-final').textContent = '$' + Math.round(millenniumBalance).toLocaleString();
             document.getElementById('ibkr-fees').textContent = '$' + Math.round(ibkrTotalFees).toLocaleString();
             document.getElementById('dominion-fees').textContent = '$' + Math.round(dominionTotalFees).toLocaleString();
+            document.getElementById('bn-fees').textContent = '$' + Math.round(bnTotalFees).toLocaleString();
+            document.getElementById('millennium-fees').textContent = '$' + Math.round(millenniumTotalFees).toLocaleString();
             
-            const difference = ibkrTotalFees - dominionTotalFees;
-            const absDifference = Math.abs(difference);
+            // Generate comparisons: Dominion vs each active fund
+            const comparisonsContainer = document.getElementById('comparisons-container');
+            comparisonsContainer.innerHTML = '';
             
-            // Update highlight box based on which is better
-            const highlightBox = document.querySelector('.highlight-box');
-            if (difference > 0) {
-                // Dominion has lower fees (better)
-                highlightBox.style.background = 'linear-gradient(135deg, #175A91 0%, #1E6FB3 100%)';
-                document.getElementById('difference').textContent = '$' + Math.round(absDifference).toLocaleString();
-                document.querySelector('.highlight-label').textContent = 'Ahorras con gestión pasiva';
-                document.getElementById('difference-text').textContent = 'en fees vs gestión activa';
-            } else {
-                // IBKR has lower fees (Dominion costs more)
-                highlightBox.style.background = 'linear-gradient(135deg, #993C1D 0%, #D85A30 100%)';
-                document.getElementById('difference').textContent = '$' + Math.round(absDifference).toLocaleString();
-                document.querySelector('.highlight-label').textContent = 'Costo adicional con gestión pasiva';
-                document.getElementById('difference-text').textContent = 'en fees vs gestión activa';
+            const comparisons = [
+                {
+                    name: 'IBKR (Gestión Activa)',
+                    fees: ibkrTotalFees,
+                    color: '#FF6B35',
+                    active: true
+                }
+            ];
+            
+            if (bnEnabled) {
+                comparisons.push({
+                    name: 'BN ETF500',
+                    fees: bnTotalFees,
+                    color: '#2B7AB5',
+                    active: true
+                });
             }
+            
+            if (millenniumEnabled) {
+                comparisons.push({
+                    name: 'Fondo Millennium BAC',
+                    fees: millenniumTotalFees,
+                    color: '#DC3545',
+                    active: true
+                });
+            }
+            
+            comparisons.forEach(comp => {
+                const difference = comp.fees - dominionTotalFees;
+                const absDifference = Math.abs(difference);
+                const isSaving = difference > 0;
+                
+                const compBox = document.createElement('div');
+                compBox.className = 'highlight-box';
+                compBox.style.background = isSaving 
+                    ? 'linear-gradient(135deg, #1A1A19 0%, #2C2C2A 100%)'
+                    : `linear-gradient(135deg, ${comp.color} 0%, ${comp.color}DD 100%)`;
+                
+                compBox.innerHTML = `
+                    <div class="highlight-label">${isSaving ? 'Ahorras' : 'Costo adicional'} con Dominion vs ${comp.name}</div>
+                    <div class="highlight-value">$${Math.round(absDifference).toLocaleString()}</div>
+                    <div class="highlight-text">${isSaving ? 'menos en fees' : 'más en fees'} durante el plazo</div>
+                `;
+                
+                comparisonsContainer.appendChild(compBox);
+            });
             
             document.getElementById('ibkr-breakdown').innerHTML = 
                 `Wire transfers: $${Math.round(ibkrWireFees).toLocaleString()}<br>` +
@@ -770,17 +1073,83 @@
                 `Fee anual: ${(getDominionFee(years) * 100).toFixed(2)}% (cubierto por EU)<br>` +
                 `EU año 1: ${euYear1Percent}% | año 2: ${euYear2Percent}%`;
             
+            document.getElementById('bn-breakdown').innerHTML = 
+                `Fee anual: 1.00%<br>` +
+                `Solo replica S&P 500`;
+            
+            document.getElementById('millennium-breakdown').innerHTML = 
+                `Fee anual: 1.25%<br>` +
+                `Diversificado globalmente`;
+            
             // Update table
             const tbody = document.getElementById('fees-tbody');
             tbody.innerHTML = '';
+            
+            // Update table header based on toggles
+            const tableHeader = document.querySelector('thead tr');
+            if (bnEnabled && millenniumEnabled) {
+                tableHeader.innerHTML = `
+                    <th>Año</th>
+                    <th>IBKR</th>
+                    <th>Dominion</th>
+                    <th>BN ETF500</th>
+                    <th>Millennium</th>
+                `;
+            } else if (bnEnabled) {
+                tableHeader.innerHTML = `
+                    <th>Año</th>
+                    <th>IBKR</th>
+                    <th>Dominion</th>
+                    <th>BN ETF500</th>
+                `;
+            } else if (millenniumEnabled) {
+                tableHeader.innerHTML = `
+                    <th>Año</th>
+                    <th>IBKR</th>
+                    <th>Dominion</th>
+                    <th>Millennium</th>
+                `;
+            } else {
+                tableHeader.innerHTML = `
+                    <th>Año</th>
+                    <th>IBKR Fees</th>
+                    <th>Dominion Fees</th>
+                    <th>Diferencia</th>
+                `;
+            }
+            
             for (let i = 0; i < years; i++) {
                 const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${i + 1}</td>
-                    <td style="color: #D85A30; font-weight: 500;">$${Math.round(yearlyIbkrFees[i]).toLocaleString()}</td>
-                    <td style="color: #1E6FB3; font-weight: 500;">$${Math.round(yearlyDominionFees[i]).toLocaleString()}</td>
-                    <td style="font-weight: 600;">$${Math.round(yearlyIbkrFees[i] - yearlyDominionFees[i]).toLocaleString()}</td>
-                `;
+                if (bnEnabled && millenniumEnabled) {
+                    row.innerHTML = `
+                        <td>${i + 1}</td>
+                        <td style="color: #FF6B35; font-weight: 500;">$${Math.round(yearlyIbkrFees[i]).toLocaleString()}</td>
+                        <td style="color: #2C2C2A; font-weight: 500;">$${Math.round(yearlyDominionFees[i]).toLocaleString()}</td>
+                        <td style="color: #2B7AB5; font-weight: 500;">$${Math.round(yearlyBnFees[i]).toLocaleString()}</td>
+                        <td style="color: #DC3545; font-weight: 500;">$${Math.round(yearlyMillenniumFees[i]).toLocaleString()}</td>
+                    `;
+                } else if (bnEnabled) {
+                    row.innerHTML = `
+                        <td>${i + 1}</td>
+                        <td style="color: #FF6B35; font-weight: 500;">$${Math.round(yearlyIbkrFees[i]).toLocaleString()}</td>
+                        <td style="color: #2C2C2A; font-weight: 500;">$${Math.round(yearlyDominionFees[i]).toLocaleString()}</td>
+                        <td style="color: #2B7AB5; font-weight: 500;">$${Math.round(yearlyBnFees[i]).toLocaleString()}</td>
+                    `;
+                } else if (millenniumEnabled) {
+                    row.innerHTML = `
+                        <td>${i + 1}</td>
+                        <td style="color: #FF6B35; font-weight: 500;">$${Math.round(yearlyIbkrFees[i]).toLocaleString()}</td>
+                        <td style="color: #2C2C2A; font-weight: 500;">$${Math.round(yearlyDominionFees[i]).toLocaleString()}</td>
+                        <td style="color: #DC3545; font-weight: 500;">$${Math.round(yearlyMillenniumFees[i]).toLocaleString()}</td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td>${i + 1}</td>
+                        <td style="color: #FF6B35; font-weight: 500;">$${Math.round(yearlyIbkrFees[i]).toLocaleString()}</td>
+                        <td style="color: #2C2C2A; font-weight: 500;">$${Math.round(yearlyDominionFees[i]).toLocaleString()}</td>
+                        <td style="font-weight: 600;">$${Math.round(yearlyIbkrFees[i] - yearlyDominionFees[i]).toLocaleString()}</td>
+                    `;
+                }
             }
             
             // Update chart
@@ -788,35 +1157,65 @@
                 chartInstance.destroy();
             }
             
+            const datasets = [
+                {
+                    label: 'IBKR (Gestión Activa)',
+                    data: ibkrBalanceHistory,
+                    borderColor: '#FF6B35',
+                    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Dominion (Gestión Pasiva)',
+                    data: dominionBalanceHistory,
+                    borderColor: '#2C2C2A',
+                    backgroundColor: 'rgba(44, 44, 42, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
+                }
+            ];
+            
+            if (bnEnabled) {
+                datasets.push({
+                    label: 'BN ETF500 (Local)',
+                    data: bnBalanceHistory,
+                    borderColor: '#2B7AB5',
+                    backgroundColor: 'rgba(43, 122, 181, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
+                });
+            }
+            
+            if (millenniumEnabled) {
+                datasets.push({
+                    label: 'Fondo Millennium BAC',
+                    data: millenniumBalanceHistory,
+                    borderColor: '#DC3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
+                });
+            }
+            
             const ctx = document.getElementById('chart').getContext('2d');
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'IBKR (Gestión Activa)',
-                            data: ibkrBalanceHistory,
-                            borderColor: '#D85A30',
-                            backgroundColor: 'rgba(216, 90, 48, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 0,
-                            pointHoverRadius: 6
-                        },
-                        {
-                            label: 'Dominion (Gestión Pasiva)',
-                            data: dominionBalanceHistory,
-                            borderColor: '#1E6FB3',
-                            backgroundColor: 'rgba(30, 111, 179, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 0,
-                            pointHoverRadius: 6
-                        }
-                    ]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -931,11 +1330,123 @@
         };
 
         // Event listeners
-        document.getElementById('initial').addEventListener('input', calculate);
-        document.getElementById('monthly').addEventListener('input', calculate);
+        // Event listeners para inputs
+        document.getElementById('initial').addEventListener('input', function() {
+            const initial = parseFloat(this.value) || 0;
+            const monthly = parseFloat(document.getElementById('monthly').value) || 0;
+            const millenniumToggle = document.getElementById('millennium-toggle');
+            
+            // Si Millennium está activo y ni la inversión inicial ni el aporte mensual llegan a $250, desactivarlo
+            const firstContribution = initial > 0 ? initial : monthly;
+            if (millenniumToggle.checked && firstContribution < 250) {
+                millenniumToggle.checked = false;
+                document.getElementById('millennium-card').classList.add('hidden');
+                document.getElementById('millennium-disclaimer').classList.remove('visible');
+                
+                const cardsContainer = document.querySelector('.cards');
+                const bnEnabled = document.getElementById('bn-toggle').checked;
+                cardsContainer.classList.remove('four-columns');
+                if (bnEnabled) {
+                    cardsContainer.classList.add('three-columns');
+                } else {
+                    cardsContainer.classList.remove('three-columns');
+                }
+            }
+            
+            calculate();
+        });
+        
+        document.getElementById('monthly').addEventListener('input', function() {
+            const initial = parseFloat(document.getElementById('initial').value) || 0;
+            const monthly = parseFloat(this.value) || 0;
+            const millenniumToggle = document.getElementById('millennium-toggle');
+            
+            // Si Millennium está activo y ni la inversión inicial ni el aporte mensual llegan a $250, desactivarlo
+            const firstContribution = initial > 0 ? initial : monthly;
+            if (millenniumToggle.checked && firstContribution < 250) {
+                millenniumToggle.checked = false;
+                document.getElementById('millennium-card').classList.add('hidden');
+                document.getElementById('millennium-disclaimer').classList.remove('visible');
+                
+                const cardsContainer = document.querySelector('.cards');
+                const bnEnabled = document.getElementById('bn-toggle').checked;
+                cardsContainer.classList.remove('four-columns');
+                if (bnEnabled) {
+                    cardsContainer.classList.add('three-columns');
+                } else {
+                    cardsContainer.classList.remove('three-columns');
+                }
+            }
+            
+            calculate();
+        });
+        
         document.getElementById('return').addEventListener('input', calculate);
         document.getElementById('years').addEventListener('input', (e) => {
             document.getElementById('years-display').textContent = e.target.value;
+            calculate();
+        });
+        
+        // BN toggle event listener
+        document.getElementById('bn-toggle').addEventListener('change', (e) => {
+            const bnCard = document.getElementById('bn-card');
+            const disclaimer = document.getElementById('bn-disclaimer');
+            const cardsContainer = document.querySelector('.cards');
+            const millenniumEnabled = document.getElementById('millennium-toggle').checked;
+            
+            if (e.target.checked) {
+                bnCard.classList.remove('hidden');
+                disclaimer.classList.add('visible');
+                // Si ambos están activos, usamos four-columns
+                if (millenniumEnabled) {
+                    cardsContainer.classList.add('four-columns');
+                    cardsContainer.classList.remove('three-columns');
+                } else {
+                    cardsContainer.classList.add('three-columns');
+                }
+            } else {
+                bnCard.classList.add('hidden');
+                disclaimer.classList.remove('visible');
+                cardsContainer.classList.remove('four-columns');
+                // Si Millennium sigue activo, mantener three-columns
+                if (millenniumEnabled) {
+                    cardsContainer.classList.add('three-columns');
+                } else {
+                    cardsContainer.classList.remove('three-columns');
+                }
+            }
+            
+            calculate();
+        });
+        
+        document.getElementById('millennium-toggle').addEventListener('change', (e) => {
+            const millenniumCard = document.getElementById('millennium-card');
+            const disclaimer = document.getElementById('millennium-disclaimer');
+            const cardsContainer = document.querySelector('.cards');
+            const bnEnabled = document.getElementById('bn-toggle').checked;
+            
+            if (e.target.checked) {
+                millenniumCard.classList.remove('hidden');
+                disclaimer.classList.add('visible');
+                // Si ambos están activos, usamos four-columns
+                if (bnEnabled) {
+                    cardsContainer.classList.add('four-columns');
+                    cardsContainer.classList.remove('three-columns');
+                } else {
+                    cardsContainer.classList.add('three-columns');
+                }
+            } else {
+                millenniumCard.classList.add('hidden');
+                disclaimer.classList.remove('visible');
+                cardsContainer.classList.remove('four-columns');
+                // Si BN sigue activo, mantener three-columns
+                if (bnEnabled) {
+                    cardsContainer.classList.add('three-columns');
+                } else {
+                    cardsContainer.classList.remove('three-columns');
+                }
+            }
+            
             calculate();
         });
 

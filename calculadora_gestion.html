@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora: Gestión Activa vs Pasiva | Olger Díaz - Método GEM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F9F8F6;
+            color: #2C2C2A;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #1E6FB3;
+            padding-bottom: 30px;
+        }
+        
+        .brand {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1E6FB3;
+            margin-bottom: 8px;
+        }
+        
+        .tagline {
+            font-size: 16px;
+            color: #5F5E5A;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2C2C2A;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #888780;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-size: 13px;
+            color: #888780;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input[type="number"],
+        input[type="text"],
+        select {
+            padding: 10px 12px;
+            border: 1px solid #D3D1C7;
+            border-radius: 8px;
+            font-size: 15px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #1D9E75;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #D3D1C7;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1E6FB3;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1E6FB3;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .range-value {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+            color: #1E6FB3;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 12px;
+            background: #F1EFE8;
+            border-radius: 8px;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #2C2C2A;
+        }
+        
+        .contributions-container {
+            margin-bottom: 30px;
+        }
+        
+        .contributions-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        button {
+            background: #1E6FB3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #175A91;
+        }
+        
+        .btn-remove {
+            background: #D85A30;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-remove:hover {
+            background: #993C1D;
+        }
+        
+        .contribution-item {
+            display: grid;
+            grid-template-columns: 100px 120px 1fr 60px;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #D3D1C7;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .card-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+        
+        .indicator-ibkr {
+            background: #D85A30;
+        }
+        
+        .indicator-dominion {
+            background: #1E6FB3;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .card-label {
+            font-size: 12px;
+            color: #888780;
+            margin-bottom: 6px;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .value-ibkr {
+            color: #D85A30;
+        }
+        
+        .value-dominion {
+            color: #1E6FB3;
+        }
+        
+        .card-divider {
+            border-top: 1px solid #D3D1C7;
+            padding-top: 16px;
+        }
+        
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .card-breakdown {
+            font-size: 12px;
+            color: #888780;
+            line-height: 1.5;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #175A91 0%, #1E6FB3 100%);
+            border-radius: 12px;
+            padding: 24px;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .highlight-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .highlight-value {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .highlight-text {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+        
+        .chart-container {
+            margin-bottom: 30px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            margin-top: 16px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        thead {
+            background: #F1EFE8;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2C2C2A;
+        }
+        
+        th:not(:first-child) {
+            text-align: right;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #D3D1C7;
+        }
+        
+        td:not(:first-child) {
+            text-align: right;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #D3D1C7;
+        }
+        
+        .disclaimer {
+            background: #F1EFE8;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #5F5E5A;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .disclaimer-title {
+            font-weight: 600;
+            color: #2C2C2A;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .footer-brand {
+            text-align: center;
+            color: #888780;
+            font-size: 13px;
+        }
+        
+        .footer-brand strong {
+            color: #1E6FB3;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+            
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .contribution-item {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand">Olger Díaz - Método GEM</div>
+            <div class="tagline">Gestión Estratégica de tu Patrimonio</div>
+            <div class="title">Gestión Activa vs Gestión Pasiva</div>
+            <div class="subtitle">Compara el impacto de los fees en tu inversión a largo plazo</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <label>Inversión inicial (USD)</label>
+                <input type="number" id="initial" value="5000" min="100" step="100">
+            </div>
+            <div class="control-group">
+                <label>Aporte mensual (USD)</label>
+                <input type="number" id="monthly" value="500" min="0" step="50">
+            </div>
+            <div class="control-group">
+                <label>Retorno anual esperado (%)</label>
+                <input type="number" id="return" value="10" min="0" max="30" step="0.5">
+            </div>
+            <div class="control-group">
+                <label>Plazo (años)</label>
+                <input type="range" id="years" min="5" max="20" value="15">
+                <div class="range-value"><span id="years-display">15</span> años</div>
+            </div>
+        </div>
+
+        <!-- EU Explanation -->
+        <div style="background: #E3F2FD; border-left: 3px solid #1E6FB3; padding: 16px; border-radius: 8px; margin-bottom: 30px; font-size: 13px; line-height: 1.6;">
+            <div style="font-weight: 600; color: #175A91; margin-bottom: 8px;">📘 Sobre las Unidades de Establecimiento (EU) en Dominion</div>
+            <div style="color: #5F5E5A;">
+                Durante los primeros 2 años, un porcentaje de tus aportes regulares se reserva como Unidades de Establecimiento (EU). Estas EU no se invierten, tienen precio fijo y se usan para pagar todos los fees del producto durante TODO el plazo. 
+                <strong>La calculadora muestra el "Valor de rescate"</strong> (lo que realmente puedes retirar), que excluye las EU.
+                <br><br>
+                <span style="font-size: 12px; opacity: 0.9;">
+                    <strong>Ejemplos:</strong> 
+                    <br>• Plan 5 años: Año 1 = 24.8% a EU, Año 2 = 6.2% a EU
+                    <br>• Plan 15 años: Año 1 = 74.3% a EU, Año 2 = 18.6% a EU
+                    <br>• Plan 20 años: Año 1 = 99% a EU, Año 2 = 24.8% a EU
+                    <br>• Aportes únicos: 7.8% a EU (constante en todos los plazos)
+                    <br>• Desde año 3: 100% se invierte normalmente
+                </span>
+            </div>
+        </div>
+
+        <!-- Unique contributions -->
+        <div class="contributions-container">
+            <div class="contributions-header">
+                <div class="section-title">Aportes únicos (opcional)</div>
+                <button id="add-contribution">+ Agregar aporte</button>
+            </div>
+            <div id="contributions-list"></div>
+        </div>
+
+        <!-- Comparison cards -->
+        <div class="cards">
+            <!-- IBKR Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-indicator indicator-ibkr"></div>
+                    <div class="card-title">Gestión Activa (IBKR)</div>
+                </div>
+                <div class="card-label">Valor final del portafolio</div>
+                <div class="card-value value-ibkr" id="ibkr-final">$0</div>
+                <div class="card-divider">
+                    <div class="card-row">
+                        <span style="color: #888780;">Total en fees</span>
+                        <span style="font-weight: 600;" id="ibkr-fees">$0</span>
+                    </div>
+                    <div class="card-breakdown" id="ibkr-breakdown">
+                        Wire transfers: $0<br>
+                        Comisiones: $0
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dominion Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-indicator indicator-dominion"></div>
+                    <div class="card-title">Gestión Pasiva (Dominion)</div>
+                </div>
+                <div class="card-label">Valor de rescate (lo accesible)</div>
+                <div class="card-value value-dominion" id="dominion-final">$0</div>
+                <div class="card-divider">
+                    <div class="card-row">
+                        <span style="color: #888780;">Total en fees</span>
+                        <span style="font-weight: 600;" id="dominion-fees">$0</span>
+                    </div>
+                    <div class="card-breakdown" id="dominion-breakdown">
+                        Fee inicial: $25<br>
+                        Fee anual: 0% (cubierto por EU)<br>
+                        EU año 1: 0% | año 2: 0%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Difference highlight -->
+        <div class="highlight-box">
+            <div class="highlight-label">Ahorras con gestión pasiva</div>
+            <div class="highlight-value" id="difference">$0</div>
+            <div class="highlight-text" id="difference-text">en fees acumulados durante el plazo</div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <div class="section-title">Evolución del portafolio</div>
+            <div class="chart-wrapper">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Fees table -->
+        <div>
+            <div class="section-title">Desglose de fees por año</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Año</th>
+                            <th>IBKR Fees</th>
+                            <th>Dominion Fees</th>
+                            <th>Diferencia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fees-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer with disclaimers -->
+        <div class="footer">
+            <div class="disclaimer">
+                <div class="disclaimer-title">Aviso Importante</div>
+                Esta calculadora es una herramienta educativa proporcionada por Olger Díaz - Método GEM con fines informativos únicamente. Los cálculos presentados son estimaciones basadas en los parámetros ingresados y no constituyen asesoría financiera, fiscal o legal.
+                <br><br>
+                <strong>Limitaciones importantes:</strong>
+                <br>• Los retornos históricos no garantizan resultados futuros
+                <br>• Los rendimientos mostrados son proyecciones y pueden variar significativamente
+                <br>• No se consideran impuestos, inflación ni otros costos adicionales
+                <br>• Las condiciones de mercado y los fees de los proveedores pueden cambiar
+                <br>• Esta herramienta no reemplaza la consulta con un profesional financiero calificado
+                <br><br>
+                El Método GEM es un sistema educativo de gestión patrimonial. No soy asesor financiero registrado y no vendo productos financieros. Consulta con profesionales calificados antes de tomar decisiones de inversión.
+            </div>
+            
+            <div class="footer-brand">
+                © 2026 <strong>Olger Díaz - Método GEM</strong> | Gestión Estratégica de tu Patrimonio
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let contributions = [];
+        let chartInstance = null;
+
+        const dominionFees = {
+            5: 0.0265, 6: 0.0215, 7: 0.0185, 8: 0.0165, 9: 0.015,
+            10: 0.0135, 11: 0.0123, 12: 0.0117, 13: 0.0116, 14: 0.0116,
+            15: 0.0115, 16: 0.0115, 17: 0.0115, 18: 0.0115, 19: 0.0115, 20: 0.0115
+        };
+
+        // Establishment Units (EU) allocation for years 1-2 by plan term
+        // ALL DATA VERIFIED from official Dominion simulations
+        const euAllocationYear1 = {
+            5: 0.2475,
+            6: 0.2970,
+            7: 0.3465,
+            8: 0.3960,
+            9: 0.4455,
+            10: 0.4950,
+            11: 0.5445,
+            12: 0.5940,
+            13: 0.6435,
+            14: 0.6930,
+            15: 0.7425,
+            16: 0.7920,
+            17: 0.8415,
+            18: 0.8910,
+            19: 0.9405,
+            20: 0.9900
+        };
+
+        const euAllocationYear2 = {
+            5: 0.0619,
+            6: 0.0743,
+            7: 0.0866,
+            8: 0.0990,
+            9: 0.1114,
+            10: 0.1238,
+            11: 0.1361,
+            12: 0.1485,
+            13: 0.1609,
+            14: 0.1733,
+            15: 0.1856,
+            16: 0.1980,
+            17: 0.2104,
+            18: 0.2228,
+            19: 0.2351,
+            20: 0.2475
+        };
+
+        // EU allocation for unique/one-time contributions
+        // CONSTANT across all plan terms
+        const euAllocationUnique = 0.0780; // 7.80% for all plans
+
+        function getDominionFee(years) {
+            return dominionFees[years] || 0.0115;
+        }
+
+        function getEUAllocationYear1(years) {
+            return euAllocationYear1[years] || 0.7425; // Default to 15-year if not found
+        }
+
+        function getEUAllocationYear2(years) {
+            return euAllocationYear2[years] || 0.1856; // Default to 15-year if not found
+        }
+
+        function getEUAllocationUnique(years) {
+            return euAllocationUnique; // Always 7.80%
+        }
+
+        function calculate() {
+            const initial = parseFloat(document.getElementById('initial').value) || 0;
+            const monthly = parseFloat(document.getElementById('monthly').value) || 0;
+            const returnRate = (parseFloat(document.getElementById('return').value) || 0) / 100;
+            const years = parseInt(document.getElementById('years').value) || 15;
+            
+            const monthlyReturn = returnRate / 12;
+            const totalMonths = years * 12;
+            
+            // IBKR calculation
+            let ibkrBalance = initial;
+            let ibkrTotalFees = 0;
+            let ibkrWireFees = 0;
+            let ibkrCommissions = 0;
+            
+            // Dominion calculation
+            // Initial investment uses Year 1 EU allocation
+            let dominionInvestedBalance = initial * (1 - getEUAllocationYear1(years));
+            let dominionEUBalance = initial * getEUAllocationYear1(years);
+            let dominionTotalFees = 25; // Initial fee
+            
+            const ibkrBalanceHistory = [initial];
+            const dominionBalanceHistory = [dominionInvestedBalance]; // Show redemption value (invested only)
+            const labels = ['0'];
+            
+            // Yearly fee tracking
+            const yearlyIbkrFees = [];
+            const yearlyDominionFees = [];
+            
+            for (let year = 1; year <= years; year++) {
+                let yearIbkrFees = 0;
+                let yearDominionFees = 0;
+                
+                for (let month = 1; month <= 12; month++) {
+                    const currentMonth = (year - 1) * 12 + month;
+                    
+                    // Check for unique contributions
+                    const uniqueContribution = contributions.find(c => c.year === year && c.month === month);
+                    const extraContribution = uniqueContribution ? uniqueContribution.amount : 0;
+                    
+                    const totalMonthlyContribution = monthly + extraContribution;
+                    
+                    // IBKR - wire transfer and commission fees
+                    if (totalMonthlyContribution > 0) {
+                        const wireFee = 50; // $30 send + $20 receive
+                        const commission = 1;
+                        ibkrWireFees += wireFee;
+                        ibkrCommissions += commission;
+                        yearIbkrFees += wireFee + commission;
+                        ibkrTotalFees += wireFee + commission;
+                    }
+                    
+                    // Calculate IBKR balance
+                    const monthlyFees = (totalMonthlyContribution > 0 ? 51 : 0);
+                    ibkrBalance = ibkrBalance * (1 + monthlyReturn) + totalMonthlyContribution - monthlyFees;
+                    
+                    // Calculate Dominion balance
+                    // Year 1: Use Year 1 EU allocation
+                    if (year === 1) {
+                        const euPercent = getEUAllocationYear1(years);
+                        const monthlyInvested = monthly * (1 - euPercent);
+                        const monthlyEU = monthly * euPercent;
+                        
+                        // Unique contributions use different EU allocation
+                        const uniqueInvested = extraContribution * (1 - getEUAllocationUnique(years));
+                        const uniqueEU = extraContribution * getEUAllocationUnique(years);
+                        
+                        dominionInvestedBalance = dominionInvestedBalance * (1 + monthlyReturn) + monthlyInvested + uniqueInvested;
+                        dominionEUBalance += monthlyEU + uniqueEU;
+                    } 
+                    // Year 2: Use Year 2 EU allocation
+                    else if (year === 2) {
+                        const euPercent = getEUAllocationYear2(years);
+                        const monthlyInvested = monthly * (1 - euPercent);
+                        const monthlyEU = monthly * euPercent;
+                        
+                        // Unique contributions use different EU allocation
+                        const uniqueInvested = extraContribution * (1 - getEUAllocationUnique(years));
+                        const uniqueEU = extraContribution * getEUAllocationUnique(years);
+                        
+                        dominionInvestedBalance = dominionInvestedBalance * (1 + monthlyReturn) + monthlyInvested + uniqueInvested;
+                        dominionEUBalance += monthlyEU + uniqueEU;
+                    } 
+                    // Year 3+: 100% gets invested
+                    else {
+                        dominionInvestedBalance = dominionInvestedBalance * (1 + monthlyReturn) + totalMonthlyContribution;
+                    }
+                }
+                
+                // NO annual fee deduction for Dominion - EU units cover all fees
+                // We only track the fee for display purposes
+                const totalDominionBalance = dominionInvestedBalance + dominionEUBalance;
+                const dominionAnnualFee = totalDominionBalance * getDominionFee(years);
+                dominionTotalFees += dominionAnnualFee;
+                yearDominionFees += dominionAnnualFee;
+                
+                yearlyIbkrFees.push(yearIbkrFees);
+                yearlyDominionFees.push(yearDominionFees);
+                
+                ibkrBalanceHistory.push(ibkrBalance);
+                dominionBalanceHistory.push(dominionInvestedBalance); // Redemption value = invested only
+                labels.push(year.toString());
+            }
+            
+            // Update UI
+            document.getElementById('ibkr-final').textContent = '$' + Math.round(ibkrBalance).toLocaleString();
+            document.getElementById('dominion-final').textContent = '$' + Math.round(dominionInvestedBalance).toLocaleString();
+            document.getElementById('ibkr-fees').textContent = '$' + Math.round(ibkrTotalFees).toLocaleString();
+            document.getElementById('dominion-fees').textContent = '$' + Math.round(dominionTotalFees).toLocaleString();
+            
+            const difference = ibkrTotalFees - dominionTotalFees;
+            const absDifference = Math.abs(difference);
+            
+            // Update highlight box based on which is better
+            const highlightBox = document.querySelector('.highlight-box');
+            if (difference > 0) {
+                // Dominion has lower fees (better)
+                highlightBox.style.background = 'linear-gradient(135deg, #175A91 0%, #1E6FB3 100%)';
+                document.getElementById('difference').textContent = '$' + Math.round(absDifference).toLocaleString();
+                document.querySelector('.highlight-label').textContent = 'Ahorras con gestión pasiva';
+                document.getElementById('difference-text').textContent = 'en fees vs gestión activa';
+            } else {
+                // IBKR has lower fees (Dominion costs more)
+                highlightBox.style.background = 'linear-gradient(135deg, #993C1D 0%, #D85A30 100%)';
+                document.getElementById('difference').textContent = '$' + Math.round(absDifference).toLocaleString();
+                document.querySelector('.highlight-label').textContent = 'Costo adicional con gestión pasiva';
+                document.getElementById('difference-text').textContent = 'en fees vs gestión activa';
+            }
+            
+            document.getElementById('ibkr-breakdown').innerHTML = 
+                `Wire transfers: $${Math.round(ibkrWireFees).toLocaleString()}<br>` +
+                `Comisiones: $${Math.round(ibkrCommissions).toLocaleString()}`;
+            
+            const euYear1Percent = (getEUAllocationYear1(years) * 100).toFixed(1);
+            const euYear2Percent = (getEUAllocationYear2(years) * 100).toFixed(1);
+            document.getElementById('dominion-breakdown').innerHTML = 
+                `Fee inicial: $25<br>` +
+                `Fee anual: ${(getDominionFee(years) * 100).toFixed(2)}% (cubierto por EU)<br>` +
+                `EU año 1: ${euYear1Percent}% | año 2: ${euYear2Percent}%`;
+            
+            // Update table
+            const tbody = document.getElementById('fees-tbody');
+            tbody.innerHTML = '';
+            for (let i = 0; i < years; i++) {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td style="color: #D85A30; font-weight: 500;">$${Math.round(yearlyIbkrFees[i]).toLocaleString()}</td>
+                    <td style="color: #1E6FB3; font-weight: 500;">$${Math.round(yearlyDominionFees[i]).toLocaleString()}</td>
+                    <td style="font-weight: 600;">$${Math.round(yearlyIbkrFees[i] - yearlyDominionFees[i]).toLocaleString()}</td>
+                `;
+            }
+            
+            // Update chart
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            const ctx = document.getElementById('chart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'IBKR (Gestión Activa)',
+                            data: ibkrBalanceHistory,
+                            borderColor: '#D85A30',
+                            backgroundColor: 'rgba(216, 90, 48, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Dominion (Gestión Pasiva)',
+                            data: dominionBalanceHistory,
+                            borderColor: '#1E6FB3',
+                            backgroundColor: 'rgba(30, 111, 179, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 13,
+                                    weight: 500
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': $' + Math.round(context.parsed.y).toLocaleString();
+                                }
+                            },
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'k';
+                                },
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Años',
+                                font: { size: 13, weight: 500 }
+                            },
+                            ticks: {
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // Add contribution
+        document.getElementById('add-contribution').addEventListener('click', () => {
+            const id = Date.now();
+            const div = document.createElement('div');
+            div.id = 'contrib-' + id;
+            div.className = 'contribution-item';
+            div.innerHTML = `
+                <input type="number" placeholder="Año" min="1" max="20" value="1" data-id="${id}" data-field="year" />
+                <select data-id="${id}" data-field="month">
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
+                <input type="number" placeholder="Monto USD" min="0" step="100" value="1000" data-id="${id}" data-field="amount" />
+                <button class="btn-remove" onclick="removeContribution(${id})">×</button>
+            `;
+            document.getElementById('contributions-list').appendChild(div);
+            
+            contributions.push({ id, year: 1, month: 1, amount: 1000 });
+            
+            div.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('change', (e) => {
+                    const contrib = contributions.find(c => c.id === parseInt(e.target.dataset.id));
+                    if (contrib) {
+                        contrib[e.target.dataset.field] = e.target.dataset.field === 'amount' ? 
+                            parseFloat(e.target.value) : parseInt(e.target.value);
+                        calculate();
+                    }
+                });
+            });
+            
+            calculate();
+        });
+
+        window.removeContribution = function(id) {
+            contributions = contributions.filter(c => c.id !== id);
+            document.getElementById('contrib-' + id).remove();
+            calculate();
+        };
+
+        // Event listeners
+        document.getElementById('initial').addEventListener('input', calculate);
+        document.getElementById('monthly').addEventListener('input', calculate);
+        document.getElementById('return').addEventListener('input', calculate);
+        document.getElementById('years').addEventListener('input', (e) => {
+            document.getElementById('years-display').textContent = e.target.value;
+            calculate();
+        });
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>

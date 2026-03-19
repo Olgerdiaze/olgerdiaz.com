@@ -15,6 +15,7 @@
     --red:#d94f4f; --red-lt:#fce8e8;
     --blue:#3a82e8; --teal:#3aacca;
     --positive:#2a8a5c; --pos-lt:#e2f5ec;
+    --warn:#c97b00; --warn-lt:#fff3cd;
     --font-display:'DM Serif Display',serif;
     --font-body:'DM Sans',sans-serif;
     --font-mono:'DM Mono',monospace;
@@ -22,49 +23,41 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;}
-
-  /* HEADER */
   .header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
   .header h1{font-family:var(--font-display);font-size:23px;font-weight:400;letter-spacing:-0.3px;}
   .header p{color:var(--muted);font-size:12px;margin-top:2px;}
   .badge{background:var(--accent);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-family:var(--font-mono);white-space:nowrap;}
-
-  /* MAIN */
   .main{max-width:1080px;margin:0 auto;padding:24px 40px 60px;}
-
-  /* TABS */
   .tabs{display:flex;gap:2px;margin-bottom:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:4px;width:fit-content;}
   .tab{padding:7px 20px;border-radius:var(--rs);border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .18s;}
   .tab.active{background:var(--accent);color:#fff;font-weight:500;}
   .tab:hover:not(.active){color:var(--text);background:var(--surface2);}
-
   .panel{display:none;}.panel.active{display:block;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-
-  /* CARD */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
   .card-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .card-subtitle{font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-bottom:12px;margin-top:-8px;}
   .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-
-  /* TC ROW */
   .tc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--muted);}
   .tc-status{font-size:11px;font-family:var(--font-mono);padding:3px 8px;border-radius:4px;}
   .tc-live{background:var(--pos-lt);color:var(--positive);}
   .tc-manual{background:#fff3cd;color:#856404;}
-
-  /* DATE ROW */
   .date-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--muted);}
-
-  /* INPUTS */
+  .ingreso-card{background:var(--surface);border:2px solid var(--accent);border-radius:var(--r);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .ingreso-label{font-size:12px;font-weight:500;color:var(--accent);font-family:var(--font-mono);letter-spacing:.5px;white-space:nowrap;}
+  .ingreso-inputs{display:flex;gap:10px;align-items:flex-end;flex:1;flex-wrap:wrap;}
+  .ingreso-group{display:flex;flex-direction:column;gap:4px;}
+  .ingreso-sublabel{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.6px;text-transform:uppercase;}
   .input-header,.data-row{display:grid;gap:8px;align-items:center;margin-bottom:6px;}
-  .dual{grid-template-columns:1fr 120px 120px 30px;}
+  .dual{grid-template-columns:1fr 110px 110px 30px;}
+  .triple{grid-template-columns:1fr 95px 95px 110px 30px;}
   .single{grid-template-columns:1fr 120px 30px;}
+  .inv-bolsa-row{grid-template-columns:1fr 95px 95px 105px 30px;}
+  .inv-fija-row{grid-template-columns:1fr 110px 110px 30px;}
   .col-lbl{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.8px;text-transform:uppercase;}
-
   input[type="text"],input[type="number"],input[type="month"]{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:7px 10px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;}
   input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(47,111,223,.1);}
   input::placeholder{color:#aab4c8;}
-
   .btn-remove{width:30px;height:30px;background:transparent;border:1px solid var(--border);border-radius:var(--rs);color:var(--muted);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;line-height:1;}
   .btn-remove:hover{border-color:var(--red);color:var(--red);background:var(--red-lt);}
   .btn-add{background:transparent;border:1px dashed var(--border2);border-radius:var(--rs);color:var(--muted);font-size:12px;padding:6px 14px;cursor:pointer;margin-top:6px;transition:all .15s;font-family:var(--font-body);display:inline-flex;align-items:center;gap:5px;}
@@ -73,68 +66,53 @@
   .btn-primary:hover{background:#1a5cc8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(47,111,223,.25);}
   .btn-secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r);padding:10px 20px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
   .btn-secondary:hover{border-color:var(--border2);color:var(--text);}
-
-  /* SUMMARY */
   .summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
   .s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
   .s-lbl{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.5px;margin-bottom:6px;}
   .s-val{font-size:18px;font-family:var(--font-mono);font-weight:500;color:var(--text);letter-spacing:-.5px;}
   .s-val.pos{color:var(--positive);}.s-val.neg{color:var(--red);}.s-val.blue{color:var(--accent);}
   .s-sub{font-size:11px;color:var(--muted);margin-top:4px;}
-
-  /* CURRENCY TOGGLE */
   .curr-toggle{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:18px;}
   .curr-btn{padding:4px 14px;border-radius:4px;border:none;background:transparent;color:var(--muted);font-size:12px;font-family:var(--font-mono);cursor:pointer;transition:all .15s;}
   .curr-btn.active{background:var(--surface);color:var(--accent);border:1px solid var(--border);font-weight:500;}
-
-  /* BREAKDOWN */
   .breakdown-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
   .breakdown-item:last-child{border-bottom:none;}
   .b-name{color:var(--muted);}.b-val{font-family:var(--font-mono);font-size:12px;}
   .b-val.pos{color:var(--positive);}.b-val.neg{color:var(--red);}
   .b-total{font-size:14px!important;font-weight:500;}
-
-  /* BARS */
   .bar-wrap{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:5px;}
   .bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
   .risk-item{margin-bottom:14px;}
   .risk-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;}
   .risk-name{color:var(--muted);}.risk-pct{font-family:var(--font-mono);color:var(--text);}
-
-  /* AI */
   .ai-panel{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--r);padding:24px;margin-top:16px;}
   .ai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
   .ai-header-left{display:flex;align-items:center;gap:10px;}
-  .ai-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   .ai-title{font-size:12px;font-family:var(--font-mono);letter-spacing:1px;color:var(--accent);text-transform:uppercase;}
   .ai-content{font-size:13.5px;color:var(--text);line-height:1.75;}
   .ai-section{margin-bottom:18px;}
-  .ai-section-title{font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border);}
-  .ai-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;font-family:var(--font-mono);}
-  .ai-dots span{animation:blink 1.4s infinite;}
-  .ai-dots span:nth-child(2){animation-delay:.2s;}
-  .ai-dots span:nth-child(3){animation-delay:.4s;}
-  @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
-
+  .ai-section-title{font-size:11px;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+  .metric-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-mono);padding:3px 9px;border-radius:12px;margin-bottom:8px;}
+  .pill-red{background:var(--red-lt);color:var(--red);}
+  .pill-warn{background:var(--warn-lt);color:var(--warn);}
+  .pill-green{background:var(--pos-lt);color:var(--positive);}
+  .pill-blue{background:var(--accent-lt);color:var(--accent);}
   .next-steps{list-style:none;margin-top:6px;}
   .next-steps li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
   .next-steps li:last-child{border-bottom:none;}
   .step-num{font-family:var(--font-mono);font-size:10px;font-weight:500;color:#fff;background:var(--accent);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-
-  /* DISCLOSURE */
+  .context-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+  .context-table td{padding:6px 10px;border-bottom:1px solid var(--border);}
+  .context-table td:first-child{color:var(--muted);}
+  .context-table td:last-child{font-family:var(--font-mono);text-align:right;}
+  .context-table tr:last-child td{border-bottom:none;}
   .disclosure{margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.6;}
   .disclosure strong{color:var(--text);}
-
-  /* MENTOR CTA */
   .mentor-cta{margin-top:16px;background:var(--accent-lt);border:1px solid #b8d4f5;border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text);line-height:1.5;}
   .mentor-icon{font-size:22px;flex-shrink:0;}
   .mentor-cta strong{color:var(--accent);}
   .mentor-cta span{color:var(--muted);font-size:12px;}
-
   .divider{height:1px;background:var(--border);margin:14px 0;}
-
-  /* EMERGENCY FUND */
   .fe-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:var(--r);padding:20px;margin-bottom:14px;}
   .fe-inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
   .fe-input-group{display:flex;flex-direction:column;gap:5px;}
@@ -142,30 +120,24 @@
   .fe-meter{margin-top:14px;padding:14px;background:var(--surface2);border-radius:var(--rs);}
   .fe-meter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
   .fe-meses{font-size:22px;font-family:var(--font-mono);font-weight:500;}
-  .fe-meses.danger{color:var(--red);}
-  .fe-meses.warn{color:#c97b00;}
-  .fe-meses.ok{color:var(--positive);}
+  .fe-meses.danger{color:var(--red);} .fe-meses.warn{color:var(--warn);} .fe-meses.ok{color:var(--positive);}
   .fe-label{font-size:12px;color:var(--muted);}
   .fe-bar-wrap{height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
   .fe-bar{height:100%;border-radius:5px;transition:width .5s ease;}
   .fe-note{font-size:11px;color:var(--muted);margin-top:8px;font-family:var(--font-mono);}
-
-  /* REPORT HEADER (visible only in PDF) */
   .report-header{display:none;}
-
-  /* ACTION BAR */
   .action-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
-
+  .inv-subsection{margin-bottom:20px;}
+  .inv-subsection-title{font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--border2);}
   @media(max-width:700px){
     .main{padding:20px 16px 40px;}
     .header{padding:16px;flex-direction:column;align-items:flex-start;}
     .summary-grid{grid-template-columns:1fr 1fr;}
     .grid2{grid-template-columns:1fr;}
-    .dual{grid-template-columns:1fr 90px 90px 30px;}
+    .dual{grid-template-columns:1fr 80px 80px 30px;}
+    .triple{grid-template-columns:1fr 75px 75px 85px 30px;}
     .fe-inputs{grid-template-columns:1fr;}
   }
-
-  /* PDF PRINT OVERRIDES */
   @media print{
     body{background:#fff;}
     .tabs,.action-bar,.btn-secondary,.btn-primary,.curr-toggle{display:none!important;}
@@ -191,10 +163,9 @@
     <button class="tab"        id="tab-resultado" onclick="switchTab('resultado')">② Resultado</button>
   </div>
 
-  <!-- ═══════════════ PANEL DATOS ═══════════════ -->
+  <!-- PANEL DATOS -->
   <div class="panel active" id="panel-datos">
 
-    <!-- TC -->
     <div class="tc-row">
       <span>Tipo de cambio (₡/$):</span>
       <input type="number" id="tc" value="520" min="1" style="width:90px">
@@ -203,11 +174,26 @@
       <span id="tc-note" style="font-size:11px;font-family:var(--font-mono);color:var(--muted)"></span>
     </div>
 
-    <!-- FECHA DEL REPORTE -->
     <div class="date-row">
       <span>Fecha del reporte:</span>
       <input type="text" id="report-date" placeholder="Ej: Marzo 2026" style="width:180px">
       <span style="font-size:11px">Este dato aparece en el PDF</span>
+    </div>
+
+    <!-- INGRESO MENSUAL NETO -->
+    <div class="ingreso-card">
+      <div class="ingreso-label">💰 INGRESO MENSUAL NETO</div>
+      <div class="ingreso-inputs">
+        <div class="ingreso-group">
+          <div class="ingreso-sublabel">Monto ₡</div>
+          <input type="number" id="ingreso-crc" placeholder="0" min="0" style="width:160px">
+        </div>
+        <div class="ingreso-group">
+          <div class="ingreso-sublabel">Monto $</div>
+          <input type="number" id="ingreso-usd" placeholder="0" min="0" style="width:140px">
+        </div>
+      </div>
+      <span style="font-size:11px;color:var(--muted);font-family:var(--font-mono);">Base para los cálculos del análisis</span>
     </div>
 
     <!-- CUENTAS -->
@@ -243,10 +229,7 @@
       </div>
       <div class="fe-meter" id="fe-meter" style="display:none">
         <div class="fe-meter-header">
-          <div>
-            <span class="fe-meses" id="fe-meses">0</span>
-            <span class="fe-label"> meses de cobertura</span>
-          </div>
+          <div><span class="fe-meses" id="fe-meses">0</span><span class="fe-label"> meses de cobertura</span></div>
           <span class="fe-label" id="fe-estado"></span>
         </div>
         <div class="fe-bar-wrap"><div class="fe-bar" id="fe-bar"></div></div>
@@ -267,8 +250,9 @@
     <!-- DEUDAS -->
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--red)"></div> Deudas / Préstamos</div>
-      <div class="input-header dual">
-        <div class="col-lbl">Descripción</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div></div>
+      <div class="card-subtitle">Incluí el saldo total y la cuota mensual de cada deuda</div>
+      <div class="input-header triple">
+        <div class="col-lbl">Descripción</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div class="col-lbl">Cuota/mes ₡</div><div></div>
       </div>
       <div id="list-deudas"></div>
       <button class="btn-add" onclick="addRow('deudas')">+ Agregar deuda</button>
@@ -287,20 +271,50 @@
     <!-- INVERSIONES -->
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--accent)"></div> Inversiones</div>
-      <div class="input-header dual">
-        <div class="col-lbl">Descripción (stocks, CDPs, Dominion, ASINTEL, broker…)</div><div class="col-lbl">Valor ₡</div><div class="col-lbl">Valor $</div><div></div>
+
+      <div class="inv-subsection">
+        <div class="inv-subsection-title">📈 Bolsa (Portafolios / Brokers)</div>
+        <div class="input-header inv-bolsa-row">
+          <div class="col-lbl">Descripción</div><div class="col-lbl">Valor ₡</div><div class="col-lbl">Valor $</div><div class="col-lbl">Aporte/mes $</div><div></div>
+        </div>
+        <div id="list-bolsa"></div>
+        <button class="btn-add" onclick="addRow('bolsa')">+ Agregar portafolio</button>
       </div>
-      <div id="list-inversiones"></div>
-      <button class="btn-add" onclick="addRow('inversiones')">+ Agregar inversión</button>
+
+      <div class="inv-subsection">
+        <div class="inv-subsection-title">🏢 ESPP (Plan de acciones de empresa)</div>
+        <div class="input-header inv-fija-row">
+          <div class="col-lbl">Empresa / Plan</div><div class="col-lbl">% Salario Bruto</div><div class="col-lbl">Valor actual $</div><div></div>
+        </div>
+        <div id="list-espp"></div>
+        <button class="btn-add" onclick="addRow('espp')">+ Agregar ESPP</button>
+      </div>
+
+      <div class="inv-subsection">
+        <div class="inv-subsection-title">🤝 Asociación Solidarista</div>
+        <div class="input-header inv-fija-row">
+          <div class="col-lbl">Asociación</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Aporte/mes ₡</div><div></div>
+        </div>
+        <div id="list-solidarista"></div>
+        <button class="btn-add" onclick="addRow('solidarista')">+ Agregar solidarista</button>
+      </div>
+
+      <div class="inv-subsection">
+        <div class="inv-subsection-title">🏦 Otras inversiones (CDPs, Vista, Fondos, etc.)</div>
+        <div class="input-header dual">
+          <div class="col-lbl">Descripción</div><div class="col-lbl">Valor ₡</div><div class="col-lbl">Valor $</div><div></div>
+        </div>
+        <div id="list-otras"></div>
+        <button class="btn-add" onclick="addRow('otras')">+ Agregar inversión</button>
+      </div>
     </div>
 
     <button class="btn-primary" onclick="calcular()">Calcular patrimonio →</button>
   </div>
 
-  <!-- ═══════════════ PANEL RESULTADO ═══════════════ -->
+  <!-- PANEL RESULTADO -->
   <div class="panel" id="panel-resultado">
 
-    <!-- PDF REPORT HEADER (hidden on screen, shown on PDF) -->
     <div class="report-header" id="report-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-end">
         <div>
@@ -323,13 +337,12 @@
       <button class="btn-secondary" onclick="switchTab('datos')">← Editar datos</button>
     </div>
 
-    <!-- KPIs -->
     <div class="summary-grid">
       <div class="s-card"><div class="s-lbl">Activos totales</div><div class="s-val blue" id="s-activos">—</div><div class="s-sub">Cuentas + Pensión + Inversiones</div></div>
       <div class="s-card"><div class="s-lbl">Pasivos totales</div><div class="s-val neg"  id="s-pasivos">—</div><div class="s-sub">Tarjetas + Deudas</div></div>
       <div class="s-card"><div class="s-lbl">Patrimonio neto</div><div class="s-val"       id="s-neto">—</div><div class="s-sub">Activos − Pasivos</div></div>
       <div class="s-card"><div class="s-lbl">Liquidez inmediata</div><div class="s-val pos" id="s-liquidez">—</div><div class="s-sub">Cuentas disponibles</div></div>
-      <div class="s-card"><div class="s-lbl">Fondo de emergencias</div><div class="s-val" id="s-fe-meses">—</div><div class="s-sub" id="s-fe-sub">meses de cobertura</div></div>
+      <div class="s-card"><div class="s-lbl">Fondo emergencias</div><div class="s-val" id="s-fe-meses">—</div><div class="s-sub" id="s-fe-sub">meses de cobertura</div></div>
     </div>
 
     <div class="grid2">
@@ -343,96 +356,63 @@
       </div>
     </div>
 
-    <!-- AI PANEL -->
-    <div class="ai-panel" id="ai-panel">
+    <div class="ai-panel">
       <div class="ai-header">
         <div class="ai-header-left">
-          <div class="ai-dot"></div>
+          <div class="dot" style="background:var(--accent)"></div>
           <div class="ai-title">Análisis educativo · Sistema GEM</div>
         </div>
       </div>
-      <div id="ai-content" class="ai-content">
-        <div class="ai-loading"><span>Analizando situación financiera</span><div class="ai-dots"><span>.</span><span>.</span><span>.</span></div></div>
-      </div>
+      <div id="ai-content" class="ai-content"></div>
     </div>
 
-  </div><!-- /panel-resultado -->
+  </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
 const SECS = {
   cuentas:     {ids:[],data:{},type:'dual'},
   tarjetas:    {ids:[],data:{},type:'dual'},
-  deudas:      {ids:[],data:{},type:'dual'},
+  deudas:      {ids:[],data:{},type:'triple'},
   pension:     {ids:[],data:{},type:'single'},
-  inversiones: {ids:[],data:{},type:'dual'},
+  bolsa:       {ids:[],data:{},type:'inv-bolsa'},
+  espp:        {ids:[],data:{},type:'inv-espp'},
+  solidarista: {ids:[],data:{},type:'inv-sol'},
+  otras:       {ids:[],data:{},type:'dual'},
 };
 let currency='CRC', resultData=null;
 
-// ══════════════════════════════════════════════
-// BCCR TYPE OF EXCHANGE
-// ══════════════════════════════════════════════
 async function fetchTC() {
-  const btn = document.querySelector('[onclick="fetchTC()"]');
-  btn.textContent = '↻ Cargando…';
-  btn.disabled = true;
-  const note = document.getElementById('tc-note');
-  const status = document.getElementById('tc-status');
+  const btn=document.querySelector('[onclick="fetchTC()"]');
+  btn.textContent='↻ Cargando…'; btn.disabled=true;
+  const note=document.getElementById('tc-note'), status=document.getElementById('tc-status');
   try {
-    // BCCR's XML endpoint (GET, no token needed for this older endpoint)
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2,'0');
-    const mm = String(today.getMonth()+1).padStart(2,'0');
-    const yyyy = today.getFullYear();
-    const fecha = `${dd}/${mm}/${yyyy}`;
-    // Using the public no-auth endpoint via a CORS proxy available for BCCR
-    const url = `https://gee.bccr.fi.cr/Indicadores/Suscripciones/WS/wsindicadoreseconomicos.asmx/ObtenerIndicadoresEconomicos?Indicador=318&FechaInicio=${fecha}&FechaFinal=${fecha}&Nombre=SistemaGEM&SubNiveles=N&CorreoElectronico=dashboard@gem.cr&Token=`;
-    const res = await fetch(url, {mode:'cors'});
-    if (!res.ok) throw new Error('no cors');
-    const text = await res.text();
-    const match = text.match(/<NUM_VALOR>([\d.,]+)<\/NUM_VALOR>/);
-    if (!match) throw new Error('no value');
-    const val = parseFloat(match[1].replace(',','.'));
-    document.getElementById('tc').value = Math.round(val);
-    status.textContent = '✓ BCCR en vivo'; status.className='tc-status tc-live';
-    note.textContent = `TC venta ${fecha}: ₡${val.toFixed(2)}`;
-  } catch(e) {
-    // Fallback: try a public wrapper
-    try {
-      const res2 = await fetch('https://apis.gometa.org/tdc/tdc.json');
-      const d = await res2.json();
-      if (d && d.venta) {
-        document.getElementById('tc').value = Math.round(d.venta);
-        const today = new Date();
-        status.textContent = '✓ BCCR en vivo'; status.className='tc-status tc-live';
-        note.textContent = `TC venta hoy: ₡${d.venta}`;
-      } else throw new Error('no data');
-    } catch(e2) {
-      status.textContent = 'Manual'; status.className='tc-status tc-manual';
-      note.textContent = 'No se pudo obtener el TC. Ingresalo manualmente.';
-    }
-  } finally {
-    btn.textContent = '↻ Actualizar BCCR';
-    btn.disabled = false;
-  }
+    const res=await fetch('https://apis.gometa.org/tdc/tdc.json');
+    const d=await res.json();
+    if(d&&d.venta){
+      document.getElementById('tc').value=Math.round(d.venta);
+      status.textContent='✓ BCCR en vivo'; status.className='tc-status tc-live';
+      note.textContent=`TC venta hoy: ₡${d.venta}`;
+    } else throw new Error();
+  } catch(e){
+    status.textContent='Manual'; status.className='tc-status tc-manual';
+    note.textContent='No se pudo obtener el TC. Ingresalo manualmente.';
+  } finally { btn.textContent='↻ Actualizar BCCR'; btn.disabled=false; }
 }
+window.addEventListener('load',()=>{ fetchTC(); });
 
-// Auto-fetch on load
-window.addEventListener('load', () => { fetchTC(); });
-
-// ══════════════════════════════════════════════
-// ROW MANAGEMENT (flush-before-add pattern)
-// ══════════════════════════════════════════════
-function flush(sec) {
-  document.querySelectorAll('#list-'+sec+' .data-row').forEach(row => {
+function flush(sec){
+  document.querySelectorAll('#list-'+sec+' .data-row').forEach(row=>{
     const id=row.dataset.id, ins=row.querySelectorAll('input');
     if(!SECS[sec].data[id]) return;
+    const t=SECS[sec].type;
     SECS[sec].data[id].name=ins[0]?.value??'';
-    SECS[sec].data[id].crc =ins[1]?.value??'';
-    if(ins[2]) SECS[sec].data[id].usd=ins[2].value;
+    if(t==='dual'||t==='triple'||t==='inv-bolsa'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
+    if(t==='triple') SECS[sec].data[id].cuota=ins[3]?.value??'';
+    if(t==='inv-bolsa') SECS[sec].data[id].aporte=ins[3]?.value??'';
+    if(t==='inv-espp'){ SECS[sec].data[id].pct=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
+    if(t==='inv-sol'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].aporte=ins[2]?.value??''; }
+    if(t==='single') SECS[sec].data[id].crc=ins[1]?.value??'';
   });
 }
 function flushAll(){ Object.keys(SECS).forEach(flush); }
@@ -441,55 +421,45 @@ function render(sec){
   const s=SECS[sec], list=document.getElementById('list-'+sec);
   const sy=window.scrollY; list.innerHTML='';
   s.ids.forEach(id=>{
-    const d=s.data[id], div=document.createElement('div');
-    div.className='data-row '+s.type; div.dataset.id=id;
-    div.innerHTML = s.type==='dual'
-      ? `<input type="text"   placeholder="Nombre"  value="${x(d.name)}">
-         <input type="number" placeholder="0"       value="${x(d.crc)}"  min="0">
-         <input type="number" placeholder="0"       value="${x(d.usd)}"  min="0">
-         <button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`
-      : `<input type="text"   placeholder="Nombre del fondo" value="${x(d.name)}">
-         <input type="number" placeholder="0"                value="${x(d.crc)}" min="0">
-         <button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
-    list.appendChild(div);
+    const d=s.data[id], div=document.createElement('div'), t=s.type;
+    let cls='data-row ';
+    if(t==='dual') cls+='dual';
+    else if(t==='triple') cls+='triple';
+    else if(t==='inv-bolsa') cls+='inv-bolsa-row';
+    else if(t==='inv-espp'||t==='inv-sol') cls+='inv-fija-row';
+    else if(t==='single') cls+='single';
+    div.className=cls; div.dataset.id=id;
+    let html='';
+    if(t==='dual') html=`<input type="text" placeholder="Nombre" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='triple') html=`<input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.cuota)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='inv-bolsa') html=`<input type="text" placeholder="Nombre del portafolio" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='inv-espp') html=`<input type="text" placeholder="Empresa / Plan" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.pct)}" min="0" max="100"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='inv-sol') html=`<input type="text" placeholder="Nombre asociación" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='single') html=`<input type="text" placeholder="Nombre del fondo" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    div.innerHTML=html; list.appendChild(div);
   });
   window.scrollTo(0,sy);
 }
 function x(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
-
 function addRow(sec){
   flush(sec);
   const id='r'+Date.now()+Math.random().toString(36).slice(2,6);
-  SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:''};
+  SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:'',cuota:'',aporte:'',pct:''};
   render(sec);
 }
 function removeRow(sec,id){
-  flush(sec);
-  SECS[sec].ids=SECS[sec].ids.filter(i=>i!==id);
-  delete SECS[sec].data[id];
-  render(sec);
+  flush(sec); SECS[sec].ids=SECS[sec].ids.filter(i=>i!==id); delete SECS[sec].data[id]; render(sec);
 }
-
-// Init one starter row per section
 Object.keys(SECS).forEach(sec=>{
-  const id='init-'+sec;
-  SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:''};
-  render(sec);
+  const id='init-'+sec; SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:'',cuota:'',aporte:'',pct:''}; render(sec);
 });
 
-// ══════════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════════
 function switchTab(tab){
   ['datos','resultado'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
   });
 }
-
-// ══════════════════════════════════════════════
-// CURRENCY & FORMAT
-// ══════════════════════════════════════════════
 function setCurrency(cur){
   currency=cur;
   document.getElementById('btn-crc').classList.toggle('active',cur==='CRC');
@@ -503,223 +473,261 @@ function fmt(crc,cur){
   return '₡'+Math.round(crc).toLocaleString('es-CR');
 }
 
-// ══════════════════════════════════════════════
-// FONDO DE EMERGENCIAS — live meter
-// ══════════════════════════════════════════════
 function calcFE(){
-  const tcv = tc();
-  const saldo  = (n(document.getElementById('fe-crc').value)) + n(document.getElementById('fe-usd').value)*tcv;
-  const gastos = (n(document.getElementById('fe-gastos-crc').value)) + n(document.getElementById('fe-gastos-usd').value)*tcv;
-  const meter  = document.getElementById('fe-meter');
-  if(saldo===0 && gastos===0){ meter.style.display='none'; return; }
+  const tcv=tc();
+  const saldo=n(document.getElementById('fe-crc').value)+n(document.getElementById('fe-usd').value)*tcv;
+  const gastos=n(document.getElementById('fe-gastos-crc').value)+n(document.getElementById('fe-gastos-usd').value)*tcv;
+  const meter=document.getElementById('fe-meter');
+  if(saldo===0&&gastos===0){meter.style.display='none';return;}
   meter.style.display='block';
-  const meses  = gastos>0 ? saldo/gastos : 0;
-  const mesesFmt = meses>0 ? meses.toFixed(1) : '0';
-  const mesEl  = document.getElementById('fe-meses');
-  const barEl  = document.getElementById('fe-bar');
-  const noteEl = document.getElementById('fe-note');
-  const estadoEl = document.getElementById('fe-estado');
-  mesEl.textContent = mesesFmt;
-  // Target: 3–6 months. Pct capped at 6 months for bar
-  const pct = Math.min(100, (meses/6)*100);
-  let color, estado, note;
-  if(meses < 1){
-    color='var(--red)'; estado='⚠️ Crítico'; mesEl.className='fe-meses danger';
-    note='El fondo cubre menos de 1 mes. Construirlo es la primera prioridad financiera.';
-  } else if(meses < 3){
-    color='#f59e0b'; estado='🔶 En construcción'; mesEl.className='fe-meses warn';
-    note='La meta mínima recomendada es 3 meses. Seguir aportando consistentemente.';
-  } else if(meses < 6){
-    color='var(--positive)'; estado='✅ Adecuado'; mesEl.className='fe-meses ok';
-    note='Rango saludable (3–6 meses). La meta ideal es llegar a 6 meses de cobertura.';
+  const meses=gastos>0?saldo/gastos:0;
+  const mesEl=document.getElementById('fe-meses'), barEl=document.getElementById('fe-bar');
+  const noteEl=document.getElementById('fe-note'), estadoEl=document.getElementById('fe-estado');
+  mesEl.textContent=meses>0?meses.toFixed(1):'0';
+  const pct=Math.min(100,(meses/6)*100);
+  let color,estado,note;
+  if(meses<3){
+    color='var(--red)'; estado='⚠️ Prioridad absoluta'; mesEl.className='fe-meses danger';
+    note=meses<1?'Menos de 1 mes — construir el fondo es el primer paso antes de invertir.':'Por debajo de 3 meses — meta mínima del Sistema GEM. No iniciar inversiones todavía.';
+  } else if(meses<6){
+    color='var(--warn)'; estado='✅ Meta mínima cumplida'; mesEl.className='fe-meses warn';
+    note='Rango adecuado (3–6 meses). Meta ideal: 6 meses. Desde aquí sí tiene sentido invertir en Bolsa.';
   } else {
-    color='var(--positive)'; estado='🏆 Sólido'; mesEl.className='fe-meses ok';
-    note='Fondo de emergencias sólido. Mantenerlo y revisarlo si cambian los gastos.';
+    color='var(--positive)'; estado='🏆 Base sólida'; mesEl.className='fe-meses ok';
+    note='Fondo sólido. Enfoque total en inversiones y eliminación de deudas.';
   }
   barEl.style.width=pct+'%'; barEl.style.background=color;
   estadoEl.textContent=estado; noteEl.textContent=note;
 }
 
-// ══════════════════════════════════════════════
-// CALCULATE
-// ══════════════════════════════════════════════
-function secTotal(sec){
-  return SECS[sec].ids.reduce((s,id)=>{
-    const d=SECS[sec].data[id]; return s+n(d.crc)+n(d.usd)*tc();
-  },0);
+function secTotalCRC(sec){
+  return SECS[sec].ids.reduce((s,id)=>{ const d=SECS[sec].data[id]; return s+n(d.crc)+n(d.usd)*tc(); },0);
 }
 
 function calcular(){
   flushAll();
-  const totalCuentas=secTotal('cuentas'), totalTarjetas=secTotal('tarjetas'),
-        totalDeudas=secTotal('deudas'),   totalPension=secTotal('pension'),
-        totalInversiones=secTotal('inversiones');
+  const tcv=tc();
+  const totalCuentas=secTotalCRC('cuentas'), totalTarjetas=secTotalCRC('tarjetas'), totalPension=secTotalCRC('pension');
+  const totalDeudas=SECS.deudas.ids.reduce((s,id)=>{ const d=SECS.deudas.data[id]; return s+n(d.crc)+n(d.usd)*tcv; },0);
+  const totalCuotas=SECS.deudas.ids.reduce((s,id)=>s+n(SECS.deudas.data[id].cuota),0);
+  const totalBolsaValor=SECS.bolsa.ids.reduce((s,id)=>{ const d=SECS.bolsa.data[id]; return s+n(d.crc)+n(d.usd)*tcv; },0);
+  const totalAporteBolsaUSD=SECS.bolsa.ids.reduce((s,id)=>s+n(SECS.bolsa.data[id].aporte),0);
+  const totalAporteBolsaCRC=totalAporteBolsaUSD*tcv;
+  const totalESPPValor=SECS.espp.ids.reduce((s,id)=>s+n(SECS.espp.data[id].usd)*tcv,0);
+  const totalSolValor=secTotalCRC('solidarista');
+  const totalOtras=secTotalCRC('otras');
+  const totalInversiones=totalBolsaValor+totalESPPValor+totalSolValor+totalOtras;
   const totalActivos=totalCuentas+totalPension+totalInversiones;
   const totalPasivos=totalTarjetas+totalDeudas;
   const patrimonioNeto=totalActivos-totalPasivos;
-
-  // Fondo de emergencias
-  const feSaldo  = n(document.getElementById('fe-crc').value) + n(document.getElementById('fe-usd').value)*tc();
-  const feGastos = n(document.getElementById('fe-gastos-crc').value) + n(document.getElementById('fe-gastos-usd').value)*tc();
-  const feMeses  = feGastos>0 ? feSaldo/feGastos : 0;
-
+  const ingresoNeto=n(document.getElementById('ingreso-crc').value)+n(document.getElementById('ingreso-usd').value)*tcv;
+  const feSaldo=n(document.getElementById('fe-crc').value)+n(document.getElementById('fe-usd').value)*tcv;
+  const feGastos=n(document.getElementById('fe-gastos-crc').value)+n(document.getElementById('fe-gastos-usd').value)*tcv;
+  const feMeses=feGastos>0?feSaldo/feGastos:0;
   function named(sec){ return SECS[sec].ids.map(id=>({...SECS[sec].data[id]})).filter(r=>r.name.trim()); }
-
   resultData={
     totalActivos,totalPasivos,totalCuentas,totalPension,totalInversiones,
-    totalTarjetas,totalDeudas,patrimonioNeto,tcRate:tc(),
-    feSaldo, feGastos, feMeses,
-    reportDate: document.getElementById('report-date').value.trim(),
-    cuentasData:named('cuentas'), tarjetasData:named('tarjetas'),
-    deudasData:named('deudas'),   pensionData:named('pension'),
-    inversionesData:named('inversiones'),
+    totalTarjetas,totalDeudas,totalCuotas,patrimonioNeto,tcRate:tcv,
+    totalBolsaValor,totalAporteBolsaCRC,totalAporteBolsaUSD,
+    totalESPPValor,totalSolValor,totalOtras,
+    ingresoNeto,feSaldo,feGastos,feMeses,
+    reportDate:document.getElementById('report-date').value.trim(),
+    esppData:named('espp'),solidaristaData:named('solidarista'),
+    bolsaData:named('bolsa'),deudasData:named('deudas'),
   };
-
-  // Update PDF report header
-  const rd = resultData.reportDate || new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
-  document.getElementById('rh-date').textContent = 'Período: ' + rd;
-
+  const rd=resultData.reportDate||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
+  document.getElementById('rh-date').textContent='Período: '+rd;
   renderResult(resultData);
   switchTab('resultado');
-  callAI(resultData);
+  renderAnalysis(resultData);
 }
 
-// ══════════════════════════════════════════════
-// RENDER RESULT
-// ══════════════════════════════════════════════
 function renderResult(d){
   const cur=currency;
-  document.getElementById('s-activos').textContent =fmt(d.totalActivos,cur);
-  document.getElementById('s-pasivos').textContent =fmt(d.totalPasivos,cur);
+  document.getElementById('s-activos').textContent=fmt(d.totalActivos,cur);
+  document.getElementById('s-pasivos').textContent=fmt(d.totalPasivos,cur);
   document.getElementById('s-liquidez').textContent=fmt(d.totalCuentas,cur);
   const ne=document.getElementById('s-neto');
-  ne.textContent=fmt(d.patrimonioNeto,cur);
-  ne.className='s-val '+(d.patrimonioNeto>=0?'pos':'neg');
-
-  // FE KPI
-  const feEl = document.getElementById('s-fe-meses');
-  const feSubEl = document.getElementById('s-fe-sub');
+  ne.textContent=fmt(d.patrimonioNeto,cur); ne.className='s-val '+(d.patrimonioNeto>=0?'pos':'neg');
+  const feEl=document.getElementById('s-fe-meses'), feSubEl=document.getElementById('s-fe-sub');
   if(d.feMeses>0){
-    feEl.textContent = d.feMeses.toFixed(1)+' meses';
-    feEl.className = 's-val ' + (d.feMeses<3 ? 'neg' : 'pos');
-    feSubEl.textContent = d.feMeses<1 ? '⚠️ Crítico' : d.feMeses<3 ? '🔶 En construcción' : d.feMeses<6 ? '✅ Adecuado' : '🏆 Sólido';
-  } else {
-    feEl.textContent='—'; feEl.className='s-val'; feSubEl.textContent='Sin datos';
-  }
+    feEl.textContent=d.feMeses.toFixed(1)+' meses';
+    feEl.className='s-val '+(d.feMeses<3?'neg':'pos');
+    feSubEl.textContent=d.feMeses<3?'⚠️ Prioridad absoluta':d.feMeses<6?'✅ Meta mínima':'🏆 Base sólida';
+  } else { feEl.textContent='—'; feEl.className='s-val'; feSubEl.textContent='Sin datos'; }
 
-  // Desglose
-  const rows=[
-    {l:'Cuentas bancarias',v:d.totalCuentas,    pos:true},
-    {l:'Fondos de pensión', v:d.totalPension,    pos:true},
-    {l:'Inversiones',       v:d.totalInversiones,pos:true},
-    {l:'Tarjetas por pagar',v:d.totalTarjetas,   pos:false},
-    {l:'Deudas / Préstamos',v:d.totalDeudas,     pos:false},
-  ];
-  document.getElementById('desglose').innerHTML=
-    rows.map(r=>`<div class="breakdown-item"><span class="b-name">${r.l}</span><span class="b-val ${r.pos?'pos':'neg'}">${fmt(r.v,cur)}</span></div>`).join('')+
-    `<div class="divider"></div><div class="breakdown-item">
-      <span class="b-name b-total">Patrimonio Neto</span>
-      <span class="b-val b-total" style="color:${d.patrimonioNeto>=0?'var(--positive)':'var(--red)'}">${fmt(d.patrimonioNeto,cur)}</span>
-    </div>`;
+  document.getElementById('desglose').innerHTML=[
+    {l:'Cuentas bancarias',  v:d.totalCuentas,     pos:true},
+    {l:'Fondos de pensión',  v:d.totalPension,     pos:true},
+    {l:'Inversiones (total)',v:d.totalInversiones, pos:true},
+    {l:'Tarjetas por pagar', v:d.totalTarjetas,    pos:false},
+    {l:'Deudas / Préstamos', v:d.totalDeudas,      pos:false},
+  ].map(r=>`<div class="breakdown-item"><span class="b-name">${r.l}</span><span class="b-val ${r.pos?'pos':'neg'}">${fmt(r.v,cur)}</span></div>`).join('')+
+  `<div class="divider"></div><div class="breakdown-item"><span class="b-name b-total">Patrimonio Neto</span><span class="b-val b-total" style="color:${d.patrimonioNeto>=0?'var(--positive)':'var(--red)'}">${fmt(d.patrimonioNeto,cur)}</span></div>`;
 
-  // Concentración
   const tot=d.totalActivos||1;
   document.getElementById('concentracion').innerHTML=[
-    {l:'Liquidez (cuentas)', v:d.totalCuentas,    c:'#3a82e8'},
-    {l:'Fondos de pensión',  v:d.totalPension,     c:'#3aacca'},
-    {l:'Inversiones',        v:d.totalInversiones, c:'#2f6fdf'},
-  ].map(c=>{
+    {l:'Liquidez (cuentas)',v:d.totalCuentas,   c:'#3a82e8'},
+    {l:'Fondos de pensión', v:d.totalPension,   c:'#3aacca'},
+    {l:'Bolsa',             v:d.totalBolsaValor,c:'#2f6fdf'},
+    {l:'ESPP',              v:d.totalESPPValor, c:'#7c6fdf'},
+    {l:'Solidarista',       v:d.totalSolValor,  c:'#2a8a5c'},
+    {l:'Otras inversiones', v:d.totalOtras,     c:'#5aacca'},
+  ].filter(c=>c.v>0).map(c=>{
     const pct=Math.max(0,Math.round(c.v/tot*100));
     return `<div class="risk-item"><div class="risk-header"><span class="risk-name">${c.l}</span><span class="risk-pct">${pct}%</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${c.c}"></div></div></div>`;
   }).join('');
 }
 
 // ══════════════════════════════════════════════
-// AI
+// SISTEMA GEM — MOTOR DE REGLAS FINANCIERAS
 // ══════════════════════════════════════════════
-async function callAI(d){
-  document.getElementById('ai-content').innerHTML=
-    `<div class="ai-loading"><span>Analizando situación financiera</span><div class="ai-dots"><span>.</span><span>.</span><span>.</span></div></div>`;
+function pill(label,type){ return `<span class="metric-pill pill-${type}">${label}</span>`; }
 
-  function r2t(rows){
-    if(!rows.length) return '  (sin datos)';
-    return rows.map(r=>{
-      const c=n(r.crc),u=n(r.usd),t=c+u*d.tcRate;
-      if(u>0&&c>0) return `  - ${r.name}: ₡${Math.round(c).toLocaleString()} + $${u.toLocaleString()} (≈₡${Math.round(t).toLocaleString()})`;
-      if(u>0) return `  - ${r.name}: $${u.toLocaleString()} (≈₡${Math.round(t).toLocaleString()})`;
-      return `  - ${r.name}: ₡${Math.round(c).toLocaleString()}`;
-    }).join('\n');
+function renderAnalysis(d){
+  const tot=d.totalActivos||1;
+  const lPct=Math.round(d.totalCuentas/tot*100);
+  const iPct=Math.round(d.totalInversiones/tot*100);
+  const pPct=Math.round(d.totalPension/tot*100);
+  const hasIngreso=d.ingresoNeto>0;
+  const hasTarjetas=d.totalTarjetas>0;
+  const hasDeudas=d.totalDeudas>0;
+  const hasAnyDebt=hasTarjetas||hasDeudas;
+  const hasBolsa=d.totalBolsaValor>0;
+  const hasESPP=d.totalESPPValor>0;
+  const hasSol=d.totalSolValor>0;
+  const debtRatio=(hasIngreso&&d.totalCuotas>0)?d.totalCuotas/d.ingresoNeto:null;
+  const bolsaRatio=(hasIngreso&&d.totalAporteBolsaCRC>0)?d.totalAporteBolsaCRC/d.ingresoNeto:null;
+  const sections=[];
+
+  // 1. FONDO DE EMERGENCIAS
+  let feText='',feColor='var(--red)',fePill='';
+  if(d.feMeses===0){
+    fePill=pill('Sin datos','warn');
+    feText='No hay datos del fondo de emergencias. Este es el primer paso del Sistema GEM antes de invertir: tener mínimo 3 meses de gastos guardados en una cuenta de fácil acceso.';
+  } else if(d.feMeses<3){
+    fePill=pill('⚠️ '+d.feMeses.toFixed(1)+' meses — Prioridad absoluta','red');
+    feText=`Con ${d.feMeses.toFixed(1)} meses de cobertura, construir el fondo es la prioridad número uno. La meta mínima del Sistema GEM es 3 meses, la ideal es 6. Mientras no se llegue a 3 meses, no se recomienda iniciar inversiones en Bolsa.`;
+  } else if(d.feMeses<6){
+    feColor='var(--warn)'; fePill=pill('✅ '+d.feMeses.toFixed(1)+' meses — Meta mínima cumplida','warn');
+    feText=`El fondo cubre ${d.feMeses.toFixed(1)} meses — meta mínima alcanzada. Desde aquí ya tiene sentido hablar de inversiones en Bolsa. La meta ideal del Sistema GEM es 6 meses; seguir aportando hasta llegar ahí.`;
+  } else {
+    feColor='var(--positive)'; fePill=pill('🏆 '+d.feMeses.toFixed(1)+' meses — Base sólida','green');
+    feText='Fondo de emergencias sólido. Con esta base cubierta, el enfoque puede estar en inversiones y reducción de deudas. Revisar el monto si cambian los gastos mensuales.';
+  }
+  sections.push({icon:'🛡️',label:'Fondo de emergencias',color:feColor,pill:fePill,text:feText});
+
+  // 2. DEUDAS
+  let debtText='',debtColor='var(--positive)',debtPill='';
+  if(!hasAnyDebt){
+    debtPill=pill('✅ Sin deudas','green');
+    debtText='Sin deudas registradas — posición ideal. Todo el flujo disponible puede destinarse a inversiones y crecimiento del patrimonio.';
+  } else {
+    if(debtRatio!==null){
+      if(debtRatio<0.15){
+        debtColor='var(--positive)'; debtPill=pill('✅ Deuda controlada — '+(debtRatio*100).toFixed(0)+'% del ingreso neto','green');
+        debtText='Las cuotas mensuales están por debajo del 15% del ingreso neto — deuda controlada. Se puede invertir en Bolsa en paralelo mientras se mantiene el plan de pagos.';
+      } else if(debtRatio<=0.25){
+        debtColor='var(--warn)'; debtPill=pill('🔶 Zona de atención — '+(debtRatio*100).toFixed(0)+'% del ingreso neto','warn');
+        debtText='Las cuotas representan entre el 15–25% del ingreso neto — zona de atención. Evaluar en el 1-1 si conviene invertir en paralelo o priorizar la reducción de deuda antes.';
+      } else {
+        debtColor='var(--red)'; debtPill=pill('⚠️ Deuda alta — '+(debtRatio*100).toFixed(0)+'% del ingreso neto','red');
+        debtText='Las cuotas superan el 25% del ingreso neto. El enfoque recomendado del Sistema GEM es un plan de pagos acelerado para salir de las deudas antes de invertir en Bolsa.';
+      }
+    } else {
+      debtColor='var(--warn)'; debtPill=pill('Sin ingreso registrado para calcular ratio','warn');
+      debtText='Hay deudas registradas. Para evaluar si se puede invertir en paralelo, ingresá el ingreso mensual neto para ver el cálculo del ratio.';
+    }
+    if(hasTarjetas) debtText+=' Las tarjetas con saldo son las deudas de mayor costo (tasas del 30–50% anual en Costa Rica). Aplicar el Método Bola de Nieve Ajustado: empezar por la tarjeta de menor saldo para generar momentum, luego avanzar a las siguientes.';
+    else if(hasDeudas) debtText+=' Aplicar el Método Bola de Nieve Ajustado: pagar primero el préstamo de menor saldo, liberar esa cuota y volcarlo al siguiente.';
+  }
+  sections.push({icon:'📋',label:'Deudas y pasivos',color:debtColor,pill:debtPill,text:debtText});
+
+  // 3. INVERSIONES EN BOLSA
+  let invText='',invColor='var(--accent)',invPill='';
+  if(!hasBolsa){
+    invColor='var(--warn)'; invPill=pill('Sin inversiones en Bolsa','warn');
+    if(d.feMeses>=3&&(debtRatio===null||debtRatio<0.15)) invText='El fondo de emergencias está en orden y la deuda es controlada — es el momento ideal para empezar a invertir en Bolsa. La meta del Sistema GEM es destinar al menos el 10% del ingreso neto mensual.';
+    else if(d.feMeses>=3&&debtRatio===null) invText='El fondo de emergencias está en orden. Para saber si ya es momento de invertir en Bolsa, revisar el ratio de deudas en el 1-1.';
+    else invText='Antes de iniciar inversiones en Bolsa, asegurarse de tener al menos 3 meses en el fondo de emergencias y deudas bajo control.';
+  } else {
+    if(bolsaRatio!==null){
+      if(bolsaRatio>=0.10){
+        invColor='var(--positive)'; invPill=pill('✅ '+(bolsaRatio*100).toFixed(0)+'% del ingreso neto — Meta cumplida','green');
+        invText=`El aporte mensual a Bolsa representa el ${(bolsaRatio*100).toFixed(0)}% del ingreso neto — meta del Sistema GEM alcanzada (≥10%). La consistencia a largo plazo es el factor más importante; el interés compuesto hace el trabajo pesado.`;
+      } else {
+        invColor='var(--warn)'; invPill=pill('🔶 '+(bolsaRatio*100).toFixed(0)+'% del ingreso neto — Por debajo de la meta','warn');
+        invText=`El aporte mensual a Bolsa representa el ${(bolsaRatio*100).toFixed(0)}% del ingreso neto. La meta del Sistema GEM es el 10%. Revisar si hay flujo disponible para aumentar el aporte gradualmente.`;
+      }
+    } else {
+      invPill=pill('Sin ingreso registrado para calcular ratio','warn');
+      invText='Hay inversiones en Bolsa registradas. Para comparar el aporte contra la meta del 10%, ingresá el ingreso mensual neto y el aporte mensual en los campos correspondientes.';
+    }
+  }
+  sections.push({icon:'📈',label:'Inversiones en Bolsa',color:invColor,pill:invPill,text:invText});
+
+  // 4. ESPP Y SOLIDARISTA (contexto)
+  if(hasESPP||hasSol){
+    let ctxRows='';
+    d.esppData.filter(r=>r.name).forEach(r=>{ ctxRows+=`<tr><td>ESPP · ${r.name}</td><td>${r.pct?r.pct+'% salario bruto':'—'}${r.usd?' · $'+parseFloat(r.usd).toLocaleString():''}</td></tr>`; });
+    d.solidaristaData.filter(r=>r.name).forEach(r=>{ ctxRows+=`<tr><td>Solidarista · ${r.name}</td><td>${r.aporte?'₡'+parseFloat(r.aporte).toLocaleString()+'/mes':'—'}${r.crc?' · Saldo ₡'+parseFloat(r.crc).toLocaleString():''}</td></tr>`; });
+    sections.push({icon:'🏢',label:'ESPP y Solidarista — contexto',color:'var(--muted)',pill:'',text:'Estas deducciones de salario son parte del panorama de inversión. Su análisis y conveniencia (aumentar, mantener o reducir el %) se revisa en el 1-1 según las metas del cliente.',extra:`<table class="context-table">${ctxRows}</table>`});
   }
 
-  const lP=d.totalActivos>0?Math.round(d.totalCuentas/d.totalActivos*100):0;
-  const iP=d.totalActivos>0?Math.round(d.totalInversiones/d.totalActivos*100):0;
-  const pP=d.totalActivos>0?Math.round(d.totalPension/d.totalActivos*100):0;
-  const dR=d.totalActivos>0?Math.round(d.totalPasivos/d.totalActivos*100):0;
-  const feStatus = d.feMeses===0 ? 'No registrado' : d.feMeses<1 ? `${d.feMeses.toFixed(1)} meses (CRÍTICO)` : d.feMeses<3 ? `${d.feMeses.toFixed(1)} meses (en construcción)` : d.feMeses<6 ? `${d.feMeses.toFixed(1)} meses (adecuado)` : `${d.feMeses.toFixed(1)} meses (sólido)`;
-
-  const prompt=`Sos un asistente educativo del Sistema GEM, programa de mentoría financiera costarricense. Tu rol es EXCLUSIVAMENTE EDUCATIVO — no das asesoría financiera individual ni recomendaciones de productos.
-
-REGLAS DE LENGUAJE:
-- Usá voseo costarricense (vos/sos/tenés)
-- Hablá de los activos/deudas/inversiones en forma GENERAL, no personalizada (ej: "la liquidez" no "tu liquidez", "las deudas" no "tus deudas", "el patrimonio" no "tu patrimonio")
-- No uses "este cliente", "esta persona", ni nombres propios
-
-REGLA ESPECIAL — PLAN DE DEUDAS:
-Si hay deudas, mencioná únicamente el Método Bola de Nieve Ajustado (no menciones el método avalancha ni ningún otro). El Método Bola de Nieve Ajustado prioriza pagar primero las deudas de menor saldo para generar momentum psicológico, ajustando según la situación.
-
-SITUACIÓN FINANCIERA:
-- Activos: ₡${Math.round(d.totalActivos).toLocaleString()} | Inversiones ${iP}% | Liquidez ${lP}% | Pensión ${pP}%
-- Pasivos: ₡${Math.round(d.totalPasivos).toLocaleString()} (${dR}% de activos)
-- Patrimonio neto: ₡${Math.round(d.patrimonioNeto).toLocaleString()}
-- Fondo de emergencias: ${feStatus}
-CUENTAS: ${r2t(d.cuentasData)}
-TARJETAS: ${r2t(d.tarjetasData)}
-DEUDAS: ${r2t(d.deudasData)}
-PENSIÓN: ${d.pensionData.map(r=>`  - ${r.name}: ₡${Math.round(n(r.crc)).toLocaleString()}`).join('\n')||'  (sin datos)'}
-INVERSIONES: ${r2t(d.inversionesData)}
-
-Respondé SOLO con JSON válido, sin markdown ni texto extra:
-{
-  "liquidez": "2-3 oraciones sobre el nivel de liquidez vs activos (lenguaje general, no personalizado)",
-  "fondo_emergencias": "2-3 oraciones educativas sobre el estado del fondo de emergencias. Si es crítico o no está registrado, explicá por qué es la base de la seguridad financiera. Si es adecuado o sólido, reforzá la importancia de mantenerlo.",
-  "inversiones": "2-3 oraciones sobre el porcentaje invertido (lenguaje general)",
-  "deudas": "2-3 oraciones. Si hay deudas mencioná el Método Bola de Nieve Ajustado. Si no hay deudas, comentá positivamente sobre eso.",
-  "concentracion": "2-3 oraciones sobre diversificación de activos (lenguaje general)",
-  "pasos": ["paso 1 máx 1 oración", "paso 2 máx 1 oración", "paso 3 máx 1 oración"]
-}`;
-
-  try {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
-    });
-    const data=await res.json();
-    const raw=(data.content?.find(b=>b.type==='text')?.text)||'';
-    const m=raw.match(/\{[\s\S]*\}/);
-    if(!m) throw new Error('no json');
-    renderAI(JSON.parse(m[0]));
-  } catch(e){
-    document.getElementById('ai-content').innerHTML=
-      `<p style="color:var(--muted);font-size:13px">No se pudo generar el análisis. Revisá tu conexión e intentá de nuevo.</p>`;
+  // 5. LIQUIDEZ
+  let liqText='',liqColor='var(--positive)',liqPill='';
+  if(lPct>25){
+    liqColor='var(--warn)'; liqPill=pill('🔶 '+lPct+'% del patrimonio en efectivo — Capital ocioso','warn');
+    liqText=`El ${lPct}% del patrimonio está en cuentas bancarias — por encima del 25%. Hay capital disponible para diversificar. El destino (inversiones, ahorros, reducción de deudas) se define según la situación particular en el 1-1.`;
+  } else if(lPct>=20){
+    liqColor='var(--warn)'; liqPill=pill('🔶 '+lPct+'% del patrimonio en efectivo — Zona de atención','warn');
+    liqText=`El ${lPct}% del patrimonio está en liquidez — zona de atención (20–25%). Vale la pena revisar si parte de ese efectivo podría estar diversificado según las metas del cliente.`;
+  } else {
+    liqPill=pill('✅ '+lPct+'% del patrimonio en efectivo','green');
+    liqText=`El ${lPct}% del patrimonio está en liquidez — dentro del rango saludable. Suficiente para cubrir imprevistos sin tener demasiado capital ocioso.`;
   }
-}
+  sections.push({icon:'💧',label:'Liquidez',color:liqColor,pill:liqPill,text:liqText});
 
-function renderAI(p){
-  const secs=[
-    {label:'💧 Liquidez',               text:p.liquidez},
-    {label:'🛡️ Fondo de emergencias',   text:p.fondo_emergencias},
-    {label:'📈 Inversiones',             text:p.inversiones},
-    {label:'📋 Deudas',                  text:p.deudas},
-    {label:'⚖️ Concentración de riesgo', text:p.concentracion},
-  ];
-  document.getElementById('ai-content').innerHTML=
-    secs.map(s=>`<div class="ai-section"><div class="ai-section-title">${s.label}</div><p>${s.text}</p></div>`).join('')+
+  // 6. CONCENTRACIÓN
+  let concText='',concColor='var(--accent)',concPill='';
+  const maxConc=Math.max(lPct,iPct,pPct);
+  if(maxConc>80){
+    concColor='var(--warn)'; concPill=pill('🔶 Alta concentración en un tipo de activo','warn');
+    concText=`Más del ${maxConc}% del patrimonio está en un solo tipo de activo. Diversificar entre liquidez, pensión e inversiones reduce la exposición a cualquier evento puntual.`;
+  } else {
+    concPill=pill('✅ Distribución balanceada','green');
+    concText='El patrimonio tiene distribución entre diferentes tipos de activos. Revisar esta composición al menos una vez al año y ajustar si cambian las metas o la tolerancia al riesgo.';
+  }
+  sections.push({icon:'⚖️',label:'Concentración de activos',color:concColor,pill:concPill,text:concText});
+
+  // PRÓXIMOS PASOS
+  const pasos=[];
+  if(d.feMeses<3) pasos.push('Construir el fondo de emergencias hasta mínimo 3 meses de gastos — es la base antes que todo.');
+  if(hasTarjetas&&(debtRatio===null||debtRatio>0.15)) pasos.push('Atacar las tarjetas de crédito con el Método Bola de Nieve Ajustado: empezar por la de menor saldo.');
+  if(hasDeudas&&!hasTarjetas&&debtRatio!==null&&debtRatio>0.25) pasos.push('Hacer un plan de pagos acelerado para bajar las cuotas por debajo del 25% del ingreso neto.');
+  if(!hasBolsa&&d.feMeses>=3&&(debtRatio===null||debtRatio<0.15)) pasos.push('Iniciar inversiones en Bolsa con un aporte mensual fijo. La meta del Sistema GEM es el 10% del ingreso neto.');
+  if(hasBolsa&&bolsaRatio!==null&&bolsaRatio<0.10) pasos.push(`Aumentar el aporte mensual a Bolsa para acercarse al 10% del ingreso neto (actualmente en ${(bolsaRatio*100).toFixed(0)}%).`);
+  if(lPct>25&&d.feMeses>=6) pasos.push('Evaluar cuánto del efectivo en cuentas podría estar diversificado — revisarlo en el próximo 1-1.');
+  if(pasos.length===0) pasos.push('Mantener la consistencia en aportes mensuales — el tiempo y el interés compuesto son los aliados más poderosos.');
+  if(pasos.length<2) pasos.push('Revisar la composición del portafolio al menos una vez al año y ajustar según cambios de vida.');
+  if(pasos.length<3) pasos.push('Documentar el patrimonio semestralmente para medir el progreso y mantener el enfoque en las metas.');
+
+  const secHTML=sections.map(s=>`
+    <div class="ai-section">
+      <div class="ai-section-title" style="color:${s.color};border-color:${s.color}22;">${s.icon} ${s.label}</div>
+      ${s.pill?`<div style="margin-bottom:8px">${s.pill}</div>`:''}
+      <p>${s.text}</p>
+      ${s.extra||''}
+    </div>`).join('');
+  const pasosHTML=pasos.slice(0,3).map((p,i)=>`<li><div class="step-num">${i+1}</div><span>${p}</span></li>`).join('');
+
+  document.getElementById('ai-content').innerHTML=secHTML+
     `<div class="ai-section">
-      <div class="ai-section-title">🚀 Próximos pasos a revisar con Olger</div>
-      <ul class="next-steps">${p.pasos.map((p,i)=>`<li><div class="step-num">${i+1}</div><span>${p}</span></li>`).join('')}</ul>
+      <div class="ai-section-title" style="color:var(--accent)">🚀 Próximos pasos a revisar con Olger</div>
+      <ul class="next-steps">${pasosHTML}</ul>
     </div>
     <div class="disclosure">
-      <strong>⚠️ Aviso importante:</strong> Este análisis fue generado por inteligencia artificial (IA) con fines educativos únicamente. Puede contener errores o imprecisiones. No constituye asesoría financiera, legal ni de inversión. Para decisiones específicas sobre las finanzas personales, consultá siempre con un profesional calificado.
+      <strong>⚠️ Aviso importante:</strong> Este análisis es educativo y orientativo, basado en el Sistema GEM. No constituye asesoría financiera, legal ni de inversión. Para decisiones específicas, consultá siempre con un profesional calificado.
     </div>
     <div class="mentor-cta">
       <div class="mentor-icon">🎯</div>
@@ -730,34 +738,15 @@ function renderAI(p){
     </div>`;
 }
 
-// ══════════════════════════════════════════════
-// PDF EXPORT
-// ══════════════════════════════════════════════
 function exportPDF(){
-  const rd = document.getElementById('report-date').value.trim()
-          || new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
-  document.getElementById('rh-date').textContent = 'Período: ' + rd;
-  document.getElementById('report-header').style.display = 'block';
-
-  const el = document.getElementById('panel-resultado');
-  // Temporarily hide action bar for PDF
-  const ab = el.querySelector('.action-bar');
-  const ct = el.querySelector('.curr-toggle');
+  const rd=document.getElementById('report-date').value.trim()||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
+  document.getElementById('rh-date').textContent='Período: '+rd;
+  document.getElementById('report-header').style.display='block';
+  const el=document.getElementById('panel-resultado');
+  const ab=el.querySelector('.action-bar');
   if(ab) ab.style.display='none';
-
-  const opt = {
-    margin:      [12,12,12,12],
-    filename:    `Reporte_Patrimonio_GEM_${rd.replace(/\s/g,'_')}.pdf`,
-    image:       {type:'jpeg',quality:0.95},
-    html2canvas: {scale:2, useCORS:true},
-    jsPDF:       {unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:   {mode:'avoid-all'},
-  };
-
-  html2pdf().set(opt).from(el).save().then(()=>{
-    document.getElementById('report-header').style.display='none';
-    if(ab) ab.style.display='';
-  });
+  const opt={margin:[12,12,12,12],filename:`Reporte_Patrimonio_GEM_${rd.replace(/\s/g,'_')}.pdf`,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:'avoid-all'}};
+  html2pdf().set(opt).from(el).save().then(()=>{ document.getElementById('report-header').style.display='none'; if(ab) ab.style.display=''; });
 }
 </script>
 </body>

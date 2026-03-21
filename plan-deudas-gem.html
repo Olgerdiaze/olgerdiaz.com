@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Método GEM para Salir de Deudas — Olger Díaz Mentoring</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9;--surface:#fff;--surface2:#edf1f7;
+  --border:#dde3ed;--border-strong:#bcc6d8;
+  --text:#2d3748;--text-2:#5a6a85;--text-3:#8fa0bb;
+  --green:#1a6b45;--green-bg:#e6f4ee;--green-border:#99ccb4;
+  --amber:#7a4f00;--amber-bg:#fdf3e0;--amber-border:#f0c060;
+  --red:#8a1a1a;--red-bg:#fdeaea;--red-border:#f0a0a0;
+  --blue-bg:#e8f0fb;--blue-border:#90b4e0;--blue-text:#2a5a9a;
+  --accent:#4a8fc4;--accent-dark:#3275ab;--accent-light:#e8f2fb;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 3px rgba(45,55,72,.07),0 1px 2px rgba(45,55,72,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* HEADER */
+.page-header{background:#2d3748;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(45,55,72,.22)}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-svg{width:36px;height:36px;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.logo-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-dark)}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}.btn-ghost:hover{background:rgba(255,255,255,.18)}
+.btn-outline{background:transparent;color:var(--text-2);border:1px dashed var(--border-strong)}.btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.btn-remove{background:transparent;color:var(--text-3);border:1px solid var(--border);width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:17px;line-height:1;flex-shrink:0;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s}.btn-remove:hover{background:var(--red-bg);border-color:var(--red-border);color:var(--red)}
+.btn svg{width:14px;height:14px}
+
+/* LAYOUT */
+.container{max-width:1000px;margin:0 auto;padding:24px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+.card-title{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px}
+.section-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+
+/* FORMS */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:var(--text-2);font-weight:500}
+input,select{height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 10px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--surface);width:100%;transition:border-color .15s}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,143,196,.12)}
+.pfx-wrap{display:flex;width:100%}
+.pfx{display:inline-flex;align-items:center;padding:0 9px;height:36px;border:1px solid var(--border);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);background:var(--surface2);color:var(--text-2);font-size:12px;flex-shrink:0;white-space:nowrap}
+.pfx+input{border-radius:0 var(--radius-sm) var(--radius-sm) 0;border-left:none}
+
+/* DEBT ROWS */
+.debt-headers,.debt-row{display:grid;grid-template-columns:1.8fr 1fr .85fr 1fr 1.1fr 30px;gap:8px;align-items:center}
+.debt-headers{margin-bottom:5px;padding:0 2px}
+.col-h{font-size:11px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em}
+.debt-row{margin-bottom:8px}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.metric{background:var(--surface2);border-radius:var(--radius);padding:14px 16px}
+.metric .lbl{font-size:11px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.metric .val{font-size:20px;font-weight:500;color:var(--text);font-family:'DM Mono',monospace}
+.metric .val.green{color:var(--green)}.metric .val.amber{color:var(--amber)}
+.metric .sub{font-size:11px;color:var(--text-3);margin-top:2px}
+
+/* ORDER LIST */
+.order-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.order-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.order-num{width:22px;height:22px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.order-name{flex:1;font-weight:500;font-size:13px}
+.order-detail{font-size:12px;color:var(--text-2);font-family:'DM Mono',monospace}
+.finish-badge{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);white-space:nowrap}
+
+/* ABONOS TABLE */
+.abonos-wrap{overflow-x:auto;max-height:460px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm)}
+.abonos-table{width:100%;border-collapse:collapse;font-size:13px}
+.abonos-table th{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;background:var(--surface2);position:sticky;top:0;z-index:2}
+.abonos-table td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.abonos-table tr:last-child td{border-bottom:none}
+.abonos-table tr.row-zero td{background:#fffdf5}
+.abonos-table tr.row-high td{background:#f2faf6}
+.month-lbl{font-size:12px;color:var(--text-2);white-space:nowrap;font-weight:500;min-width:65px}
+
+/* Abono input — completamente libre */
+.abono-inp{
+  width:140px;height:30px;
+  font-size:13px;font-family:'DM Mono',monospace;
+  text-align:right;padding:0 8px;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:var(--surface);
+  color:var(--text);
+  transition:border-color .15s;
+}
+.abono-inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(74,143,196,.1)}
+.abono-inp.zero{color:var(--text-3)}
+.abono-inp.pos{color:var(--green);font-weight:500}
+.abono-inp.auto-added{border-color:var(--green-border);background:var(--green-bg)}
+
+.bar-wrap{width:90px;height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:99px;transition:width .25s}
+.saldo-cell{font-family:'DM Mono',monospace;font-size:12px;color:var(--text-2);white-space:nowrap;text-align:right;padding-right:14px!important}
+.auto-badge{font-size:10px;padding:1px 6px;border-radius:99px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);margin-left:4px;white-space:nowrap;vertical-align:middle}
+
+/* PRESET BUTTONS */
+.preset-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.preset-row span{font-size:12px;color:var(--text-2)}
+.preset-btn{padding:4px 12px;font-size:12px;border:1px solid var(--border);border-radius:99px;background:var(--surface);color:var(--text-2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
+.preset-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* STATS */
+.abonos-stats{display:flex;gap:20px;font-size:12px;color:var(--text-2);margin-bottom:12px;flex-wrap:wrap}
+.abonos-stats strong{color:var(--text)}
+
+/* TAGS */
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
+.tag-tc{background:#e8f0fb;color:#2a5a9a}.tag-tz{background:#fdf3e0;color:#7a4f00}
+.tag-mq{background:#f0e8fb;color:#5a2a9a}.tag-cel{background:#e6f4ee;color:#1a6b45}
+.tag-pp{background:#fdeaea;color:#8a1a1a}.tag-pr{background:#f5f0e8;color:#6b4a1a}
+
+.empty-msg{font-size:13px;color:var(--text-3);padding:8px 0}
+
+/* CALLOUT */
+.callout{border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:10px;line-height:1.5}
+.callout.info{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.callout.good{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.callout.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.callout.danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+
+/* PLAN TOGGLE */
+.plan-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;width:fit-content}
+.plan-toggle button{padding:7px 18px;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.plan-toggle button.active{background:var(--accent);color:#fff;font-weight:500}
+.plan-toggle button:not(.active):hover{background:var(--surface2)}
+
+/* INCOME SECTION */
+.income-grid{display:grid;gap:12px;margin-top:14px}
+.income-grid.solo{grid-template-columns:1fr 1fr}
+.income-grid.pareja{grid-template-columns:1fr 1fr 1fr}
+.income-divider{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;margin-top:4px}
+
+/* HEALTH INDICATOR */
+.health-card{border-radius:var(--radius);padding:16px 20px;border:1px solid;margin-bottom:18px;display:flex;align-items:flex-start;gap:16px}
+.health-card.ok{background:var(--green-bg);border-color:var(--green-border)}
+.health-card.warn{background:var(--amber-bg);border-color:var(--amber-border)}
+.health-card.danger{background:var(--red-bg);border-color:var(--red-border)}
+.health-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.health-body{flex:1}
+.health-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.health-card.ok .health-title{color:var(--green)}
+.health-card.warn .health-title{color:var(--amber)}
+.health-card.danger .health-title{color:var(--red)}
+.health-detail{font-size:13px;color:var(--text-2);line-height:1.5}
+.health-bar-bg{height:8px;background:rgba(0,0,0,.08);border-radius:99px;margin-top:10px;overflow:hidden}
+.health-bar-fill{height:100%;border-radius:99px;transition:width .4s}
+.health-pct{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;flex-shrink:0;margin-top:2px}
+.health-card.ok .health-pct{color:var(--green)}
+.health-card.warn .health-pct{color:var(--amber)}
+.health-card.danger .health-pct{color:var(--red)}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="logo-area">
+    <svg class="logo-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="7" width="19" height="19" rx="3" transform="rotate(-8 2 7)" fill="#4a8fc4"/>
+      <rect x="13" y="13" width="12" height="12" rx="2" transform="rotate(15 13 13)" fill="#2d3748"/>
+    </svg>
+    <div>
+      <div class="logo-text">Método GEM para Salir de Deudas</div>
+      <div class="logo-sub">Olger Díaz Mentoring</div>
+    </div>
+  </div>
+  <button class="btn btn-ghost" onclick="exportPDF()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 12l-4-4m4 4l4-4"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg>
+    Exportar PDF
+  </button>
+</header>
+
+<div class="container">
+
+  <!-- Config -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="card-title" style="margin:0">Configuración general</div>
+      <div class="plan-toggle">
+        <button class="active" id="btn-individual" onclick="setPlanType('individual')">Individual</button>
+        <button id="btn-pareja" onclick="setPlanType('pareja')">En pareja</button>
+      </div>
+    </div>
+
+    <div class="grid-4">
+      <div class="field" id="field-nombre-1"><label id="lbl-nombre-1">Nombre del cliente</label><input type="text" id="client-name" placeholder="Ej: Juan Pérez"/></div>
+      <div class="field" id="field-nombre-2" style="display:none"><label>Nombre — Persona 2</label><input type="text" id="client-name-2" placeholder="Ej: María López"/></div>
+      <div class="field"><label>Fecha de inicio</label><input type="month" id="start-date"/></div>
+      <div class="field"><label>Moneda</label>
+        <select id="currency" onchange="onCurrencyChange()">
+          <option value="CRC">Colones (₡)</option>
+          <option value="USD">Dólares ($)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Ingresos -->
+    <div class="income-divider" style="margin-top:16px">Ingresos netos mensuales</div>
+    <div class="income-grid solo" id="income-grid">
+      <div class="field">
+        <label id="lbl-ingreso-1">Ingreso neto mensual</label>
+        <div class="pfx-wrap"><span class="pfx" id="pfx-inc1">₡</span>
+          <input type="number" id="income-1" placeholder="0" min="0" oninput="onIncomeChange()"/>
+        </div>
+      </div>
+      <div class="field" id="field-ingreso-2" style="display:none">
+        <label id="lbl-ingreso-2">Ingreso neto — Persona 2</label>
+        <div class="pfx-wrap"><span class="pfx" id="pfx-inc2">₡</span>
+          <input type="number" id="income-2" placeholder="0" min="0" oninput="onIncomeChange()"/>
+        </div>
+      </div>
+      <div class="field" id="field-ingreso-total" style="display:none">
+        <label>Ingreso total combinado</label>
+        <div style="height:36px;display:flex;align-items:center;font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--accent)" id="income-total-display">₡0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deudas -->
+  <div class="card">
+    <div class="section-row"><div class="card-title" style="margin:0">Deudas</div></div>
+    <div class="debt-headers">
+      <div class="col-h">Nombre / descripción</div>
+      <div class="col-h">Saldo actual</div>
+      <div class="col-h">Tasa anual %</div>
+      <div class="col-h">Cuota mínima</div>
+      <div class="col-h">Tipo</div>
+      <div></div>
+    </div>
+    <div id="debt-list"></div>
+    <button class="btn btn-outline" style="margin-top:4px;font-size:13px" onclick="addDebt()">+ Agregar deuda</button>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+    <button class="btn btn-primary" style="padding:10px 28px;font-size:14px" onclick="buildPlan()">Calcular plan →</button>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div id="results" style="display:none">
+
+    <!-- Indicador de salud financiera -->
+    <div id="health-indicator"></div>
+
+    <!-- Métricas -->
+    <div class="metrics" id="metrics-bar"></div>
+
+    <!-- Orden de ataque — ANTES de la tabla de abonos -->
+    <div class="card">
+      <div class="card-title">Orden de ataque — bola de nieve</div>
+      <div class="callout info" style="margin-bottom:14px">
+        Cuando se liquida una deuda, su cuota mínima se suma automáticamente al abono de los meses restantes.
+      </div>
+      <ul class="order-list" id="order-list"></ul>
+    </div>
+
+    <!-- ABONOS VARIABLES -->
+    <div class="card">
+      <div class="section-row" style="margin-bottom:10px">
+        <div class="card-title" style="margin:0">Plan de abonos mensuales</div>
+        <span style="font-size:12px;color:var(--text-3)">Editá cada mes según tu realidad</span>
+      </div>
+
+      <div class="preset-row">
+        <span>Aplicar a todos:</span>
+        <button class="preset-btn" onclick="applyPreset(0)">Sin abono</button>
+        <button class="preset-btn" onclick="applyCustom()">Monto personalizado…</button>
+        <button class="preset-btn" onclick="applyPattern()">Patrón mes a mes…</button>
+      </div>
+
+      <div class="abonos-stats" id="abonos-stats"></div>
+
+      <div class="abonos-wrap">
+        <table class="abonos-table">
+          <thead>
+            <tr>
+              <th style="min-width:72px">Mes</th>
+              <th>Abono extra</th>
+              <th style="min-width:100px">Esfuerzo</th>
+              <th style="text-align:right;padding-right:14px">Saldo restante</th>
+            </tr>
+          </thead>
+          <tbody id="abonos-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── STATE ── */
+let debts = [];
+let baseExtras = [];
+let plan = null;
+let planType = 'individual'; // 'individual' | 'pareja'
+
+/* ── PLAN TYPE TOGGLE ── */
+function setPlanType(type){
+  planType=type;
+  document.getElementById('btn-individual').classList.toggle('active',type==='individual');
+  document.getElementById('btn-pareja').classList.toggle('active',type==='pareja');
+  const isPareja=type==='pareja';
+
+  // Name fields
+  document.getElementById('lbl-nombre-1').textContent=isPareja?'Nombre — Persona 1':'Nombre del cliente';
+  document.getElementById('client-name').placeholder=isPareja?'Ej: Juan Pérez':'Ej: Juan Pérez';
+  document.getElementById('field-nombre-2').style.display=isPareja?'':'none';
+
+  // Grid columns: pareja needs 5 columns (nombre1, nombre2, fecha, moneda, abono)
+  // individual keeps 4
+  document.querySelector('.grid-4').style.gridTemplateColumns=isPareja
+    ?'repeat(5,1fr)'
+    :'repeat(4,1fr)';
+
+  // Income grid
+  document.getElementById('income-grid').className=`income-grid ${isPareja?'pareja':'solo'}`;
+  document.getElementById('field-ingreso-2').style.display=isPareja?'':'none';
+  document.getElementById('field-ingreso-total').style.display=isPareja?'':'none';
+  document.getElementById('lbl-ingreso-1').textContent=isPareja?'Ingreso neto — Persona 1':'Ingreso neto mensual';
+
+  onIncomeChange();
+}
+
+function getTotalIncome(){
+  const i1=parseFloat(document.getElementById('income-1').value)||0;
+  const i2=planType==='pareja'?(parseFloat(document.getElementById('income-2').value)||0):0;
+  return i1+i2;
+}
+
+function onIncomeChange(){
+  const total=getTotalIncome();
+  document.getElementById('income-total-display').textContent=fmt(total)||'₡0';
+  document.querySelectorAll('.pfx').forEach(e=>e.textContent=pfx());
+  if(plan) rdHealthIndicator();
+}
+
+const TYPES = [
+  {val:'tc',label:'Tarjeta de crédito',tag:'tag-tc'},
+  {val:'tz',label:'Tasa cero',tag:'tag-tz'},
+  {val:'mq',label:'Mini cuotas',tag:'tag-mq'},
+  {val:'cel',label:'Celular financiado',tag:'tag-cel'},
+  {val:'pp',label:'Préstamo personal',tag:'tag-pp'},
+  {val:'pr',label:'Préstamo prendario',tag:'tag-pr'}
+];
+const COLORS = ['#4a8fc4','#2d3748','#e08c3a','#7b5ea7','#3aaa6e','#c44a6b'];
+
+/* ── FORMAT ── */
+function cur(){return document.getElementById('currency').value}
+function pfx(){return cur()==='CRC'?'₡':'$'}
+function fmt(n){
+  const a=Math.round(Math.abs(n));
+  return pfx()+(cur()==='CRC'?a.toLocaleString('es-CR'):a.toLocaleString('en-US'));
+}
+// PDF-safe format: no ₡ symbol, uses spaces as thousand separators
+function fmtPDF(n){
+  const a=Math.round(Math.abs(n));
+  const prefix=cur()==='CRC'?'CRC ':'USD ';
+  // Format with spaces as thousand separators (safe for jsPDF helvetica)
+  return prefix+a.toLocaleString('en-US').replace(/,/g,' ');
+}
+function safePDF(str){
+  // Strip any character outside latin-1 printable range
+  return (str||'').replace(/[^\x20-\x7E\xA0-\xFF]/g,'?');
+}
+function mLbl(ym,off){
+  if(!ym)return`Mes ${off+1}`;
+  const[y,m]=ym.split('-').map(Number);
+  const d=new Date(y,m-1+off,1);
+  return d.toLocaleDateString('es-CR',{month:'short',year:'2-digit'}).replace('. ','/').replace('.','');
+}
+
+/* ── DEBT LIST ── */
+function addDebt(name='',balance='',rate='',minPay='',type='tc'){
+  debts.push({id:Date.now()+Math.random(),name,balance,rate,minPay,type});
+  rdDebts();
+}
+function rmDebt(id){debts=debts.filter(d=>d.id!==id);rdDebts()}
+function gd(id){return debts.find(d=>d.id===id)}
+function onCurrencyChange(){
+  rdDebts();
+  document.querySelectorAll('.pfx').forEach(e=>e.textContent=pfx());
+  onIncomeChange();
+}
+
+function rdDebts(){
+  const el=document.getElementById('debt-list');
+  if(!debts.length){el.innerHTML='<p class="empty-msg">Sin deudas aún.</p>';return}
+  el.innerHTML=debts.map(d=>`
+    <div class="debt-row">
+      <input type="text" placeholder="Ej: Visa Banco Nacional" value="${d.name}" oninput="gd(${d.id}).name=this.value"/>
+      <div class="pfx-wrap"><span class="pfx">${pfx()}</span>
+        <input type="number" placeholder="0" value="${d.balance}" min="0" oninput="gd(${d.id}).balance=parseFloat(this.value)||0"/></div>
+      <input type="number" placeholder="0" value="${d.rate}" min="0" max="200" step="0.01" oninput="gd(${d.id}).rate=parseFloat(this.value)||0"/>
+      <div class="pfx-wrap"><span class="pfx">${pfx()}</span>
+        <input type="number" placeholder="0" value="${d.minPay}" min="0" oninput="gd(${d.id}).minPay=parseFloat(this.value)||0"/></div>
+      <select onchange="gd(${d.id}).type=this.value">
+        ${TYPES.map(t=>`<option value="${t.val}"${t.val===d.type?' selected':''}>${t.label}</option>`).join('')}
+      </select>
+      <button class="btn-remove" onclick="rmDebt(${d.id})">×</button>
+    </div>`).join('');
+}
+
+/* ── SNOWBALL ENGINE ──
+   Key difference: when a debt is paid off, its minPay is added
+   to baseExtras for all subsequent months automatically.
+── */
+function snowball(dl, extBaseArr){
+  // extBaseArr: user-defined extras per month (base, before auto-adds)
+  // We track cumulative freed minimums as debts are liquidated
+  let ds = dl.map(d=>({...d, rem:d.balance}));
+  ds.sort((a,b)=>a.rem - b.rem);
+
+  const tl = [], MAX = 600;
+  let month = 0;
+  let freedMin = 0; // accumulates freed minimums as debts liquidate
+
+  while(ds.some(d=>d.rem>0.5) && month<MAX){
+    const userExtra = month < extBaseArr.length ? (extBaseArr[month]||0) : 0;
+    const totalExtra = userExtra + freedMin;
+    month++;
+    const row = {month, userExtra, freedMin, totalExtra, paid:[], debts:{}};
+
+    // Apply interest + minimums
+    for(let d of ds){
+      if(d.rem<=0){row.debts[d.id]=0;continue}
+      const ir = d.rate/100/12;
+      const interest = d.rem*ir;
+      let pay = Math.min(d.minPay, d.rem+interest);
+      d.rem = Math.max(0, d.rem+interest-pay);
+      row.debts[d.id] = d.rem;
+      if(d.rem<0.5){d.rem=0; row.paid.push(d.id)}
+    }
+
+    // Apply extra to smallest remaining debt
+    let left = totalExtra;
+    for(let d of ds){
+      if(d.rem<=0 || left<=0) continue;
+      const app = Math.min(left, d.rem);
+      d.rem = Math.max(0, d.rem-app);
+      left -= app;
+      row.debts[d.id] = d.rem;
+      if(d.rem<0.5){d.rem=0; row.paid.push(d.id)}
+      if(left<=0) break;
+    }
+
+    // If any debt was paid off this month, add its minimum to freedMin
+    // for all future months
+    for(const id of row.paid){
+      const orig = dl.find(x=>x.id===id);
+      if(orig) freedMin += orig.minPay;
+    }
+
+    tl.push(row);
+  }
+  return {tl, order:ds.map(d=>d.id)};
+}
+
+function calcInt(dl, extBaseArr){
+  let ds = dl.map(d=>({...d,rem:d.balance}));
+  ds.sort((a,b)=>a.rem-b.rem);
+  let tot=0, m=0, freedMin=0;
+  while(ds.some(d=>d.rem>0.5)&&m<600){
+    const userExtra = m<extBaseArr.length?(extBaseArr[m]||0):0;
+    const totalExtra = userExtra + freedMin;
+    m++;
+    const paid=[];
+    for(let d of ds){
+      if(d.rem<=0)continue;
+      const ir=d.rate/100/12;const int=d.rem*ir;tot+=int;
+      let pay=Math.min(d.minPay,d.rem+int);d.rem=Math.max(0,d.rem+int-pay);
+      if(d.rem<0.5){d.rem=0;paid.push(d.id)}
+    }
+    let left=totalExtra;
+    for(let d of ds){
+      if(d.rem<=0||left<=0)continue;
+      const app=Math.min(left,d.rem);d.rem=Math.max(0,d.rem-app);left-=app;
+      if(d.rem<0.5){d.rem=0;paid.push(d.id)}
+      if(left<=0)break;
+    }
+    for(const id of paid){const orig=dl.find(x=>x.id===id);if(orig)freedMin+=orig.minPay}
+  }
+  return{totalInt:Math.round(tot),months:m}
+}
+
+function calcNoExtra(dl){
+  let ds=dl.map(d=>({...d,rem:d.balance}));
+  ds.sort((a,b)=>a.rem-b.rem);
+  let tot=0,m=0;
+  while(ds.some(d=>d.rem>0.5)&&m<600){
+    m++;
+    for(let d of ds){
+      if(d.rem<=0)continue;
+      const ir=d.rate/100/12;const int=d.rem*ir;tot+=int;
+      let pay=Math.min(d.minPay,d.rem+int);d.rem=Math.max(0,d.rem+int-pay);
+      if(d.rem<0.5)d.rem=0;
+    }
+  }
+  return{totalInt:Math.round(tot),months:m}
+}
+
+function finM(tl,id){
+  for(let i=0;i<tl.length;i++)if(tl[i].paid.includes(id))return i;
+  return tl.length-1;
+}
+
+/* ── BUILD PLAN ── */
+function buildPlan(){
+  const vl=debts.filter(d=>d.balance>0&&d.minPay>0);
+  if(!vl.length){document.getElementById('results').style.display='none';return}
+  if(!baseExtras.length){
+    baseExtras=Array.from({length:120},()=>0);
+  }
+  document.getElementById('results').style.display='block';
+  recompute(vl);
+}
+
+function recompute(vlOv){
+  const vl=vlOv||debts.filter(d=>d.balance>0&&d.minPay>0);
+  if(!vl.length)return;
+  const ym=document.getElementById('start-date').value;
+  const{tl,order}=snowball(vl,baseExtras);
+  const{totalInt}=calcInt(vl,baseExtras);
+  const{totalInt:noExtInt}=calcNoExtra(vl);
+  const totalDebt=vl.reduce((s,d)=>s+d.balance,0);
+  plan={tl,order,vl,totalInt,noExtInt,totalDebt,months:tl.length,ym};
+  rdHealthIndicator();
+  rdMetrics();
+  rdOrder();
+  rdAbonosTable();
+}
+
+/* ── HEALTH INDICATOR ── */
+function rdHealthIndicator(){
+  const el=document.getElementById('health-indicator');
+  const income=getTotalIncome();
+  if(!income||!plan){el.innerHTML='';return}
+
+  const{vl}=plan;
+  const totalMinimos=vl.reduce((s,d)=>s+d.minPay,0);
+  const pct=Math.round(totalMinimos/income*100);
+  const GEM_LIMIT=30;
+
+  let cls,icon,title,detail,barColor;
+  if(pct<=20){
+    cls='ok';icon='✓';barColor='var(--green)';
+    title=`Carga de deuda saludable — ${pct}% del ingreso`;
+    detail=`Las cuotas mínimas representan ${fmt(totalMinimos)}/mes de un ingreso ${planType==='pareja'?'combinado':'neto'} de ${fmt(income)}. Estás por debajo del límite del ${GEM_LIMIT}% del Método GEM. Hay espacio para un abono extra consistente.`;
+  } else if(pct<=GEM_LIMIT){
+    cls='warn';icon='⚠';barColor='#e8a020';
+    title=`Carga de deuda moderada — ${pct}% del ingreso`;
+    detail=`Las cuotas mínimas representan ${fmt(totalMinimos)}/mes de un ingreso ${planType==='pareja'?'combinado':'neto'} de ${fmt(income)}. Estás cerca del límite del ${GEM_LIMIT}% del Método GEM. El margen para abonos extras es ajustado — cada colón extra cuenta.`;
+  } else {
+    cls='danger';icon='!';barColor='var(--red)';
+    title=`Carga de deuda crítica — ${pct}% del ingreso`;
+    detail=`Las cuotas mínimas representan ${fmt(totalMinimos)}/mes de un ingreso ${planType==='pareja'?'combinado':'neto'} de ${fmt(income)}. Superás el límite del ${GEM_LIMIT}% del Método GEM. Prioridad inmediata: no agregar deuda nueva y ejecutar el plan de bola de nieve.`;
+  }
+
+  const barW=Math.min(pct,100);
+  const limitPos=Math.min(GEM_LIMIT,100);
+
+  el.innerHTML=`
+    <div class="health-card ${cls}">
+      <div class="health-pct">${pct}%</div>
+      <div class="health-body">
+        <div class="health-title">${icon} ${title}</div>
+        <div class="health-detail">${detail}</div>
+        <div class="health-bar-bg" style="position:relative">
+          <div class="health-bar-fill" style="width:${barW}%;background:${barColor}"></div>
+          <div style="position:absolute;top:-4px;left:${limitPos}%;width:2px;height:16px;background:rgba(0,0,0,.25);border-radius:1px" title="Límite GEM 30%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:3px">
+          <span>0%</span><span style="margin-left:${limitPos-8}%">Límite GEM 30%</span><span>100%</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── METRICS ── */
+function rdMetrics(){
+  const{totalDebt,months,totalInt,noExtInt,ym}=plan;
+  const saved=Math.max(0,noExtInt-totalInt);
+  const yrs=Math.floor(months/12),mos=months%12;
+  const ts=yrs>0?`${yrs}a ${mos}m`:`${months}m`;
+  const endL=ym?mLbl(ym,months):'';
+  // Promedio CORRECTO: suma de todos los abonos totales (user + freed) / meses
+  const totalAbonado=plan.tl.reduce((s,r)=>s+r.totalExtra,0);
+  const promedio=months>0?Math.round(totalAbonado/months):0;
+  const mConAbono=plan.tl.filter(r=>r.totalExtra>0).length;
+  document.getElementById('metrics-bar').innerHTML=`
+    <div class="metric"><div class="lbl">Deuda total</div><div class="val">${fmt(totalDebt)}</div></div>
+    <div class="metric"><div class="lbl">Tiempo para liquidar</div><div class="val amber">${ts}</div>${endL?`<div class="sub">${endL}</div>`:''}</div>
+    <div class="metric"><div class="lbl">Intereses totales</div><div class="val">${fmt(totalInt)}</div></div>
+    <div class="metric"><div class="lbl">Ahorro vs sin abono extra</div><div class="val green">${fmt(saved)}</div><div class="sub">${mConAbono} de ${months} meses con abono</div></div>`;
+}
+
+/* ── ORDER LIST ── */
+function rdOrder(){
+  const{order,vl,tl,ym}=plan;
+  document.getElementById('order-list').innerHTML=order.map((id,i)=>{
+    const d=vl.find(x=>x.id===id);if(!d)return'';
+    const t=TYPES.find(x=>x.val===d.type)||TYPES[0];
+    const fi=finM(tl,id);
+    const fd=ym?mLbl(ym,fi):`Mes ${fi+1}`;
+    return`<li class="order-item">
+      <span class="order-num">${i+1}</span>
+      <span class="order-name">${d.name||t.label}</span>
+      <span class="tag ${t.tag}">${t.label}</span>
+      <span class="order-detail">${fmt(d.balance)} · ${d.rate}% · mín ${fmt(d.minPay)}/mes</span>
+      <span class="finish-badge">Liquida: ${fd}</span>
+    </li>`}).join('');
+}
+
+/* ── ABONOS TABLE ── */
+function rdAbonosTable(){
+  const{months,tl,vl,ym}=plan;
+  while(baseExtras.length<months)baseExtras.push(0);
+
+  // Stats: usar totalExtra de cada fila (incluye freed)
+  const totalesReales=tl.map(r=>r.totalExtra);
+  const totalAbonado=totalesReales.reduce((s,a)=>s+a,0);
+  // Promedio correcto: solo meses donde hay algún abono
+  const mConAbono=totalesReales.filter(a=>a>0).length;
+  const promedio=mConAbono>0?Math.round(totalAbonado/mConAbono):0;
+  const maxA=Math.max(...totalesReales,1);
+  const nCero=totalesReales.filter(a=>!a||a===0).length;
+
+  document.getElementById('abonos-stats').innerHTML=`
+    <span>Total abonado: <strong>${fmt(totalAbonado)}</strong></span>
+    <span>Promedio (meses activos): <strong>${fmt(promedio)}</strong></span>
+    <span>Meses sin abono: <strong>${nCero}</strong></span>`;
+
+  let html='';
+  for(let i=0;i<months;i++){
+    const row=tl[i];
+    const userAmt=baseExtras[i]||0;
+    const totalAmt=row.totalExtra;
+    const freedThisMonth=row.freedMin; // accumulated freed minimum at this month
+    const hasAutoAdd=freedThisMonth>0;
+
+    const totalRow=vl.reduce((s,d)=>s+(row.debts[d.id]||0),0);
+    const barPct=maxA>0?Math.round(totalAmt/maxA*100):0;
+    const isZero=totalAmt===0;
+    const prom=mConAbono>0?totalAbonado/mConAbono:0;
+    const isHigh=totalAmt>prom*1.5&&totalAmt>0;
+    const rowCls=isZero?'row-zero':isHigh?'row-high':'';
+    const barColor=isZero?'var(--border-strong)':isHigh?'var(--green)':'var(--accent)';
+    const lbl=ym?mLbl(ym,i):`Mes ${i+1}`;
+
+    html+=`<tr class="${rowCls}">
+      <td class="month-lbl">${lbl}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="pfx-wrap" style="width:fit-content">
+            <span class="pfx" style="height:30px">${pfx()}</span>
+            <input class="abono-inp ${userAmt===0?'zero':'pos'}"
+              type="number" min="0"
+              value="${userAmt}"
+              onchange="onAbonoChg(this,${i})"
+              onblur="onAbonoChg(this,${i})"/>
+          </div>
+          ${hasAutoAdd?`<span class="auto-badge">+${fmt(freedThisMonth)} liberado</span>`:''}
+        </div>
+      </td>
+      <td>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+        ${isZero?`<span style="font-size:10px;color:var(--text-3);margin-left:6px">sin abono</span>`:''}
+        ${isHigh&&!isZero?`<span style="font-size:10px;color:var(--green);margin-left:6px">abono alto</span>`:''}
+      </td>
+      <td class="saldo-cell">${fmt(totalRow)}</td>
+    </tr>`;
+  }
+  document.getElementById('abonos-body').innerHTML=html;
+}
+
+function onAbonoChg(el,i){
+  const v=parseFloat(el.value)||0;
+  baseExtras[i]=v;
+  el.className=`abono-inp ${v===0?'zero':'pos'}`;
+  recompute();
+}
+
+/* ── PRESETS ── */
+function applyPreset(v){
+  const{months}=plan;
+  while(baseExtras.length<months)baseExtras.push(0);
+  for(let i=0;i<months;i++)baseExtras[i]=v;
+  recompute();
+}
+function applyCustom(){
+  const r=prompt(`Monto a aplicar a todos los meses (${pfx()}):`);
+  if(r===null)return;
+  const v=parseFloat(r.replace(/[^0-9.]/g,''))||0;
+  applyPreset(v);
+}
+function applyPattern(){
+  const r=prompt(
+    'Escribe un patrón separado por comas — se repite en ciclo.\n'+
+    `Ejemplo: 50000,50000,0,100000,0,150000\nMoneda: ${pfx()}`
+  );
+  if(!r)return;
+  const parts=r.split(',').map(x=>parseFloat(x.trim())||0);
+  if(!parts.length)return;
+  const{months}=plan;
+  while(baseExtras.length<months)baseExtras.push(0);
+  for(let i=0;i<months;i++)baseExtras[i]=parts[i%parts.length];
+  recompute();
+}
+
+/* ── PDF ── */
+async function exportPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const client=document.getElementById('client-name').value||'Cliente';
+  const client2=document.getElementById('client-name-2').value||'';
+  const clientLabel=planType==='pareja'&&client2?`${client} & ${client2}`:client;
+  const ds=new Date().toLocaleDateString('es-CR');
+  const cr=cur()==='CRC'?'Colones (CRC)':'Dolares (USD)';
+
+  // Header
+  doc.setFillColor(45,55,72);doc.rect(0,0,210,28,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(255,255,255);
+  doc.text('Metodo GEM para Salir de Deudas',20,12);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,210,230);
+  doc.text('Olger Diaz Mentoring',20,19);doc.setTextColor(180,195,220);
+  doc.text(`Cliente: ${safePDF(clientLabel)}   |   Fecha: ${ds}   |   Moneda: ${cr}`,20,25);
+
+  if(!plan){doc.setFontSize(11);doc.setTextColor(50,50,50);doc.text('Calcula el plan primero.',20,42);doc.save('plan-gem.pdf');return}
+
+  const{vl,totalInt,months,noExtInt,totalDebt,order,tl,ym}=plan;
+  const saved=Math.max(0,noExtInt-totalInt);
+  const yr=Math.floor(months/12),mo2=months%12;
+  const ts=yr>0?`${yr} a ${mo2} m`:`${months} meses`;
+  const totAbonado=tl.reduce((s,r)=>s+r.totalExtra,0);
+  const mConAbono=tl.filter(r=>r.totalExtra>0).length;
+  const promedio=mConAbono>0?Math.round(totAbonado/mConAbono):0;
+  const nCero=tl.filter(r=>r.totalExtra===0).length;
+
+  const income=getTotalIncome();
+  const totalMinimos=vl.reduce((s,d)=>s+d.minPay,0);
+  const pctCarga=income>0?Math.round(totalMinimos/income*100):null;
+  const isPareja=planType==='pareja';
+
+  let y=36;
+  // Resumen
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(45,55,72);
+  doc.text('Resumen del plan',20,y);y+=7;
+  const endLabel=ym?` (${mLbl(ym,months)})`:'';
+  const mets=[
+    ['Tipo de plan',isPareja?'En pareja':'Individual'],
+    ['Deuda total',fmtPDF(totalDebt)],
+    ['Tiempo para liquidar',ts+endLabel],
+    ['Intereses totales',fmtPDF(totalInt)],
+    ['Total abonado extra',fmtPDF(totAbonado)],
+    ['Promedio mensual (meses activos)',fmtPDF(promedio)],
+    ['Meses sin abono',`${nCero} de ${months}`],
+    ['Ahorro vs sin abono extra',fmtPDF(saved)]
+  ];
+  if(income>0){
+    mets.splice(2,0,[isPareja?'Ingreso total combinado':'Ingreso neto mensual',fmtPDF(income)]);
+    if(pctCarga!==null) mets.splice(3,0,['Carga de deuda (cuotas / ingreso)',`${pctCarga}% ${pctCarga<=30?'- dentro del limite GEM':'- supera limite GEM 30%'}`]);
+  }
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  mets.forEach(([k,v])=>{
+    doc.setTextColor(90,106,133);doc.text(safePDF(k)+':',22,y);
+    doc.setFont('helvetica','bold');doc.setTextColor(45,55,72);doc.text(safePDF(v),105,y);
+    doc.setFont('helvetica','normal');y+=6;
+  });
+  y+=5;
+
+  // Orden de ataque
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(45,55,72);
+  doc.text('Orden de ataque',20,y);y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  order.forEach((id,i)=>{
+    const d=vl.find(x=>x.id===id);if(!d)return;
+    const t=TYPES.find(x=>x.val===d.type)||TYPES[0];
+    const fi=finM(tl,id);const fd=ym?mLbl(ym,fi):`Mes ${fi+1}`;
+    doc.setTextColor(74,143,196);doc.text(`${i+1}.`,22,y);
+    doc.setTextColor(45,55,72);doc.setFont('helvetica','bold');doc.text(safePDF(d.name||t.label),30,y);
+    doc.setFont('helvetica','normal');doc.setTextColor(90,106,133);
+    doc.text(`${fmtPDF(d.balance)} | ${d.rate}% | min ${fmtPDF(d.minPay)}/mes | Liquida: ${fd}`,30,y+5);
+    y+=12;if(y>270){doc.addPage();y=20}
+  });
+  y+=5;
+
+  // Plan de abonos
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(45,55,72);
+  doc.text('Plan de abonos mensuales',20,y);y+=3;
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(90,106,133);
+  doc.text('* Total abonado = abono manual + cuotas liberadas por deudas liquidadas.',22,y+4);y+=9;
+  const abCols=['Mes','Abono manual','Cuotas liberadas','Total abonado','Saldo restante'];
+  const abW=[25,38,40,40,40];
+  let cx=20;
+  doc.setFontSize(9);doc.setTextColor(90,106,133);doc.setFont('helvetica','bold');
+  abCols.forEach((c,ci)=>{doc.text(c,cx,y);cx+=abW[ci]});
+  y+=4;doc.setDrawColor(200,210,225);doc.line(20,y,190,y);y+=3;
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+
+  for(let i=0;i<months;i++){
+    const row=tl[i];
+    const lbl=ym?mLbl(ym,i):`Mes ${i+1}`;
+    const totalRow=vl.reduce((s,d)=>s+(tl[i]?.debts[d.id]||0),0);
+    const isZero=row.totalExtra===0;
+    doc.setTextColor(isZero?160:45,isZero?170:55,isZero?190:72);
+    cx=20;
+    doc.text(lbl,cx,y);cx+=abW[0];
+    doc.text(row.userExtra>0?fmtPDF(row.userExtra):'-',cx,y);cx+=abW[1];
+    doc.text(row.freedMin>0?fmtPDF(row.freedMin):'-',cx,y);cx+=abW[2];
+    doc.text(row.totalExtra>0?fmtPDF(row.totalExtra):'Sin abono',cx,y);cx+=abW[3];
+    doc.setTextColor(45,55,72);doc.text(fmtPDF(totalRow),cx,y);
+    y+=5;if(y>275){doc.addPage();y=20}
+  }
+
+  doc.setFontSize(8);doc.setTextColor(143,160,187);
+  doc.text(`Generado por Metodo GEM | Olger Diaz Mentoring | ${ds}`,20,290);
+  doc.save(`plan-deudas-${clientLabel.replace(/\s+/g,'-').replace(/&/g,'y').toLowerCase()}-gem.pdf`);
+}
+
+/* ── INIT ── */
+(function(){
+  const t=new Date();
+  document.getElementById('start-date').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
+  addDebt('Visa Banco Nacional',3500000,28,120000,'tc');
+  addDebt('Tasa cero Samsung',800000,0,67000,'tz');
+  addDebt('Préstamo personal BAC',8000000,18,280000,'pp');
+  buildPlan();
+})();
+</script>
+</body>
+</html>

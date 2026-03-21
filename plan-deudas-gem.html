@@ -832,10 +832,6 @@ async function exportPDF(){
 (function(){
   const t=new Date();
   document.getElementById('start-date').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
-  addDebt('Visa Banco Nacional',3500000,28,120000,'tc');
-  addDebt('Tasa cero Samsung',800000,0,67000,'tz');
-  addDebt('Préstamo personal BAC',8000000,18,280000,'pp');
-  buildPlan();
 })();
 </script>
 </body>

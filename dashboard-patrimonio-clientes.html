@@ -129,6 +129,34 @@
   .action-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
   .inv-subsection{margin-bottom:20px;}
   .inv-subsection-title{font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--border2);}
+  /* TARJETAS EXPANDED */
+  .tarjeta-row{grid-template-columns:1fr 80px 80px 90px 90px 30px;}
+  /* AHORROS */
+  .ahorros-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--positive);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+  /* METAS */
+  .metas-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+  .metas-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:12px;}
+  .meta-group{display:flex;flex-direction:column;gap:4px;}
+  .meta-group-title{font-size:10px;font-family:var(--font-mono);letter-spacing:.8px;text-transform:uppercase;font-weight:600;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid;}
+  .meta-corto{color:var(--accent);border-color:var(--accent)!important;}
+  .meta-mediano{color:var(--warn);border-color:var(--warn)!important;}
+  .meta-largo{color:var(--positive);border-color:var(--positive)!important;}
+  .meta-input-wrap{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+  .meta-input-wrap input{flex:1;}
+  .meta-hint{font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;line-height:1.4;}
+  /* METAS en resultado */
+  .metas-result{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-top:16px;}
+  .metas-result-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .metas-result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:4px;}
+  .meta-col-title{font-size:11px;font-family:var(--font-mono);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid;}
+  .meta-item{font-size:13px;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+  .meta-item:last-child{border-bottom:none;}
+  .meta-bullet{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+  .meta-priority-box{background:var(--red-lt);border:1px solid #f5c6c6;border-radius:var(--rs);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--red);line-height:1.6;}
+  @media(max-width:700px){
+    .metas-grid,.metas-result-grid{grid-template-columns:1fr;}
+    .tarjeta-row{grid-template-columns:1fr 70px 70px 80px 80px 30px;}
+  }
   @media(max-width:700px){
     .main{padding:20px 16px 40px;}
     .header{padding:16px;flex-direction:column;align-items:flex-start;}
@@ -237,11 +265,24 @@
       </div>
     </div>
 
+
+    <!-- AHORROS -->
+    <div class="ahorros-card">
+      <div class="card-title"><div class="dot" style="background:var(--positive)"></div> Ahorros Actuales</div>
+      <div class="card-subtitle">Ahorros que ya tenés con una meta específica (viajes, carro, prima de casa, etc.)</div>
+      <div class="input-header dual">
+        <div class="col-lbl">Descripción del ahorro</div><div class="col-lbl">Monto ₡</div><div class="col-lbl">Monto $</div><div></div>
+      </div>
+      <div id="list-ahorros"></div>
+      <button class="btn-add" onclick="addRow('ahorros')">+ Agregar ahorro</button>
+    </div>
+
     <!-- TARJETAS -->
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--red)"></div> Tarjetas de Crédito por Pagar</div>
-      <div class="input-header dual">
-        <div class="col-lbl">Tarjeta</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div></div>
+      <div class="card-subtitle">Incluí el saldo y las fechas para alinearlas si están desordenadas</div>
+      <div class="input-header tarjeta-row">
+        <div class="col-lbl">Tarjeta</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div class="col-lbl">Día corte</div><div class="col-lbl">Día pago</div><div></div>
       </div>
       <div id="list-tarjetas"></div>
       <button class="btn-add" onclick="addRow('tarjetas')">+ Agregar tarjeta</button>
@@ -309,6 +350,36 @@
       </div>
     </div>
 
+
+    <!-- METAS FINANCIERAS -->
+    <div class="metas-card">
+      <div class="card-title"><div class="dot" style="background:var(--accent)"></div> Metas Financieras</div>
+      <div class="card-subtitle">Las dos primeras prioridades siempre son: fondo de emergencias y salir de deudas — las metas personales van después</div>
+      <div class="metas-grid">
+        <div class="meta-group">
+          <div class="meta-group-title meta-corto">⚡ Corto plazo (hasta 12 meses)</div>
+          <div class="meta-input-wrap"><input type="text" id="meta-c1" placeholder="Meta 1"></div>
+          <div class="meta-input-wrap"><input type="text" id="meta-c2" placeholder="Meta 2"></div>
+          <div class="meta-input-wrap"><input type="text" id="meta-c3" placeholder="Meta 3"></div>
+          <div class="meta-hint">Ej: Crear fondo de emergencias, salir de tarjeta X, viaje a México</div>
+        </div>
+        <div class="meta-group">
+          <div class="meta-group-title meta-mediano">🎯 Mediano plazo (3–5 años)</div>
+          <div class="meta-input-wrap"><input type="text" id="meta-m1" placeholder="Meta 1"></div>
+          <div class="meta-input-wrap"><input type="text" id="meta-m2" placeholder="Meta 2"></div>
+          <div class="meta-input-wrap"><input type="text" id="meta-m3" placeholder="Meta 3"></div>
+          <div class="meta-hint">Ej: Prima de casa, carro propio, portafolio de $10,000</div>
+        </div>
+        <div class="meta-group">
+          <div class="meta-group-title meta-largo">🌱 Largo plazo (+5 años)</div>
+          <div class="meta-input-wrap"><input type="text" id="meta-l1" placeholder="Meta 1"></div>
+          <div class="meta-input-wrap"><input type="text" id="meta-l2" placeholder="Meta 2"></div>
+          <div class="meta-input-wrap"><input type="text" id="meta-l3" placeholder="Meta 3"></div>
+          <div class="meta-hint">Ej: Independencia financiera, casa propia, retiro anticipado</div>
+        </div>
+      </div>
+    </div>
+
     <button class="btn-primary" onclick="calcular()">Calcular patrimonio →</button>
   </div>
 
@@ -338,7 +409,7 @@
     </div>
 
     <div class="summary-grid">
-      <div class="s-card"><div class="s-lbl">Activos totales</div><div class="s-val blue" id="s-activos">—</div><div class="s-sub">Cuentas + Pensión + Inversiones</div></div>
+      <div class="s-card"><div class="s-lbl">Activos totales</div><div class="s-val blue" id="s-activos">—</div><div class="s-sub">Cuentas + Ahorros + Pensión + Inversiones</div></div>
       <div class="s-card"><div class="s-lbl">Pasivos totales</div><div class="s-val neg"  id="s-pasivos">—</div><div class="s-sub">Tarjetas + Deudas</div></div>
       <div class="s-card"><div class="s-lbl">Patrimonio neto</div><div class="s-val"       id="s-neto">—</div><div class="s-sub">Activos − Pasivos</div></div>
       <div class="s-card"><div class="s-lbl">Liquidez inmediata</div><div class="s-val pos" id="s-liquidez">—</div><div class="s-sub">Cuentas disponibles</div></div>
@@ -353,6 +424,27 @@
       <div class="card">
         <div class="card-title"><div class="dot" style="background:var(--teal)"></div> Concentración de activos</div>
         <div id="concentracion"></div>
+      </div>
+    </div>
+
+
+    <!-- METAS EN RESULTADO -->
+    <div class="metas-result" id="metas-result" style="display:none">
+      <div class="metas-result-title"><div class="dot" style="background:var(--accent)"></div> Metas Financieras del Cliente</div>
+      <div id="metas-priority-msg"></div>
+      <div class="metas-result-grid">
+        <div>
+          <div class="meta-col-title" style="color:var(--accent);border-color:var(--accent)">⚡ Corto plazo</div>
+          <div id="metas-corto-list"></div>
+        </div>
+        <div>
+          <div class="meta-col-title" style="color:var(--warn);border-color:var(--warn)">🎯 Mediano plazo</div>
+          <div id="metas-mediano-list"></div>
+        </div>
+        <div>
+          <div class="meta-col-title" style="color:var(--positive);border-color:var(--positive)">🌱 Largo plazo</div>
+          <div id="metas-largo-list"></div>
+        </div>
       </div>
     </div>
 
@@ -372,7 +464,8 @@
 <script>
 const SECS = {
   cuentas:     {ids:[],data:{},type:'dual'},
-  tarjetas:    {ids:[],data:{},type:'dual'},
+  ahorros:     {ids:[],data:{},type:'dual'},
+  tarjetas:    {ids:[],data:{},type:'tarjeta'},
   deudas:      {ids:[],data:{},type:'triple'},
   pension:     {ids:[],data:{},type:'single'},
   bolsa:       {ids:[],data:{},type:'inv-bolsa'},
@@ -409,6 +502,7 @@ function flush(sec){
     SECS[sec].data[id].name=ins[0]?.value??'';
     if(t==='dual'||t==='triple'||t==='inv-bolsa'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
     if(t==='triple') SECS[sec].data[id].cuota=ins[3]?.value??'';
+    if(t==='tarjeta'){ SECS[sec].data[id].corte=ins[3]?.value??''; SECS[sec].data[id].pago=ins[4]?.value??''; }
     if(t==='inv-bolsa') SECS[sec].data[id].aporte=ins[3]?.value??'';
     if(t==='inv-espp'){ SECS[sec].data[id].pct=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
     if(t==='inv-sol'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].aporte=ins[2]?.value??''; }
@@ -424,6 +518,7 @@ function render(sec){
     const d=s.data[id], div=document.createElement('div'), t=s.type;
     let cls='data-row ';
     if(t==='dual') cls+='dual';
+    else if(t==='tarjeta') cls+='tarjeta-row';
     else if(t==='triple') cls+='triple';
     else if(t==='inv-bolsa') cls+='inv-bolsa-row';
     else if(t==='inv-espp'||t==='inv-sol') cls+='inv-fija-row';
@@ -431,6 +526,7 @@ function render(sec){
     div.className=cls; div.dataset.id=id;
     let html='';
     if(t==='dual') html=`<input type="text" placeholder="Nombre" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='tarjeta') html=`<input type="text" placeholder="Nombre tarjeta" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="día" value="${x(d.corte)}" min="1" max="31"><input type="number" placeholder="día" value="${x(d.pago)}" min="1" max="31"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='triple') html=`<input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.cuota)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='inv-bolsa') html=`<input type="text" placeholder="Nombre del portafolio" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='inv-espp') html=`<input type="text" placeholder="Empresa / Plan" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.pct)}" min="0" max="100"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
@@ -464,7 +560,7 @@ function setCurrency(cur){
   currency=cur;
   document.getElementById('btn-crc').classList.toggle('active',cur==='CRC');
   document.getElementById('btn-usd').classList.toggle('active',cur==='USD');
-  if(resultData) renderResult(resultData);
+  if(resultData){ renderResult(resultData); renderMetas(resultData); }
 }
 function tc(){ return parseFloat(document.getElementById('tc').value)||520; }
 function n(v){ return parseFloat(v)||0; }
@@ -508,6 +604,7 @@ function calcular(){
   flushAll();
   const tcv=tc();
   const totalCuentas=secTotalCRC('cuentas'), totalTarjetas=secTotalCRC('tarjetas'), totalPension=secTotalCRC('pension');
+  const totalAhorros=secTotalCRC('ahorros');
   const totalDeudas=SECS.deudas.ids.reduce((s,id)=>{ const d=SECS.deudas.data[id]; return s+n(d.crc)+n(d.usd)*tcv; },0);
   const totalCuotas=SECS.deudas.ids.reduce((s,id)=>s+n(SECS.deudas.data[id].cuota),0);
   const totalBolsaValor=SECS.bolsa.ids.reduce((s,id)=>{ const d=SECS.bolsa.data[id]; return s+n(d.crc)+n(d.usd)*tcv; },0);
@@ -517,7 +614,7 @@ function calcular(){
   const totalSolValor=secTotalCRC('solidarista');
   const totalOtras=secTotalCRC('otras');
   const totalInversiones=totalBolsaValor+totalESPPValor+totalSolValor+totalOtras;
-  const totalActivos=totalCuentas+totalPension+totalInversiones;
+  const totalActivos=totalCuentas+totalAhorros+totalPension+totalInversiones;
   const totalPasivos=totalTarjetas+totalDeudas;
   const patrimonioNeto=totalActivos-totalPasivos;
   const ingresoNeto=n(document.getElementById('ingreso-crc').value)+n(document.getElementById('ingreso-usd').value)*tcv;
@@ -525,12 +622,19 @@ function calcular(){
   const feGastos=n(document.getElementById('fe-gastos-crc').value)+n(document.getElementById('fe-gastos-usd').value)*tcv;
   const feMeses=feGastos>0?feSaldo/feGastos:0;
   function named(sec){ return SECS[sec].ids.map(id=>({...SECS[sec].data[id]})).filter(r=>r.name.trim()); }
+  // Metas financieras
+  const getMeta = id => document.getElementById(id)?.value?.trim() || '';
+  const metasCorto   = [getMeta('meta-c1'),getMeta('meta-c2'),getMeta('meta-c3')].filter(Boolean);
+  const metasMediano = [getMeta('meta-m1'),getMeta('meta-m2'),getMeta('meta-m3')].filter(Boolean);
+  const metasLargo   = [getMeta('meta-l1'),getMeta('meta-l2'),getMeta('meta-l3')].filter(Boolean);
+
   resultData={
-    totalActivos,totalPasivos,totalCuentas,totalPension,totalInversiones,
+    totalActivos,totalPasivos,totalCuentas,totalAhorros,totalPension,totalInversiones,
     totalTarjetas,totalDeudas,totalCuotas,patrimonioNeto,tcRate:tcv,
     totalBolsaValor,totalAporteBolsaCRC,totalAporteBolsaUSD,
     totalESPPValor,totalSolValor,totalOtras,
-    ingresoNeto,feSaldo,feGastos,feMeses,
+    ingresoNeto,feSaldo,feGastos,feMeses,totalAhorros,
+    metasCorto,metasMediano,metasLargo,
     reportDate:document.getElementById('report-date').value.trim(),
     esppData:named('espp'),solidaristaData:named('solidarista'),
     bolsaData:named('bolsa'),deudasData:named('deudas'),
@@ -538,6 +642,7 @@ function calcular(){
   const rd=resultData.reportDate||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
   document.getElementById('rh-date').textContent='Período: '+rd;
   renderResult(resultData);
+  renderMetas(resultData);
   switchTab('resultado');
   renderAnalysis(resultData);
 }
@@ -558,6 +663,7 @@ function renderResult(d){
 
   document.getElementById('desglose').innerHTML=[
     {l:'Cuentas bancarias',  v:d.totalCuentas,     pos:true},
+    {l:'Ahorros con meta',   v:d.totalAhorros||0,  pos:true},
     {l:'Fondos de pensión',  v:d.totalPension,     pos:true},
     {l:'Inversiones (total)',v:d.totalInversiones, pos:true},
     {l:'Tarjetas por pagar', v:d.totalTarjetas,    pos:false},
@@ -577,6 +683,38 @@ function renderResult(d){
     const pct=Math.max(0,Math.round(c.v/tot*100));
     return `<div class="risk-item"><div class="risk-header"><span class="risk-name">${c.l}</span><span class="risk-pct">${pct}%</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${c.c}"></div></div></div>`;
   }).join('');
+}
+
+
+// ══════════════════════════════════════════════
+// METAS FINANCIERAS
+// ══════════════════════════════════════════════
+function renderMetas(d){
+  const allMetas = [...d.metasCorto,...d.metasMediano,...d.metasLargo];
+  if(!allMetas.length){ document.getElementById('metas-result').style.display='none'; return; }
+  document.getElementById('metas-result').style.display='block';
+
+  // Priority message
+  const needsFE    = d.feMeses < 3;
+  const needsDeuda = d.totalTarjetas > 0 || d.totalDeudas > 0;
+  let priorityHTML = '';
+  if(needsFE || needsDeuda){
+    let msgs = [];
+    if(needsFE)    msgs.push('construir el fondo de emergencias hasta mínimo 3 meses');
+    if(needsDeuda) msgs.push('salir de deudas con el Método Bola de Nieve Ajustado');
+    priorityHTML = `<div class="meta-priority-box">
+      ⚠️ <strong>Prioridades Sistema GEM antes de las metas personales:</strong> ${msgs.join(' y ')}.
+    </div>`;
+  }
+  document.getElementById('metas-priority-msg').innerHTML = priorityHTML;
+
+  function listHTML(metas, color){
+    if(!metas.length) return '<div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);">—</div>';
+    return metas.map(m=>`<div class="meta-item"><div class="meta-bullet" style="background:${color}"></div><span>${m}</span></div>`).join('');
+  }
+  document.getElementById('metas-corto-list').innerHTML   = listHTML(d.metasCorto,   'var(--accent)');
+  document.getElementById('metas-mediano-list').innerHTML = listHTML(d.metasMediano, 'var(--warn)');
+  document.getElementById('metas-largo-list').innerHTML   = listHTML(d.metasLargo,   'var(--positive)');
 }
 
 // ══════════════════════════════════════════════

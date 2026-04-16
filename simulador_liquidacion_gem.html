@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Distribución Patrimonial — Método GEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gem-dark: #2d3748;
+    --gem-blue: #4a8fc4;
+    --gem-blue-light: #e8f2fa;
+    --bg: #f7f8fc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --text-muted: #718096;
+    --text-light: #a0aec0;
+    --green: #1D9E75;
+    --green-bg: #e6f7f2;
+    --red: #E24B4A;
+    --red-bg: #fdf0f0;
+    --amber: #BA7517;
+    --amber-bg: #fef3e2;
+    --blue: #378ADD;
+    --blue-bg: #e8f2fa;
+    --gray: #888780;
+    --gray-bg: #f1f0ec;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--gem-dark);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--gem-blue);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px; font-weight: 500; color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .logo-text { color: #fff; font-size: 15px; font-weight: 500; }
+  .logo-sub { color: #718096; font-size: 12px; margin-top: 1px; }
+  .header-badge {
+    font-size: 11px; color: #a0aec0; font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 36px 24px 60px; }
+
+  .page-title { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .page-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+
+  .section { margin-bottom: 32px; }
+  .section-label {
+    font-size: 11px; font-weight: 500; color: var(--text-light);
+    letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+  }
+
+  .alert-warn {
+    background: var(--amber-bg);
+    border-left: 3px solid var(--amber);
+    padding: 10px 14px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 13px; color: var(--amber);
+    margin-bottom: 18px; line-height: 1.5;
+  }
+
+  .ctrl-row {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 14px;
+  }
+  .ctrl-row:last-child { margin-bottom: 0; }
+  .ctrl-row label { font-size: 13px; color: var(--text-muted); min-width: 220px; }
+  .ctrl-row input[type=range] {
+    flex: 1; height: 4px;
+    -webkit-appearance: none; appearance: none;
+    background: var(--border); border-radius: 2px; outline: none;
+  }
+  .ctrl-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--gem-blue);
+    cursor: pointer; border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  }
+  .ctrl-row input[type=checkbox] {
+    width: 18px; height: 18px; cursor: pointer; accent-color: var(--gem-blue);
+  }
+  .ctrl-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; font-weight: 500;
+    min-width: 100px; text-align: right;
+    color: var(--text);
+  }
+
+  .espp-sub {
+    padding-left: 16px;
+    border-left: 2px solid var(--border);
+    margin-top: 4px; margin-bottom: 14px;
+  }
+  .espp-note {
+    font-size: 12px; color: var(--text-muted);
+    background: var(--blue-bg);
+    border-left: 2px solid var(--gem-blue);
+    padding: 8px 12px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-top: 8px; line-height: 1.5;
+  }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .metric {
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+  }
+  .metric-label { font-size: 11px; color: var(--text-light); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; }
+  .metric-value { font-size: 20px; font-weight: 500; color: var(--text); font-family: 'DM Mono', monospace; }
+  .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  .dist-bar { display: flex; height: 20px; border-radius: 6px; overflow: hidden; gap: 2px; margin: 14px 0; }
+  .dist-seg { height: 100%; transition: width .35s ease; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .block-list { margin-top: 14px; }
+  .block-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .block-row:last-child { border-bottom: none; }
+  .block-left { display: flex; align-items: center; gap: 10px; }
+  .block-color { width: 4px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+  .block-name { font-size: 13px; color: var(--text); font-weight: 500; }
+  .block-pct { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .block-right { text-align: right; }
+  .block-amt { font-size: 15px; font-weight: 500; color: var(--text); font-family: 'DM Mono', monospace; }
+  .badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border-radius: 4px; font-weight: 500; margin-top: 3px;
+  }
+  .b-ok { background: var(--green-bg); color: var(--green); }
+  .b-warn { background: var(--amber-bg); color: var(--amber); }
+  .b-info { background: var(--blue-bg); color: var(--blue); }
+  .b-err { background: var(--red-bg); color: var(--red); }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: -1px; }
+  .tab {
+    font-size: 13px; padding: 8px 16px; cursor: pointer;
+    color: var(--text-muted); background: transparent;
+    border: none; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; font-family: 'DM Sans', sans-serif;
+    transition: color .15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.on { color: var(--gem-blue); border-bottom-color: var(--gem-blue); font-weight: 500; }
+  .panel { display: none; }
+  .panel.on { display: block; }
+
+  .proj-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .proj-table th {
+    text-align: left; font-weight: 500; color: var(--text-muted);
+    padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .proj-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .proj-table tr:last-child td { border-bottom: none; }
+  .proj-table tr:hover td { background: var(--bg); }
+  .pos { color: var(--green); font-weight: 500; font-family: 'DM Mono', monospace; }
+  .mono { font-family: 'DM Mono', monospace; }
+
+  .proj-note {
+    font-size: 12px; color: var(--text-muted);
+    background: var(--bg);
+    border-left: 2px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-top: 12px; line-height: 1.5;
+  }
+
+  .pf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .pf-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: border-color .15s;
+  }
+  .pf-card:hover { border-color: var(--gem-blue); }
+  .pf-card.featured { border-color: var(--gem-blue); border-width: 2px; }
+  .pf-name { font-size: 14px; font-weight: 500; color: var(--text); margin: 8px 0 5px; }
+  .pf-type { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+  .pf-detail { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  .summary-card {
+    background: var(--gem-dark);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    color: #fff;
+  }
+  .summary-title { font-size: 13px; color: #718096; margin-bottom: 16px; text-transform: uppercase; letter-spacing: .06em; }
+  .summary-line { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid #3d4a5c; font-size: 14px; }
+  .summary-line:last-of-type { border-bottom: none; }
+  .summary-key { color: #a0aec0; }
+  .summary-val { color: #fff; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; text-align: right; max-width: 60%; }
+  .summary-note { font-size: 11px; color: #4a5568; margin-top: 14px; line-height: 1.6; }
+
+  .print-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; padding: 9px 18px;
+    background: var(--gem-blue); color: #fff;
+    border: none; border-radius: var(--radius-md);
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    margin-top: 16px; transition: opacity .15s;
+  }
+  .print-btn:hover { opacity: .88; }
+
+  @media print {
+    header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-btn { display: none; }
+    body { background: #fff; }
+  }
+
+  @media (max-width: 700px) {
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .pf-grid { grid-template-columns: 1fr; }
+    .ctrl-row label { min-width: 140px; font-size: 12px; }
+    header { padding: 14px 20px; }
+    .main { padding: 24px 16px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">GEM</div>
+    <div>
+      <div class="logo-text">Método GEM — Olger Díaz</div>
+      <div class="logo-sub">Simulador de Distribución Patrimonial</div>
+    </div>
+  </div>
+  <div class="header-badge">USO INTERNO — SESIÓN CON CLIENTE</div>
+</header>
+
+<div class="main">
+
+  <div class="page-title">Distribución de capital por liquidación</div>
+  <p class="page-sub">Perfil: conservador-moderado · Sin ingreso activo al momento del análisis</p>
+
+  <!-- INPUTS -->
+  <div class="section">
+    <div class="section-label">Capital disponible</div>
+    <div class="card">
+      <div class="alert-warn">
+        El cliente no cuenta con ingreso mensual activo. La prioridad es proteger el capital y garantizar estabilidad de vida antes de invertir.
+      </div>
+
+      <div class="ctrl-row">
+        <label>Capital de liquidación ($)</label>
+        <input type="range" id="capital" min="10000" max="300000" step="1000" value="150000" oninput="update()">
+        <span class="ctrl-val" id="capitalVal">$150,000</span>
+      </div>
+      <div class="ctrl-row">
+        <label>Deuda total actual ($)</label>
+        <input type="range" id="deuda" min="0" max="100000" step="500" value="10000" oninput="update()">
+        <span class="ctrl-val" id="deudaVal">$10,000</span>
+      </div>
+      <div class="ctrl-row">
+        <label>Gastos mensuales de estilo de vida ($)</label>
+        <input type="range" id="gastos" min="500" max="5000" step="100" value="2000" oninput="update()">
+        <span class="ctrl-val" id="gastosVal">$2,000</span>
+      </div>
+      <div class="ctrl-row">
+        <label>Tiene ESPP disponible para vender</label>
+        <input type="checkbox" id="espp" onchange="update()">
+        <span class="ctrl-val" id="esppLabel" style="font-size:12px;color:var(--text-muted);">No</span>
+      </div>
+
+      <div id="esppBlock" style="display:none;" class="espp-sub">
+        <div class="ctrl-row" style="margin-top:10px;">
+          <label>Valor estimado ESPP ($)</label>
+          <input type="range" id="esppAmt" min="1000" max="80000" step="500" value="20000" oninput="update()">
+          <span class="ctrl-val" id="esppAmtVal">$20,000</span>
+        </div>
+        <div class="espp-note">
+          El ESPP se analiza caso a caso. En general se recomienda vender y sumar al capital disponible, salvo análisis específico del plan de la empresa.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="section">
+    <div class="section-label">Indicadores clave</div>
+    <div class="metrics-grid" id="metricsGrid"></div>
+  </div>
+
+  <!-- DISTRIBUTION -->
+  <div class="section">
+    <div class="section-label">Distribución GEM recomendada</div>
+    <div class="card">
+      <div class="dist-bar" id="distBar"></div>
+      <div class="legend" id="distLegend"></div>
+      <div class="block-list" id="blockList"></div>
+    </div>
+  </div>
+
+  <!-- PROJECTION -->
+  <div class="section">
+    <div class="section-label">Proyección del bloque de inversión en bolsa</div>
+    <div class="card">
+      <div class="tabs">
+        <button class="tab on" onclick="setTab('cons',this)">Conservador — 5.5%</button>
+        <button class="tab" onclick="setTab('mod',this)">Moderado — 7.5%</button>
+        <button class="tab" onclick="setTab('agr',this)">Agresivo — 10%</button>
+      </div>
+      <div id="tab-cons" class="panel on"><table class="proj-table" id="proj-cons"></table></div>
+      <div id="tab-mod" class="panel"><table class="proj-table" id="proj-mod"></table></div>
+      <div id="tab-agr" class="panel"><table class="proj-table" id="proj-agr"></table></div>
+      <div class="proj-note">
+        Proyección ilustrativa con capitalización compuesta anual. No incluye aportes adicionales.
+        Rendimientos pasados no garantizan resultados futuros. Este análisis es de carácter educativo y no constituye asesoría financiera personalizada.
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="section">
+    <div class="section-label">Plataformas de inversión</div>
+    <div class="pf-grid">
+      <div class="pf-card featured">
+        <span class="badge b-info">Recomendado</span>
+        <div class="pf-name">Dominion Capital Strategies</div>
+        <div class="pf-type">Gestor de Fondos</div>
+        <div class="pf-detail">Gestión delegada de portafolio. Ideal para perfil conservador-moderado que no requiere administrar la cuenta activamente. Estructura regulada offshore.</div>
+      </div>
+      <div class="pf-card">
+        <span class="badge b-warn">Gestión activa</span>
+        <div class="pf-name">Charles Schwab International</div>
+        <div class="pf-type">Broker — Gestión activa</div>
+        <div class="pf-detail">Cuenta de corretaje directa. Sin mínimo de depósito desde 2025. Acceso a ETFs indexados (VOO, VTI, BND). El cliente administra su propia cuenta.</div>
+      </div>
+      <div class="pf-card">
+        <span class="badge b-warn">Gestión activa</span>
+        <div class="pf-name">IBKR (Interactive Brokers)</div>
+        <div class="pf-type">Broker — Gestión activa</div>
+        <div class="pf-detail">Plataforma robusta con costos bajos y amplia variedad de instrumentos. Recomendada si el cliente tiene experiencia previa en mercados.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-label">Resumen de sesión</div>
+    <div class="summary-card" id="summaryCard"></div>
+    <button class="print-btn" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4V1h8v3M4 11H2V7a2 2 0 012-2h8a2 2 0 012 2v4h-2M4 9h8v6H4V9z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Imprimir / Exportar PDF
+    </button>
+  </div>
+
+</div>
+
+<script>
+const C = {
+  fondo: '#1D9E75', deuda: '#E24B4A',
+  bolsa: '#378ADD', cdp: '#BA7517', reserva: '#888780'
+};
+const LABELS = {
+  fondo: 'Fondo de emergencia (12 meses)',
+  deuda: 'Liquidación de deudas',
+  bolsa: 'Inversión en bolsa (gestión pasiva)',
+  cdp: 'Renta fija — CDP',
+  reserva: 'Estilo de vida sin invertir'
+};
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+function pct(a, b) { return (a / b * 100).toFixed(1) + '%'; }
+
+function getBlocks(total, deuda, gastos) {
+  let fondo = gastos * 12;
+  if (fondo > total * 0.25) fondo = Math.round(total * 0.25);
+  let deudaAmt = Math.min(deuda, total * 0.35);
+  let rem = total - fondo - deudaAmt;
+  let bolsa = Math.round(rem * 0.55);
+  let cdp = Math.round(rem * 0.25);
+  let reserva = rem - bolsa - cdp;
+  return [
+    { key: 'fondo', amt: fondo, badge: fondo >= gastos * 12 ? 'ok' : 'warn', badgeText: fondo >= gastos * 12 ? '12 meses cubiertos' : 'Fondos limitados — revisar' },
+    { key: 'deuda', amt: deudaAmt, badge: deudaAmt >= deuda ? 'ok' : 'warn', badgeText: deudaAmt >= deuda ? 'Deuda liquidada' : 'Liquidación parcial' },
+    { key: 'bolsa', amt: bolsa, badge: 'info', badgeText: 'Gestión pasiva indexada' },
+    { key: 'cdp', amt: cdp, badge: 'info', badgeText: 'Renta fija local' },
+    { key: 'reserva', amt: reserva, badge: 'warn', badgeText: 'No invertir — mantener líquido' },
+  ];
+}
+
+function buildProj(id, amt, rate) {
+  const yrs = [1, 3, 5, 10, 15, 20];
+  let h = `<thead><tr><th>Año</th><th>Capital inicial</th><th>Ganancia acumulada</th><th>Valor proyectado</th></tr></thead><tbody>`;
+  yrs.forEach(y => {
+    const v = amt * Math.pow(1 + rate, y);
+    const g = v - amt;
+    h += `<tr>
+      <td>${y}</td>
+      <td class="mono">${fmt(amt)}</td>
+      <td class="pos">+${fmt(g)}</td>
+      <td class="mono"><strong>${fmt(v)}</strong></td>
+    </tr>`;
+  });
+  document.getElementById(id).innerHTML = h + '</tbody>';
+}
+
+function update() {
+  const capital = +document.getElementById('capital').value;
+  const deuda = +document.getElementById('deuda').value;
+  const gastos = +document.getElementById('gastos').value;
+  const hasEspp = document.getElementById('espp').checked;
+  const esppAmt = hasEspp ? +document.getElementById('esppAmt').value : 0;
+  const total = capital + esppAmt;
+
+  document.getElementById('capitalVal').textContent = fmt(capital);
+  document.getElementById('deudaVal').textContent = fmt(deuda);
+  document.getElementById('gastosVal').textContent = fmt(gastos);
+  document.getElementById('esppLabel').textContent = hasEspp ? 'Sí' : 'No';
+  document.getElementById('esppBlock').style.display = hasEspp ? 'block' : 'none';
+  if (hasEspp) document.getElementById('esppAmtVal').textContent = fmt(esppAmt);
+
+  const estiloMeses = Math.floor((total - deuda) / gastos);
+  const blocks = getBlocks(total, deuda, gastos);
+  const bolsaAmt = blocks[2].amt;
+  const invTotal = bolsaAmt + blocks[3].amt;
+
+  // Metrics
+  document.getElementById('metricsGrid').innerHTML = `
+    <div class="metric">
+      <div class="metric-label">Capital total</div>
+      <div class="metric-value">${fmt(total)}</div>
+      <div class="metric-sub">${hasEspp ? 'Incl. ESPP ' + fmt(esppAmt) : 'Sin ESPP'}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Estilo de vida sin invertir</div>
+      <div class="metric-value">${estiloMeses} meses</div>
+      <div class="metric-sub">A ${fmt(gastos)}/mes</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Capital a invertir</div>
+      <div class="metric-value">${fmt(invTotal)}</div>
+      <div class="metric-sub">Bolsa + renta fija</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Deuda / capital</div>
+      <div class="metric-value">${(deuda / total * 100).toFixed(1)}%</div>
+      <div class="metric-sub">${deuda <= total * 0.15 ? 'Ratio manejable' : 'Revisar prioridad'}</div>
+    </div>
+  `;
+
+  // Bar
+  document.getElementById('distBar').innerHTML = blocks.map(b =>
+    `<div class="dist-seg" style="width:${(b.amt / total * 100).toFixed(1)}%;background:${C[b.key]}"></div>`
+  ).join('');
+
+  document.getElementById('distLegend').innerHTML = blocks.map(b =>
+    `<span class="leg-item"><span class="leg-dot" style="background:${C[b.key]}"></span>${LABELS[b.key]} — ${pct(b.amt, total)}</span>`
+  ).join('');
+
+  // Block list
+  document.getElementById('blockList').innerHTML = blocks.map(b => `
+    <div class="block-row">
+      <div class="block-left">
+        <div class="block-color" style="background:${C[b.key]}"></div>
+        <div>
+          <div class="block-name">${LABELS[b.key]}</div>
+          <div class="block-pct">${pct(b.amt, total)} del capital total</div>
+        </div>
+      </div>
+      <div class="block-right">
+        <div class="block-amt">${fmt(b.amt)}</div>
+        <span class="badge b-${b.badge}">${b.badgeText}</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Projections
+  buildProj('proj-cons', bolsaAmt, 0.055);
+  buildProj('proj-mod', bolsaAmt, 0.075);
+  buildProj('proj-agr', bolsaAmt, 0.10);
+
+  // Summary
+  const deudaCubierta = blocks[1].amt >= deuda;
+  document.getElementById('summaryCard').innerHTML = `
+    <div class="summary-title">Resumen del análisis</div>
+    <div class="summary-line"><span class="summary-key">Capital total disponible</span><span class="summary-val">${fmt(total)}${hasEspp ? ' (incl. ESPP ' + fmt(esppAmt) + ')' : ''}</span></div>
+    <div class="summary-line"><span class="summary-key">Estilo de vida sin invertir</span><span class="summary-val">${estiloMeses} meses a ${fmt(gastos)}/mes</span></div>
+    <div class="summary-line"><span class="summary-key">Fondo de emergencia</span><span class="summary-val">${fmt(blocks[0].amt)} — ${blocks[0].amt >= gastos * 12 ? '12 meses cubiertos' : 'Insuficiente para 12 meses'}</span></div>
+    <div class="summary-line"><span class="summary-key">Liquidación de deudas</span><span class="summary-val">${deudaCubierta ? 'Completa — ' + fmt(deuda) : 'Parcial — ' + fmt(blocks[1].amt) + ' de ' + fmt(deuda)}</span></div>
+    <div class="summary-line"><span class="summary-key">Inversión en bolsa (bloque principal)</span><span class="summary-val">${fmt(bolsaAmt)}</span></div>
+    <div class="summary-line"><span class="summary-key">Proyección a 10 años (conservador 5.5%)</span><span class="summary-val">${fmt(bolsaAmt * Math.pow(1.055, 10))}</span></div>
+    <div class="summary-line"><span class="summary-key">Proyección a 10 años (moderado 7.5%)</span><span class="summary-val">${fmt(bolsaAmt * Math.pow(1.075, 10))}</span></div>
+    <div class="summary-line"><span class="summary-key">Proyección a 10 años (agresivo 10%)</span><span class="summary-val">${fmt(bolsaAmt * Math.pow(1.10, 10))}</span></div>
+    <div class="summary-line"><span class="summary-key">Renta fija (CDP)</span><span class="summary-val">${fmt(blocks[3].amt)}</span></div>
+    <div class="summary-line"><span class="summary-key">Reserva estilo de vida</span><span class="summary-val">${fmt(blocks[4].amt)} — mantener líquido</span></div>
+    <div class="summary-note">Este análisis es de carácter educativo y no constituye asesoría financiera personalizada. Olger Díaz — Método GEM Mentoring.</div>
+  `;
+}
+
+function setTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('tab-' + id).classList.add('on');
+}
+
+update();
+</script>
+</body>
+</html>

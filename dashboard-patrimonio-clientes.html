@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard de Patrimonio · Sistema GEM</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   :root {
@@ -16,15 +15,17 @@
     --blue:#3a82e8; --teal:#3aacca;
     --positive:#2a8a5c; --pos-lt:#e2f5ec;
     --warn:#c97b00; --warn-lt:#fff3cd;
-    --font-display:'DM Serif Display',serif;
-    --font-body:'DM Sans',sans-serif;
-    --font-mono:'DM Mono',monospace;
+    --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
     --r:10px; --rs:6px;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;
+       -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:'kern' 1;letter-spacing:-0.01em;}
+  .font-mono,input,.s-val,.b-val,.risk-pct,.fe-meses{font-variant-numeric:tabular-nums;}
   .header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-  .header h1{font-family:var(--font-display);font-size:23px;font-weight:400;letter-spacing:-0.3px;}
+  .header h1{font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.5px;}
   .header p{color:var(--muted);font-size:12px;margin-top:2px;}
   .badge{background:var(--accent);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-family:var(--font-mono);white-space:nowrap;}
   .main{max-width:1080px;margin:0 auto;padding:24px 40px 60px;}
@@ -43,19 +44,22 @@
   .tc-live{background:var(--pos-lt);color:var(--positive);}
   .tc-manual{background:#fff3cd;color:#856404;}
   .date-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--muted);}
-  .ingreso-card{background:var(--surface);border:2px solid var(--accent);border-radius:var(--r);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .ingreso-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+  .total-strip{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:var(--accent-lt);border-radius:var(--rs);font-size:12px;color:var(--muted);}
+  .total-strip strong{font-family:var(--font-mono);font-size:15px;color:var(--accent);font-weight:600;}
   .ingreso-label{font-size:12px;font-weight:500;color:var(--accent);font-family:var(--font-mono);letter-spacing:.5px;white-space:nowrap;}
   .ingreso-inputs{display:flex;gap:10px;align-items:flex-end;flex:1;flex-wrap:wrap;}
   .ingreso-group{display:flex;flex-direction:column;gap:4px;}
   .ingreso-sublabel{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.6px;text-transform:uppercase;}
   .input-header,.data-row{display:grid;gap:8px;align-items:center;margin-bottom:6px;}
   .dual{grid-template-columns:1fr 110px 110px 30px;}
-  .triple{grid-template-columns:1fr 95px 95px 110px 30px;}
+  .triple{grid-template-columns:1fr 90px 90px 100px 75px 30px;}
   .single{grid-template-columns:1fr 120px 30px;}
   .inv-bolsa-row{grid-template-columns:1fr 95px 95px 105px 30px;}
   .inv-fija-row{grid-template-columns:1fr 110px 110px 30px;}
   .col-lbl{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.8px;text-transform:uppercase;}
-  input[type="text"],input[type="number"],input[type="month"]{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:7px 10px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;}
+  input[type="text"],input[type="number"],input[type="month"]{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-body);font-size:12.5px;padding:7px 10px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;}
+  input[type="number"]{font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums;}
   input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(47,111,223,.1);}
   input::placeholder{color:#aab4c8;}
   .btn-remove{width:30px;height:30px;background:transparent;border:1px solid var(--border);border-radius:var(--rs);color:var(--muted);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;line-height:1;}
@@ -66,7 +70,7 @@
   .btn-primary:hover{background:#1a5cc8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(47,111,223,.25);}
   .btn-secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r);padding:10px 20px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
   .btn-secondary:hover{border-color:var(--border2);color:var(--text);}
-  .summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:20px;}
   .s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
   .s-lbl{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.5px;margin-bottom:6px;}
   .s-val{font-size:18px;font-family:var(--font-mono);font-weight:500;color:var(--text);letter-spacing:-.5px;}
@@ -125,12 +129,25 @@
   .fe-bar-wrap{height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
   .fe-bar{height:100%;border-radius:5px;transition:width .5s ease;}
   .fe-note{font-size:11px;color:var(--muted);margin-top:8px;font-family:var(--font-mono);}
+  .fe-question{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--border);}
+  .fe-q-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;}
+  .fe-q-hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px;}
+  .seg{display:inline-flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:3px;flex-wrap:wrap;}
+  .seg-btn{padding:6px 14px;border-radius:4px;border:none;background:transparent;color:var(--muted);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s;}
+  .seg-btn.active{background:var(--surface);color:var(--accent);font-weight:600;box-shadow:0 1px 2px rgba(30,37,53,.08);}
+  .seg-btn.active[data-val="no"]{color:var(--red);}
+  .seg-btn.active[data-val="parcial"]{color:var(--warn);}
+  .esc-badge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;font-family:var(--font-mono);padding:5px 11px;border-radius:12px;background:var(--accent-lt);color:var(--accent);}
+  .client-bar{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:14px;}
+  .client-avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;letter-spacing:.5px;flex-shrink:0;}
+  .client-name{font-size:16px;font-weight:600;letter-spacing:-0.3px;}
+  .client-meta{font-size:12px;color:var(--muted);}
   .report-header{display:none;}
   .action-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
   .inv-subsection{margin-bottom:20px;}
   .inv-subsection-title{font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--border2);}
   /* TARJETAS EXPANDED */
-  .tarjeta-row{grid-template-columns:1fr 80px 80px 90px 90px 30px;}
+  .tarjeta-row{grid-template-columns:1fr 85px 85px 68px 68px 72px 30px;}
   /* AHORROS */
   .ahorros-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--positive);border-radius:var(--r);padding:20px;margin-bottom:14px;}
   /* METAS */
@@ -143,6 +160,12 @@
   .meta-largo{color:var(--positive);border-color:var(--positive)!important;}
   .meta-input-wrap{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
   .meta-input-wrap input{flex:1;}
+  .meta-row{grid-template-columns:1fr 150px 140px 30px;}
+  select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-body);font-size:12px;padding:7px 8px;width:100%;outline:none;cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M3 4.5L6 8l3-3.5' fill='none' stroke='%236b7591' stroke-width='1.4' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center;background-size:12px;padding-right:24px;}
+  select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(47,111,223,.1);}
+  .meta-amount{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;}
   .meta-hint{font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;line-height:1.4;}
   /* METAS en resultado */
   .metas-result{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-top:16px;}
@@ -155,7 +178,12 @@
   .meta-priority-box{background:var(--red-lt);border:1px solid #f5c6c6;border-radius:var(--rs);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--red);line-height:1.6;}
   @media(max-width:700px){
     .metas-grid,.metas-result-grid{grid-template-columns:1fr;}
-    .tarjeta-row{grid-template-columns:1fr 70px 70px 80px 80px 30px;}
+    .tarjeta-row{grid-template-columns:1fr 68px 68px 56px 56px 60px 30px;}
+    .meta-row{grid-template-columns:1fr 110px 30px;}
+    .meta-row input:nth-of-type(2),.input-header.meta-row .col-lbl:nth-child(3){display:none;}
+    .seg{width:100%;}.seg-btn{flex:1;padding:6px 8px;font-size:11px;}
+    .date-row{flex-wrap:wrap;}
+    .date-row input{width:100%!important;}
   }
   @media(max-width:700px){
     .main{padding:20px 16px 40px;}
@@ -163,7 +191,7 @@
     .summary-grid{grid-template-columns:1fr 1fr;}
     .grid2{grid-template-columns:1fr;}
     .dual{grid-template-columns:1fr 80px 80px 30px;}
-    .triple{grid-template-columns:1fr 75px 75px 85px 30px;}
+    .triple{grid-template-columns:1fr 72px 72px 80px 60px 30px;}
     .fe-inputs{grid-template-columns:1fr;}
   }
   @media print{
@@ -202,31 +230,43 @@
       <span id="tc-note" style="font-size:11px;font-family:var(--font-mono);color:var(--muted)"></span>
     </div>
 
+    <div class="date-row" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span>Diagnóstico guardado:</span>
+        <button class="btn-secondary" style="padding:7px 14px;font-size:12px" onclick="guardarDiagnostico()">💾 Guardar archivo</button>
+        <button class="btn-secondary" style="padding:7px 14px;font-size:12px" onclick="document.getElementById('load-file').click()">📂 Cargar archivo</button>
+        <input type="file" id="load-file" accept=".json,application/json" style="display:none" onchange="cargarDiagnostico(event)">
+      </div>
+      <span style="font-size:11px" id="save-status">Guardá el archivo para retomar el diagnóstico después o comparar avance</span>
+    </div>
+
     <div class="date-row">
-      <span>Fecha del reporte:</span>
-      <input type="text" id="report-date" placeholder="Ej: Marzo 2026" style="width:180px">
-      <span style="font-size:11px">Este dato aparece en el PDF</span>
+      <span>Cliente:</span>
+      <input type="text" id="client-name" placeholder="Nombre y apellidos" style="width:230px">
+      <span style="margin-left:8px">Fecha del reporte:</span>
+      <input type="text" id="report-date" placeholder="Ej: Marzo 2026" style="width:150px">
+      <span style="font-size:11px">Ambos datos aparecen en el PDF</span>
     </div>
 
     <!-- INGRESO MENSUAL NETO -->
     <div class="ingreso-card">
-      <div class="ingreso-label">💰 INGRESO MENSUAL NETO</div>
-      <div class="ingreso-inputs">
-        <div class="ingreso-group">
-          <div class="ingreso-sublabel">Monto ₡</div>
-          <input type="number" id="ingreso-crc" placeholder="0" min="0" style="width:160px">
-        </div>
-        <div class="ingreso-group">
-          <div class="ingreso-sublabel">Monto $</div>
-          <input type="number" id="ingreso-usd" placeholder="0" min="0" style="width:140px">
-        </div>
+      <div class="card-title" style="margin-bottom:4px"><div class="dot" style="background:var(--accent)"></div> Ingreso Mensual Neto</div>
+      <div class="card-subtitle">Agregá cada fuente de ingreso por separado: salario, bonos prorrateados, freelance, alquileres, etc. Solo lo que llega neto a la cuenta cada mes.</div>
+      <div class="input-header dual">
+        <div class="col-lbl">Fuente de ingreso</div><div class="col-lbl">Monto ₡</div><div class="col-lbl">Monto $</div><div></div>
       </div>
-      <span style="font-size:11px;color:var(--muted);font-family:var(--font-mono);">Base para los cálculos del análisis</span>
+      <div id="list-ingresos"></div>
+      <button class="btn-add" onclick="addRow('ingresos')">+ Agregar fuente de ingreso</button>
+      <div class="total-strip">
+        <span>Ingreso mensual neto total</span>
+        <strong id="ingreso-total">₡0</strong>
+      </div>
     </div>
 
     <!-- CUENTAS -->
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--blue)"></div> Cuentas Bancarias</div>
+      <div class="card-subtitle">Escribí el nombre de cada cuenta que tenés hoy, tal como la identificás (ej: "Cuenta de ahorro colones", "Cuenta planilla", "Cuenta dólares"). Una línea por cuenta, con el saldo del día de hoy.</div>
       <div class="input-header dual">
         <div class="col-lbl">Nombre de la cuenta</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div></div>
       </div>
@@ -237,22 +277,41 @@
     <!-- FONDO DE EMERGENCIAS -->
     <div class="fe-card">
       <div class="card-title"><div class="dot" style="background:var(--teal)"></div> Fondo de Emergencias</div>
-      <div class="fe-inputs">
-        <div class="fe-input-group">
-          <div class="fe-input-label">Saldo actual ₡</div>
-          <input type="number" id="fe-crc" placeholder="0" min="0" oninput="calcFE()">
+      <div class="card-subtitle">Este fondo no es "lo que sobra en la cuenta". Es dinero apartado, con nombre y propósito, que no se toca para gastos del mes a mes.</div>
+
+      <div class="fe-question">
+        <div class="fe-q-label">¿El fondo está separado de las cuentas de uso diario?</div>
+        <div class="seg" id="seg-separado">
+          <button type="button" class="seg-btn" data-val="si" onclick="setSeparado('si')">Sí, en cuenta aparte</button>
+          <button type="button" class="seg-btn" data-val="parcial" onclick="setSeparado('parcial')">Parcialmente</button>
+          <button type="button" class="seg-btn" data-val="no" onclick="setSeparado('no')">No, está mezclado</button>
         </div>
-        <div class="fe-input-group">
-          <div class="fe-input-label">Saldo actual $</div>
-          <input type="number" id="fe-usd" placeholder="0" min="0" oninput="calcFE()">
+        <div class="fe-q-hint" id="fe-sep-hint">Si el fondo está en la misma cuenta donde entra el salario y salen los gastos, en la práctica no funciona como fondo: se gasta sin darse cuenta.</div>
+      </div>
+
+      <div class="fe-question">
+        <div class="fe-q-label">¿Dónde está el fondo hoy?</div>
+        <div class="fe-q-hint" style="margin-bottom:10px">Agregá una línea por cada lugar donde tenés parte del fondo. Si está repartido en más de una institución, se marca automáticamente como <strong>fondo escalonado</strong>.</div>
+        <div class="input-header dual">
+          <div class="col-lbl">Institución / tipo de cuenta</div><div class="col-lbl">Monto ₡</div><div class="col-lbl">Monto $</div><div></div>
         </div>
-        <div class="fe-input-group">
-          <div class="fe-input-label">Gastos mensuales ₡</div>
-          <input type="number" id="fe-gastos-crc" placeholder="0" min="0" oninput="calcFE()">
-        </div>
-        <div class="fe-input-group">
-          <div class="fe-input-label">Gastos mensuales $</div>
-          <input type="number" id="fe-gastos-usd" placeholder="0" min="0" oninput="calcFE()">
+        <div id="list-fondo"></div>
+        <button class="btn-add" onclick="addRow('fondo')">+ Agregar ubicación del fondo</button>
+        <div id="fe-escalonado-badge"></div>
+      </div>
+
+      <div class="fe-question" style="border-bottom:none;padding-bottom:0;margin-bottom:0">
+        <div class="fe-q-label">Gastos mensuales totales</div>
+        <div class="fe-q-hint">Todo lo que sale cada mes: vida diaria, servicios, alquiler o hipoteca, seguros <strong>y las cuotas de deudas y tarjetas</strong>. Es el monto que el fondo tiene que poder cubrir si mañana se cae el ingreso.</div>
+        <div class="fe-inputs" style="margin-top:8px">
+          <div class="fe-input-group">
+            <div class="fe-input-label">Gastos mensuales ₡</div>
+            <input type="number" id="fe-gastos-crc" placeholder="0" min="0" oninput="calcFE()">
+          </div>
+          <div class="fe-input-group">
+            <div class="fe-input-label">Gastos mensuales $</div>
+            <input type="number" id="fe-gastos-usd" placeholder="0" min="0" oninput="calcFE()">
+          </div>
         </div>
       </div>
       <div class="fe-meter" id="fe-meter" style="display:none">
@@ -282,7 +341,7 @@
       <div class="card-title"><div class="dot" style="background:var(--red)"></div> Tarjetas de Crédito por Pagar</div>
       <div class="card-subtitle">Incluí el saldo y las fechas para alinearlas si están desordenadas</div>
       <div class="input-header tarjeta-row">
-        <div class="col-lbl">Tarjeta</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div class="col-lbl">Día corte</div><div class="col-lbl">Día pago</div><div></div>
+        <div class="col-lbl">Tarjeta</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div class="col-lbl">Día corte</div><div class="col-lbl">Día pago</div><div class="col-lbl">Tasa % anual</div><div></div>
       </div>
       <div id="list-tarjetas"></div>
       <button class="btn-add" onclick="addRow('tarjetas')">+ Agregar tarjeta</button>
@@ -291,9 +350,9 @@
     <!-- DEUDAS -->
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--red)"></div> Deudas / Préstamos</div>
-      <div class="card-subtitle">Incluí el saldo total y la cuota mensual de cada deuda</div>
+      <div class="card-subtitle">Incluí el saldo, la cuota mensual y la tasa de interés anual de cada deuda. La tasa es la que define cuánto está costando realmente cada una.</div>
       <div class="input-header triple">
-        <div class="col-lbl">Descripción</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div class="col-lbl">Cuota/mes ₡</div><div></div>
+        <div class="col-lbl">Descripción</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Saldo $</div><div class="col-lbl">Cuota/mes ₡</div><div class="col-lbl">Tasa % anual</div><div></div>
       </div>
       <div id="list-deudas"></div>
       <button class="btn-add" onclick="addRow('deudas')">+ Agregar deuda</button>
@@ -355,29 +414,17 @@
     <div class="metas-card">
       <div class="card-title"><div class="dot" style="background:var(--accent)"></div> Metas Financieras</div>
       <div class="card-subtitle">Las dos primeras prioridades siempre son: fondo de emergencias y salir de deudas — las metas personales van después</div>
-      <div class="metas-grid">
-        <div class="meta-group">
-          <div class="meta-group-title meta-corto">⚡ Corto plazo (hasta 12 meses)</div>
-          <div class="meta-input-wrap"><input type="text" id="meta-c1" placeholder="Meta 1"></div>
-          <div class="meta-input-wrap"><input type="text" id="meta-c2" placeholder="Meta 2"></div>
-          <div class="meta-input-wrap"><input type="text" id="meta-c3" placeholder="Meta 3"></div>
-          <div class="meta-hint">Ej: Crear fondo de emergencias, salir de tarjeta X, viaje a México</div>
-        </div>
-        <div class="meta-group">
-          <div class="meta-group-title meta-mediano">🎯 Mediano plazo (3–5 años)</div>
-          <div class="meta-input-wrap"><input type="text" id="meta-m1" placeholder="Meta 1"></div>
-          <div class="meta-input-wrap"><input type="text" id="meta-m2" placeholder="Meta 2"></div>
-          <div class="meta-input-wrap"><input type="text" id="meta-m3" placeholder="Meta 3"></div>
-          <div class="meta-hint">Ej: Prima de casa, carro propio, portafolio de $10,000</div>
-        </div>
-        <div class="meta-group">
-          <div class="meta-group-title meta-largo">🌱 Largo plazo (+5 años)</div>
-          <div class="meta-input-wrap"><input type="text" id="meta-l1" placeholder="Meta 1"></div>
-          <div class="meta-input-wrap"><input type="text" id="meta-l2" placeholder="Meta 2"></div>
-          <div class="meta-input-wrap"><input type="text" id="meta-l3" placeholder="Meta 3"></div>
-          <div class="meta-hint">Ej: Independencia financiera, casa propia, retiro anticipado</div>
-        </div>
+      <div class="input-header meta-row">
+        <div class="col-lbl">Meta</div><div class="col-lbl">Plazo</div><div class="col-lbl">Monto estimado</div><div></div>
       </div>
+      <div id="list-metas"></div>
+      <button class="btn-add" onclick="addRow('metas')">+ Agregar meta</button>
+      <div class="meta-hint" style="margin-top:10px">
+        <strong>Corto plazo</strong> (hasta 12 meses): fondo de emergencias, salir de tarjeta X, viaje.
+        <strong>Mediano plazo</strong> (1–5 años): prima de casa, carro, portafolio de $10,000.
+        <strong>Largo plazo</strong> (+5 años): independencia financiera, casa propia, retiro anticipado.
+      </div>
+      <div id="metas-counter" class="meta-hint" style="margin-top:6px"></div>
     </div>
 
     <button class="btn-primary" onclick="calcular()">Calcular patrimonio →</button>
@@ -389,13 +436,22 @@
     <div class="report-header" id="report-header">
       <div style="display:flex;justify-content:space-between;align-items:flex-end">
         <div>
-          <div style="font-family:var(--font-display);font-size:22px;font-weight:400">Reporte de Patrimonio</div>
-          <div style="font-size:13px;color:var(--muted);margin-top:2px" id="rh-date"></div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.5px">Reporte de Patrimonio</div>
+          <div style="font-size:15px;font-weight:600;margin-top:4px" id="rh-name"></div>
+          <div style="font-size:13px;color:var(--muted);margin-top:1px" id="rh-date"></div>
         </div>
         <div style="font-size:12px;text-align:right;color:var(--muted)">
           <div style="font-weight:500;color:var(--accent)">Sistema GEM</div>
           <div>Mentoría Financiera · Olger Díaz</div>
         </div>
+      </div>
+    </div>
+
+    <div class="client-bar" id="client-bar" style="display:none">
+      <div class="client-avatar" id="cb-initials"></div>
+      <div>
+        <div class="client-name" id="cb-name"></div>
+        <div class="client-meta">Reporte de patrimonio · <span id="cb-date"></span></div>
       </div>
     </div>
 
@@ -414,6 +470,7 @@
       <div class="s-card"><div class="s-lbl">Patrimonio neto</div><div class="s-val"       id="s-neto">—</div><div class="s-sub">Activos − Pasivos</div></div>
       <div class="s-card"><div class="s-lbl">Liquidez inmediata</div><div class="s-val pos" id="s-liquidez">—</div><div class="s-sub">Cuentas disponibles</div></div>
       <div class="s-card"><div class="s-lbl">Fondo emergencias</div><div class="s-val" id="s-fe-meses">—</div><div class="s-sub" id="s-fe-sub">meses de cobertura</div></div>
+      <div class="s-card"><div class="s-lbl">Capacidad de ahorro</div><div class="s-val" id="s-capacidad">—</div><div class="s-sub" id="s-capacidad-sub">Ingreso − gastos totales</div></div>
     </div>
 
     <div class="grid2">
@@ -430,7 +487,7 @@
 
     <!-- METAS EN RESULTADO -->
     <div class="metas-result" id="metas-result" style="display:none">
-      <div class="metas-result-title"><div class="dot" style="background:var(--accent)"></div> Metas Financieras del Cliente</div>
+      <div class="metas-result-title"><div class="dot" style="background:var(--accent)"></div> <span id="metas-result-title-text">Metas Financieras del Cliente</span></div>
       <div id="metas-priority-msg"></div>
       <div class="metas-result-grid">
         <div>
@@ -463,6 +520,9 @@
 
 <script>
 const SECS = {
+  ingresos:    {ids:[],data:{},type:'dual'},
+  fondo:       {ids:[],data:{},type:'dual'},
+  metas:       {ids:[],data:{},type:'meta'},
   cuentas:     {ids:[],data:{},type:'dual'},
   ahorros:     {ids:[],data:{},type:'dual'},
   tarjetas:    {ids:[],data:{},type:'tarjeta'},
@@ -490,7 +550,7 @@ async function fetchTC() {
   } catch(e){
     status.textContent='Manual'; status.className='tc-status tc-manual';
     note.textContent='No se pudo obtener el TC. Ingresalo manualmente.';
-  } finally { btn.textContent='↻ Actualizar BCCR'; btn.disabled=false; }
+  } finally { btn.textContent='↻ Actualizar BCCR'; btn.disabled=false; calcFE(); updateIngresoTotal(); }
 }
 window.addEventListener('load',()=>{ fetchTC(); });
 
@@ -500,13 +560,14 @@ function flush(sec){
     if(!SECS[sec].data[id]) return;
     const t=SECS[sec].type;
     SECS[sec].data[id].name=ins[0]?.value??'';
-    if(t==='dual'||t==='triple'||t==='inv-bolsa'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
-    if(t==='triple') SECS[sec].data[id].cuota=ins[3]?.value??'';
-    if(t==='tarjeta'){ SECS[sec].data[id].corte=ins[3]?.value??''; SECS[sec].data[id].pago=ins[4]?.value??''; }
+    if(t==='dual'||t==='triple'||t==='inv-bolsa'||t==='tarjeta'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
+    if(t==='triple'){ SECS[sec].data[id].cuota=ins[3]?.value??''; SECS[sec].data[id].tasa=ins[4]?.value??''; }
+    if(t==='tarjeta'){ SECS[sec].data[id].corte=ins[3]?.value??''; SECS[sec].data[id].pago=ins[4]?.value??''; SECS[sec].data[id].tasa=ins[5]?.value??''; }
     if(t==='inv-bolsa') SECS[sec].data[id].aporte=ins[3]?.value??'';
     if(t==='inv-espp'){ SECS[sec].data[id].pct=ins[1]?.value??''; SECS[sec].data[id].usd=ins[2]?.value??''; }
     if(t==='inv-sol'){ SECS[sec].data[id].crc=ins[1]?.value??''; SECS[sec].data[id].aporte=ins[2]?.value??''; }
     if(t==='single') SECS[sec].data[id].crc=ins[1]?.value??'';
+    if(t==='meta'){ SECS[sec].data[id].monto=ins[1]?.value??''; SECS[sec].data[id].plazo=row.querySelector('select')?.value??'corto'; }
   });
 }
 function flushAll(){ Object.keys(SECS).forEach(flush); }
@@ -523,15 +584,27 @@ function render(sec){
     else if(t==='inv-bolsa') cls+='inv-bolsa-row';
     else if(t==='inv-espp'||t==='inv-sol') cls+='inv-fija-row';
     else if(t==='single') cls+='single';
+    else if(t==='meta') cls+='meta-row';
     div.className=cls; div.dataset.id=id;
     let html='';
     if(t==='dual') html=`<input type="text" placeholder="Nombre" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
-    else if(t==='tarjeta') html=`<input type="text" placeholder="Nombre tarjeta" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="día" value="${x(d.corte)}" min="1" max="31"><input type="number" placeholder="día" value="${x(d.pago)}" min="1" max="31"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
-    else if(t==='triple') html=`<input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.cuota)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='tarjeta') html=`<input type="text" placeholder="Nombre tarjeta" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="día" value="${x(d.corte)}" min="1" max="31"><input type="number" placeholder="día" value="${x(d.pago)}" min="1" max="31"><input type="number" placeholder="%" value="${x(d.tasa)}" min="0" step="0.01"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='triple') html=`<input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.cuota)}" min="0"><input type="number" placeholder="%" value="${x(d.tasa)}" min="0" step="0.01"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='inv-bolsa') html=`<input type="text" placeholder="Nombre del portafolio" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='inv-espp') html=`<input type="text" placeholder="Empresa / Plan" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.pct)}" min="0" max="100"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='inv-sol') html=`<input type="text" placeholder="Nombre asociación" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='single') html=`<input type="text" placeholder="Nombre del fondo" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='meta'){
+      const p=d.plazo||'corto';
+      html=`<input type="text" placeholder="Ej: Comprar carro de contado" value="${x(d.name)}">
+        <select>
+          <option value="corto"${p==='corto'?' selected':''}>Corto plazo</option>
+          <option value="mediano"${p==='mediano'?' selected':''}>Mediano plazo</option>
+          <option value="largo"${p==='largo'?' selected':''}>Largo plazo</option>
+        </select>
+        <input type="text" placeholder="Opcional: $5,000" value="${x(d.monto)}">
+        <button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    }
     div.innerHTML=html; list.appendChild(div);
   });
   window.scrollTo(0,sy);
@@ -540,15 +613,52 @@ function x(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 function addRow(sec){
   flush(sec);
   const id='r'+Date.now()+Math.random().toString(36).slice(2,6);
-  SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:'',cuota:'',aporte:'',pct:''};
+  SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:'',cuota:'',aporte:'',pct:'',tasa:'',plazo:'corto',monto:''};
   render(sec);
+  if(sec==='fondo') calcFE();
+  if(sec==='ingresos') updateIngresoTotal();
 }
 function removeRow(sec,id){
   flush(sec); SECS[sec].ids=SECS[sec].ids.filter(i=>i!==id); delete SECS[sec].data[id]; render(sec);
+  if(sec==='fondo') calcFE();
+  if(sec==='ingresos') updateIngresoTotal();
+  if(sec==='metas') updateMetasCounter();
 }
 Object.keys(SECS).forEach(sec=>{
-  const id='init-'+sec; SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:'',cuota:'',aporte:'',pct:''}; render(sec);
+  const id='init-'+sec; SECS[sec].ids.push(id); SECS[sec].data[id]={name:'',crc:'',usd:'',cuota:'',aporte:'',pct:'',tasa:'',plazo:'corto',monto:''}; render(sec);
 });
+
+// ── Estado del fondo de emergencias ──
+let feSeparado='';
+function setSeparado(val){
+  feSeparado=val;
+  document.querySelectorAll('#seg-separado .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===val));
+  const hint=document.getElementById('fe-sep-hint');
+  if(val==='si')      hint.innerHTML='Correcto. El fondo separado de la cuenta operativa es lo que hace que sobreviva a los meses difíciles.';
+  else if(val==='parcial') hint.innerHTML='Una parte está expuesta al gasto diario. Conviene mover el resto a una cuenta que no esté ligada a la tarjeta de débito de uso frecuente.';
+  else                hint.innerHTML='⚠️ Si el fondo está en la misma cuenta donde entra el salario y salen los gastos, en la práctica no funciona como fondo: se gasta sin darse cuenta. Separarlo es el primer paso.';
+}
+
+// ── Actualizaciones en vivo ──
+document.getElementById('list-fondo').addEventListener('input',()=>{ flush('fondo'); calcFE(); });
+document.getElementById('list-ingresos').addEventListener('input',()=>{ flush('ingresos'); updateIngresoTotal(); });
+document.getElementById('list-metas').addEventListener('input',()=>{ flush('metas'); updateMetasCounter(); });
+document.getElementById('list-metas').addEventListener('change',()=>{ flush('metas'); updateMetasCounter(); });
+document.getElementById('tc').addEventListener('input',()=>{ calcFE(); updateIngresoTotal(); });
+
+function updateIngresoTotal(){
+  flush('ingresos');
+  document.getElementById('ingreso-total').textContent='₡'+Math.round(secTotalCRC('ingresos')).toLocaleString('es-CR');
+}
+function updateMetasCounter(){
+  flush('metas');
+  const m=SECS.metas.ids.map(i=>SECS.metas.data[i]).filter(r=>(r.name||'').trim());
+  const c={corto:0,mediano:0,largo:0};
+  m.forEach(r=>{ c[r.plazo||'corto']++; });
+  document.getElementById('metas-counter').innerHTML = m.length
+    ? `<strong>${m.length} meta${m.length>1?'s':''} registrada${m.length>1?'s':''}:</strong> ${c.corto} corto · ${c.mediano} mediano · ${c.largo} largo plazo`
+    : '';
+}
 
 function switchTab(tab){
   ['datos','resultado'].forEach(t=>{
@@ -569,10 +679,23 @@ function fmt(crc,cur){
   return '₡'+Math.round(crc).toLocaleString('es-CR');
 }
 
+function feInstituciones(){
+  flush('fondo');
+  return SECS.fondo.ids.map(id=>SECS.fondo.data[id]).filter(r=>(r.name||'').trim()||n(r.crc)||n(r.usd));
+}
 function calcFE(){
   const tcv=tc();
-  const saldo=n(document.getElementById('fe-crc').value)+n(document.getElementById('fe-usd').value)*tcv;
+  flush('fondo');
+  const saldo=secTotalCRC('fondo');
   const gastos=n(document.getElementById('fe-gastos-crc').value)+n(document.getElementById('fe-gastos-usd').value)*tcv;
+
+  // Badge de fondo escalonado
+  const inst=feInstituciones();
+  const badge=document.getElementById('fe-escalonado-badge');
+  if(inst.length>=2) badge.innerHTML=`<span class="esc-badge">🪜 Fondo escalonado en ${inst.length} instituciones · ₡${Math.round(saldo).toLocaleString('es-CR')} en total</span>`;
+  else if(inst.length===1) badge.innerHTML=`<span class="esc-badge" style="background:var(--surface2);color:var(--muted)">Fondo concentrado en 1 institución · ₡${Math.round(saldo).toLocaleString('es-CR')}</span>`;
+  else badge.innerHTML='';
+
   const meter=document.getElementById('fe-meter');
   if(saldo===0&&gastos===0){meter.style.display='none';return;}
   meter.style.display='block';
@@ -617,16 +740,20 @@ function calcular(){
   const totalActivos=totalCuentas+totalAhorros+totalPension+totalInversiones;
   const totalPasivos=totalTarjetas+totalDeudas;
   const patrimonioNeto=totalActivos-totalPasivos;
-  const ingresoNeto=n(document.getElementById('ingreso-crc').value)+n(document.getElementById('ingreso-usd').value)*tcv;
-  const feSaldo=n(document.getElementById('fe-crc').value)+n(document.getElementById('fe-usd').value)*tcv;
+  const ingresoNeto=secTotalCRC('ingresos');
+  const feSaldo=secTotalCRC('fondo');
   const feGastos=n(document.getElementById('fe-gastos-crc').value)+n(document.getElementById('fe-gastos-usd').value)*tcv;
   const feMeses=feGastos>0?feSaldo/feGastos:0;
-  function named(sec){ return SECS[sec].ids.map(id=>({...SECS[sec].data[id]})).filter(r=>r.name.trim()); }
+  const capacidadAhorro=(ingresoNeto>0&&feGastos>0)?ingresoNeto-feGastos:null;
+  const capacidadPct=(capacidadAhorro!==null&&ingresoNeto>0)?capacidadAhorro/ingresoNeto:null;
+  function named(sec){ return SECS[sec].ids.map(id=>({...SECS[sec].data[id]})).filter(r=>(r.name||'').trim()); }
   // Metas financieras
-  const getMeta = id => document.getElementById(id)?.value?.trim() || '';
-  const metasCorto   = [getMeta('meta-c1'),getMeta('meta-c2'),getMeta('meta-c3')].filter(Boolean);
-  const metasMediano = [getMeta('meta-m1'),getMeta('meta-m2'),getMeta('meta-m3')].filter(Boolean);
-  const metasLargo   = [getMeta('meta-l1'),getMeta('meta-l2'),getMeta('meta-l3')].filter(Boolean);
+  const metasAll = named('metas').map(r=>({texto:r.name.trim(),plazo:r.plazo||'corto',monto:(r.monto||'').trim()}));
+  const metasCorto   = metasAll.filter(m=>m.plazo==='corto');
+  const metasMediano = metasAll.filter(m=>m.plazo==='mediano');
+  const metasLargo   = metasAll.filter(m=>m.plazo==='largo');
+  const ingresosData = named('ingresos');
+  const fondoData    = named('fondo');
 
   resultData={
     totalActivos,totalPasivos,totalCuentas,totalAhorros,totalPension,totalInversiones,
@@ -635,12 +762,23 @@ function calcular(){
     totalESPPValor,totalSolValor,totalOtras,
     ingresoNeto,feSaldo,feGastos,feMeses,totalAhorros,
     metasCorto,metasMediano,metasLargo,
+    ingresosData,fondoData,feSeparado,feEscalonado:fondoData.length>=2,
+    capacidadAhorro,capacidadPct,tarjetasData:named('tarjetas'),
+    clientName:document.getElementById('client-name').value.trim(),
     reportDate:document.getElementById('report-date').value.trim(),
     esppData:named('espp'),solidaristaData:named('solidarista'),
     bolsaData:named('bolsa'),deudasData:named('deudas'),
   };
   const rd=resultData.reportDate||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
   document.getElementById('rh-date').textContent='Período: '+rd;
+  document.getElementById('rh-name').textContent=resultData.clientName||'';
+  const cb=document.getElementById('client-bar');
+  if(resultData.clientName){
+    cb.style.display='flex';
+    document.getElementById('cb-name').textContent=resultData.clientName;
+    document.getElementById('cb-initials').textContent=resultData.clientName.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    document.getElementById('cb-date').textContent=rd;
+  } else cb.style.display='none';
   renderResult(resultData);
   renderMetas(resultData);
   switchTab('resultado');
@@ -660,6 +798,16 @@ function renderResult(d){
     feEl.className='s-val '+(d.feMeses<3?'neg':'pos');
     feSubEl.textContent=d.feMeses<3?'⚠️ Prioridad absoluta':d.feMeses<6?'✅ Meta mínima':'🏆 Base sólida';
   } else { feEl.textContent='—'; feEl.className='s-val'; feSubEl.textContent='Sin datos'; }
+
+  const capEl=document.getElementById('s-capacidad'), capSubEl=document.getElementById('s-capacidad-sub');
+  if(d.capacidadAhorro===null){
+    capEl.textContent='—'; capEl.className='s-val'; capSubEl.textContent='Faltan ingresos o gastos';
+  } else {
+    capEl.textContent=fmt(d.capacidadAhorro,cur);
+    capEl.className='s-val '+(d.capacidadAhorro>0?'pos':'neg');
+    const p=Math.round(d.capacidadPct*100);
+    capSubEl.textContent=d.capacidadAhorro>0?p+'% del ingreso neto':'⚠️ Gasta más de lo que entra';
+  }
 
   document.getElementById('desglose').innerHTML=[
     {l:'Cuentas bancarias',  v:d.totalCuentas,     pos:true},
@@ -707,10 +855,12 @@ function renderMetas(d){
     </div>`;
   }
   document.getElementById('metas-priority-msg').innerHTML = priorityHTML;
+  const mt=document.getElementById('metas-result-title-text');
+  if(mt) mt.textContent = d.clientName ? `Metas Financieras · ${d.clientName}` : 'Metas Financieras del Cliente';
 
   function listHTML(metas, color){
     if(!metas.length) return '<div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);">—</div>';
-    return metas.map(m=>`<div class="meta-item"><div class="meta-bullet" style="background:${color}"></div><span>${m}</span></div>`).join('');
+    return metas.map(m=>`<div class="meta-item"><div class="meta-bullet" style="background:${color}"></div><span>${m.texto}</span>${m.monto?`<span class="meta-amount">${m.monto}</span>`:''}</div>`).join('');
   }
   document.getElementById('metas-corto-list').innerHTML   = listHTML(d.metasCorto,   'var(--accent)');
   document.getElementById('metas-mediano-list').innerHTML = listHTML(d.metasMediano, 'var(--warn)');
@@ -753,9 +903,52 @@ function renderAnalysis(d){
     feColor='var(--positive)'; fePill=pill('🏆 '+d.feMeses.toFixed(1)+' meses — Base sólida','green');
     feText='Fondo de emergencias sólido. Con esta base cubierta, el enfoque puede estar en inversiones y reducción de deudas. Revisar el monto si cambian los gastos mensuales.';
   }
+  // Estructura del fondo: separación y escalonamiento
+  let feExtra='';
+  if(d.feSeparado==='no'){
+    feExtra+=' <strong>El fondo no está separado de las cuentas de uso diario.</strong> Un fondo mezclado con el dinero del mes a mes deja de ser fondo: se consume sin que la persona lo note. Abrir una cuenta exclusiva para el fondo es el primer ajuste.';
+    if(feColor==='var(--positive)') feColor='var(--warn)';
+  } else if(d.feSeparado==='parcial'){
+    feExtra+=' Parte del fondo sigue expuesta al gasto diario. Conviene trasladar el resto a una cuenta que no esté ligada a la tarjeta de uso frecuente.';
+  } else if(d.feSeparado==='si'){
+    feExtra+=' El fondo está en una cuenta separada de la operativa — así es como debe estar.';
+  }
+  if(d.feEscalonado){
+    feExtra+=` El fondo está escalonado en ${d.fondoData.length} instituciones (${d.fondoData.map(r=>r.name).filter(Boolean).join(', ')}), lo que reduce el riesgo de quedarse sin acceso al dinero si una entidad tiene un problema operativo o de disponibilidad.`;
+  } else if(d.fondoData.length===1&&d.feMeses>=3){
+    feExtra+=' Todo el fondo está en una sola institución. Vale la pena evaluar escalonarlo en dos entidades para no depender de un único punto de acceso.';
+  }
+  feText+=feExtra;
   sections.push({icon:'🛡️',label:'Fondo de emergencias',color:feColor,pill:fePill,text:feText});
 
-  // 2. DEUDAS
+  // 2. CAPACIDAD DE AHORRO
+  let capText='',capColor='var(--positive)',capPill='';
+  if(d.capacidadAhorro===null){
+    capColor='var(--muted)'; capPill=pill('Sin datos suficientes','warn');
+    capText='Para calcular la capacidad de ahorro mensual hacen falta el ingreso neto y los gastos mensuales totales. Este número es el que define cuánto se puede destinar realmente al fondo de emergencias, a las deudas y a las inversiones.';
+  } else {
+    const cp=Math.round(d.capacidadPct*100);
+    if(d.capacidadAhorro<=0){
+      capColor='var(--red)'; capPill=pill('⚠️ Flujo mensual negativo','red');
+      capText='Los gastos mensuales igualan o superan el ingreso neto. Mientras el flujo sea negativo, cualquier plan de inversión se sostiene sobre arena: el primer trabajo es cerrar esa brecha, sea bajando gastos o aumentando ingresos. Es la conversación central del 1-1.';
+    } else if(cp<10){
+      capColor='var(--warn)'; capPill=pill('🔶 '+cp+'% del ingreso neto disponible','warn');
+      capText=`Queda un ${cp}% del ingreso libre cada mes (${fmt(d.capacidadAhorro,currency)}). Es un margen estrecho: la meta del Sistema GEM de invertir el 10% del ingreso no cabe hoy sin ajustar el presupuesto. Revisar en el 1-1 dónde está la fuga.`;
+    } else if(cp<20){
+      capColor='var(--positive)'; capPill=pill('✅ '+cp+'% del ingreso neto disponible','green');
+      capText=`Quedan ${fmt(d.capacidadAhorro,currency)} libres cada mes (${cp}% del ingreso). Hay espacio para cubrir la meta del 10% en inversiones y todavía dejar margen para el fondo de emergencias o el plan de deudas.`;
+    } else {
+      capColor='var(--positive)'; capPill=pill('🏆 '+cp+'% del ingreso neto disponible','green');
+      capText=`Quedan ${fmt(d.capacidadAhorro,currency)} libres cada mes (${cp}% del ingreso) — una capacidad de ahorro muy por encima del promedio. El riesgo aquí no es la falta de flujo, sino que ese dinero se quede dormido en la cuenta. Lo importante es asignarlo con un destino definido.`;
+    }
+    if(hasBolsa&&d.totalAporteBolsaCRC>0&&d.capacidadAhorro>0){
+      const usoPct=Math.round(d.totalAporteBolsaCRC/d.capacidadAhorro*100);
+      capText+=` Hoy se está destinando el ${usoPct}% de esa capacidad al aporte mensual a Bolsa.`;
+    }
+  }
+  sections.push({icon:'💵',label:'Capacidad de ahorro mensual',color:capColor,pill:capPill,text:capText});
+
+  // 3. DEUDAS
   let debtText='',debtColor='var(--positive)',debtPill='';
   if(!hasAnyDebt){
     debtPill=pill('✅ Sin deudas','green');
@@ -779,7 +972,26 @@ function renderAnalysis(d){
     if(hasTarjetas) debtText+=' Las tarjetas con saldo son las deudas de mayor costo (tasas del 30–50% anual en Costa Rica). Aplicar el Método Bola de Nieve Ajustado: empezar por la tarjeta de menor saldo para generar momentum, luego avanzar a las siguientes.';
     else if(hasDeudas) debtText+=' Aplicar el Método Bola de Nieve Ajustado: pagar primero el préstamo de menor saldo, liberar esa cuota y volcarlo al siguiente.';
   }
-  sections.push({icon:'📋',label:'Deudas y pasivos',color:debtColor,pill:debtPill,text:debtText});
+  let debtExtra='';
+  if(hasAnyDebt){
+    const tcv=d.tcRate;
+    const todas=[
+      ...(d.tarjetasData||[]).map(r=>({n:r.name,s:n(r.crc)+n(r.usd)*tcv,t:n(r.tasa),tipo:'Tarjeta'})),
+      ...(d.deudasData||[]).map(r=>({n:r.name,s:n(r.crc)+n(r.usd)*tcv,t:n(r.tasa),tipo:'Préstamo'})),
+    ].filter(r=>r.s>0).sort((a,b)=>a.s-b.s);
+    if(todas.length){
+      const conTasa=todas.filter(r=>r.t>0);
+      const filas=todas.map((r,i)=>`<tr><td>${i+1}. ${r.n||r.tipo} <span style="opacity:.6">· ${r.tipo}</span></td><td>${fmt(r.s,currency)}${r.t>0?` · ${r.t}%`:' · tasa n/d'}</td></tr>`).join('');
+      debtExtra=`<div style="font-size:11px;color:var(--muted);margin-top:10px;margin-bottom:4px">Orden sugerido de ataque — Bola de Nieve Ajustado (de menor a mayor saldo):</div><table class="context-table">${filas}</table>`;
+      if(conTasa.length){
+        const mayor=conTasa.reduce((a,b)=>b.t>a.t?b:a);
+        const posMayor=todas.findIndex(r=>r===mayor);
+        if(mayor.t>=30&&posMayor>0) debtExtra+=`<div style="font-size:11px;color:var(--warn);margin-top:8px">🔶 La deuda más cara no es la primera de la fila: <strong>${mayor.n||mayor.tipo}</strong> cobra ${mayor.t}% anual y va en la posición ${posMayor+1}. Este es exactamente el punto donde el orden por saldo se ajusta en el 1-1.</div>`;
+      }
+      if(conTasa.length<todas.length) debtExtra+=`<div style="font-size:11px;color:var(--muted);margin-top:6px">Faltan tasas en ${todas.length-conTasa.length} de ${todas.length} deudas. Sin la tasa no se puede medir cuál está costando más.</div>`;
+    }
+  }
+  sections.push({icon:'📋',label:'Deudas y pasivos',color:debtColor,pill:debtPill,text:debtText,extra:debtExtra});
 
   // 3. INVERSIONES EN BOLSA
   let invText='',invColor='var(--accent)',invPill='';
@@ -840,6 +1052,8 @@ function renderAnalysis(d){
 
   // PRÓXIMOS PASOS
   const pasos=[];
+  if(d.capacidadAhorro!==null&&d.capacidadAhorro<=0) pasos.push('Cerrar la brecha entre ingresos y gastos antes que cualquier otra cosa — hoy no queda flujo mensual disponible.');
+  if(d.feSeparado==='no'&&d.feSaldo>0) pasos.push('Abrir una cuenta exclusiva para el fondo de emergencias y trasladarlo ahí — separado del dinero de uso diario.');
   if(d.feMeses<3) pasos.push('Construir el fondo de emergencias hasta mínimo 3 meses de gastos — es la base antes que todo.');
   if(hasTarjetas&&(debtRatio===null||debtRatio>0.15)) pasos.push('Atacar las tarjetas de crédito con el Método Bola de Nieve Ajustado: empezar por la de menor saldo.');
   if(hasDeudas&&!hasTarjetas&&debtRatio!==null&&debtRatio>0.25) pasos.push('Hacer un plan de pagos acelerado para bajar las cuotas por debajo del 25% del ingreso neto.');
@@ -876,15 +1090,84 @@ function renderAnalysis(d){
     </div>`;
 }
 
+// ══════════════════════════════════════════════
+// GUARDAR / CARGAR DIAGNÓSTICO
+// ══════════════════════════════════════════════
+function estadoActual(){
+  flushAll();
+  const secs={};
+  Object.keys(SECS).forEach(s=>{ secs[s]={ids:[...SECS[s].ids],data:JSON.parse(JSON.stringify(SECS[s].data))}; });
+  return {
+    version:2, guardadoEl:new Date().toISOString(),
+    clientName:document.getElementById('client-name').value,
+    reportDate:document.getElementById('report-date').value,
+    tc:document.getElementById('tc').value,
+    feSeparado, feGastosCrc:document.getElementById('fe-gastos-crc').value,
+    feGastosUsd:document.getElementById('fe-gastos-usd').value,
+    secs
+  };
+}
+function guardarDiagnostico(){
+  const est=estadoActual();
+  const cn=(est.clientName||'').trim();
+  const slug=cn?cn.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_'):'Cliente';
+  const fecha=new Date().toISOString().slice(0,10);
+  const blob=new Blob([JSON.stringify(est,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Diagnostico_GEM_${slug}_${fecha}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  setStatus('✓ Diagnóstico guardado');
+}
+function setStatus(msg){
+  const el=document.getElementById('save-status');
+  el.textContent=msg; el.style.color='var(--positive)';
+  setTimeout(()=>{ el.textContent='Guardá el archivo para retomar el diagnóstico después o comparar avance'; el.style.color=''; },4000);
+}
+function cargarDiagnostico(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const est=JSON.parse(reader.result);
+      if(!est.secs) throw new Error('formato');
+      document.getElementById('client-name').value=est.clientName||'';
+      document.getElementById('report-date').value=est.reportDate||'';
+      if(est.tc) document.getElementById('tc').value=est.tc;
+      document.getElementById('fe-gastos-crc').value=est.feGastosCrc||'';
+      document.getElementById('fe-gastos-usd').value=est.feGastosUsd||'';
+      Object.keys(SECS).forEach(s=>{
+        if(est.secs[s]){ SECS[s].ids=[...est.secs[s].ids]; SECS[s].data=est.secs[s].data; }
+        if(!SECS[s].ids.length){ const id='init-'+s; SECS[s].ids=[id]; SECS[s].data={[id]:{name:'',crc:'',usd:'',cuota:'',aporte:'',pct:'',tasa:'',plazo:'corto',monto:''}}; }
+        render(s);
+      });
+      if(est.feSeparado) setSeparado(est.feSeparado);
+      calcFE(); updateIngresoTotal(); updateMetasCounter();
+      setStatus('✓ Diagnóstico cargado'+(est.guardadoEl?' · guardado el '+new Date(est.guardadoEl).toLocaleDateString('es-CR'):''));
+    }catch(e){
+      const el=document.getElementById('save-status');
+      el.textContent='✕ El archivo no es un diagnóstico válido'; el.style.color='var(--red)';
+    }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
 function exportPDF(){
   const rd=document.getElementById('report-date').value.trim()||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
+  const cn=document.getElementById('client-name').value.trim();
   document.getElementById('rh-date').textContent='Período: '+rd;
+  document.getElementById('rh-name').textContent=cn;
   document.getElementById('report-header').style.display='block';
   const el=document.getElementById('panel-resultado');
   const ab=el.querySelector('.action-bar');
   if(ab) ab.style.display='none';
-  const opt={margin:[12,12,12,12],filename:`Reporte_Patrimonio_GEM_${rd.replace(/\s/g,'_')}.pdf`,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:'avoid-all'}};
-  html2pdf().set(opt).from(el).save().then(()=>{ document.getElementById('report-header').style.display='none'; if(ab) ab.style.display=''; });
+  const cbar=document.getElementById('client-bar');
+  const cbPrev=cbar.style.display; cbar.style.display='none';
+  const slug=(cn?cn.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_')+'_':'');
+  const opt={margin:[12,12,12,12],filename:`Reporte_Patrimonio_GEM_${slug}${rd.replace(/\s/g,'_')}.pdf`,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:'avoid-all'}};
+  html2pdf().set(opt).from(el).save().then(()=>{ document.getElementById('report-header').style.display='none'; if(ab) ab.style.display=''; cbar.style.display=cbPrev; });
 }
 </script>
 </body>

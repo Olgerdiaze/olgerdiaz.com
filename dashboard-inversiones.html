@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Inversiones · Sistema GEM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --bg:#f4f6f9; --surface:#ffffff; --surface2:#eef1f6;
+    --border:#dde2ec; --border2:#c4ccdb;
+    --text:#1e2535; --muted:#6b7591;
+    --accent:#2f6fdf; --accent2:#4e9af0; --accent-lt:#deeaf9;
+    --red:#d94f4f; --red-lt:#fce8e8;
+    --blue:#3a82e8; --teal:#3aacca; --purple:#7c6fdf;
+    --positive:#2a8a5c; --pos-lt:#e2f5ec;
+    --warn:#c97b00; --warn-lt:#fff3cd;
+    --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+    --r:10px; --rs:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;
+       -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:'kern' 1;letter-spacing:-0.01em;}
+  .font-mono,input,select,.s-val,.b-val,.risk-pct{font-variant-numeric:tabular-nums;}
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .header h1{font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.5px;}
+  .header p{color:var(--muted);font-size:12px;margin-top:2px;}
+  .badge{background:var(--accent);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-family:var(--font-mono);white-space:nowrap;}
+  .main{max-width:1080px;margin:0 auto;padding:24px 40px 60px;}
+  .tabs{display:flex;gap:2px;margin-bottom:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:4px;width:fit-content;}
+  .tab{padding:7px 20px;border-radius:var(--rs);border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .18s;}
+  .tab.active{background:var(--accent);color:#fff;font-weight:500;}
+  .tab:hover:not(.active){color:var(--text);background:var(--surface2);}
+  .panel{display:none;}.panel.active{display:block;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+  .card-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .card-subtitle{font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-bottom:12px;margin-top:-8px;}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .tc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--muted);}
+  .tc-status{font-size:11px;font-family:var(--font-mono);padding:3px 8px;border-radius:4px;}
+  .tc-live{background:var(--pos-lt);color:var(--positive);}
+  .tc-manual{background:#fff3cd;color:#856404;}
+  .date-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--muted);flex-wrap:wrap;}
+  .aporte-strip{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:var(--accent-lt);border-radius:var(--rs);font-size:12px;color:var(--muted);flex-wrap:wrap;gap:6px;}
+  .aporte-strip strong{font-family:var(--font-mono);font-size:15px;color:var(--accent);font-weight:600;}
+  .input-header,.data-row{display:grid;gap:8px;align-items:center;margin-bottom:6px;}
+  .row-bolsa{grid-template-columns:1fr 108px 90px 90px 88px 30px;}
+  .row-espp{grid-template-columns:1fr 90px 100px 30px;}
+  .row-single{grid-template-columns:1fr 120px 30px;}
+  .row-sol{grid-template-columns:1fr 110px 110px 30px;}
+  .row-banc{grid-template-columns:1fr 95px 95px 80px 30px;}
+  .row-otras{grid-template-columns:150px 1fr 90px 90px 30px;}
+  .col-lbl{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.8px;text-transform:uppercase;}
+  input[type="text"],input[type="number"]{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-body);font-size:12.5px;padding:7px 10px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;}
+  input[type="number"]{font-family:var(--font-mono);font-size:12px;}
+  input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(47,111,223,.1);}
+  input::placeholder{color:#aab4c8;}
+  select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-body);font-size:12px;padding:7px 8px;width:100%;outline:none;cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M3 4.5L6 8l3-3.5' fill='none' stroke='%236b7591' stroke-width='1.4' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center;background-size:12px;padding-right:22px;}
+  .btn-remove{width:30px;height:30px;background:transparent;border:1px solid var(--border);border-radius:var(--rs);color:var(--muted);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;line-height:1;}
+  .btn-remove:hover{border-color:var(--red);color:var(--red);background:var(--red-lt);}
+  .btn-add{background:transparent;border:1px dashed var(--border2);border-radius:var(--rs);color:var(--muted);font-size:12px;padding:6px 14px;cursor:pointer;margin-top:6px;transition:all .15s;font-family:var(--font-body);display:inline-flex;align-items:center;gap:5px;}
+  .btn-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt);}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:12px 28px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+  .btn-primary:hover{background:#1a5cc8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(47,111,223,.25);}
+  .btn-secondary{background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:var(--r);padding:10px 20px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+  .btn-secondary:hover{border-color:var(--border2);color:var(--text);}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:20px;}
+  .s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+  .s-lbl{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.5px;margin-bottom:6px;}
+  .s-val{font-size:18px;font-family:var(--font-mono);font-weight:500;color:var(--text);letter-spacing:-.5px;}
+  .s-val.pos{color:var(--positive);}.s-val.neg{color:var(--red);}.s-val.blue{color:var(--accent);}
+  .s-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+  .curr-toggle{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:18px;}
+  .curr-btn{padding:4px 14px;border-radius:4px;border:none;background:transparent;color:var(--muted);font-size:12px;font-family:var(--font-mono);cursor:pointer;transition:all .15s;}
+  .curr-btn.active{background:var(--surface);color:var(--accent);border:1px solid var(--border);font-weight:500;}
+  .breakdown-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .breakdown-item:last-child{border-bottom:none;}
+  .b-name{color:var(--muted);}.b-val{font-family:var(--font-mono);font-size:12px;}
+  .b-val.pos{color:var(--positive);}
+  .b-total{font-size:14px!important;font-weight:500;}
+  .bar-wrap{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:5px;}
+  .bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+  .risk-item{margin-bottom:14px;}
+  .risk-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;}
+  .risk-name{color:var(--muted);}.risk-pct{font-family:var(--font-mono);color:var(--text);}
+  .ai-panel{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--r);padding:24px;margin-top:16px;}
+  .ai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .ai-header-left{display:flex;align-items:center;gap:10px;}
+  .ai-title{font-size:12px;font-family:var(--font-mono);letter-spacing:1px;color:var(--accent);text-transform:uppercase;}
+  .ai-content{font-size:13.5px;color:var(--text);line-height:1.75;}
+  .ai-section{margin-bottom:18px;}
+  .ai-section-title{font-size:11px;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+  .metric-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-mono);padding:3px 9px;border-radius:12px;margin-bottom:8px;}
+  .pill-red{background:var(--red-lt);color:var(--red);}
+  .pill-warn{background:var(--warn-lt);color:var(--warn);}
+  .pill-green{background:var(--pos-lt);color:var(--positive);}
+  .pill-blue{background:var(--accent-lt);color:var(--accent);}
+  .next-steps{list-style:none;margin-top:6px;}
+  .next-steps li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .next-steps li:last-child{border-bottom:none;}
+  .step-num{font-family:var(--font-mono);font-size:10px;font-weight:500;color:#fff;background:var(--accent);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .context-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+  .context-table td{padding:6px 10px;border-bottom:1px solid var(--border);}
+  .context-table td:first-child{color:var(--muted);}
+  .context-table td:last-child{font-family:var(--font-mono);text-align:right;}
+  .context-table tr:last-child td{border-bottom:none;}
+  .disclosure{margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.6;}
+  .disclosure strong{color:var(--text);}
+  .mentor-cta{margin-top:16px;background:var(--accent-lt);border:1px solid #b8d4f5;border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text);line-height:1.5;}
+  .mentor-icon{font-size:22px;flex-shrink:0;}
+  .mentor-cta strong{color:var(--accent);}
+  .mentor-cta span{color:var(--muted);font-size:12px;}
+  .divider{height:1px;background:var(--border);margin:14px 0;}
+  .client-bar{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:14px;}
+  .client-avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;letter-spacing:.5px;flex-shrink:0;}
+  .client-name{font-size:16px;font-weight:600;letter-spacing:-0.3px;}
+  .client-meta{font-size:12px;color:var(--muted);}
+  .report-header{display:none;}
+  .action-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+  @media(max-width:700px){
+    .main{padding:20px 16px 40px;}
+    .header{padding:16px;flex-direction:column;align-items:flex-start;}
+    .summary-grid{grid-template-columns:1fr 1fr;}
+    .grid2{grid-template-columns:1fr;}
+    .row-bolsa{grid-template-columns:1fr 84px 72px 72px 68px 30px;}
+    .row-espp{grid-template-columns:1fr 72px 84px 30px;}
+    .row-sol{grid-template-columns:1fr 88px 88px 30px;}
+    .row-banc{grid-template-columns:1fr 80px 80px 64px 30px;}
+    .row-otras{grid-template-columns:1fr 30px;grid-auto-rows:auto;}
+    .row-otras select,.row-otras input{grid-column:1/2;}
+    .date-row input{width:100%!important;}
+  }
+  @media print{
+    body{background:#fff;}
+    .tabs,.action-bar,.btn-secondary,.btn-primary,.curr-toggle{display:none!important;}
+    .panel{display:block!important;}
+    #panel-datos{display:none!important;}
+    .report-header{display:block!important;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--accent);}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Dashboard de Inversiones</h1>
+    <p>Registrá todos los instrumentos donde tenés dinero invertido para ver cómo está distribuido tu patrimonio</p>
+  </div>
+  <div class="badge">Sistema GEM</div>
+</div>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab active" id="tab-datos"     onclick="switchTab('datos')">① Datos</button>
+    <button class="tab"        id="tab-resultado" onclick="switchTab('resultado')">② Resultado</button>
+  </div>
+
+  <!-- PANEL DATOS -->
+  <div class="panel active" id="panel-datos">
+
+    <div class="tc-row">
+      <span>Tipo de cambio (₡/$):</span>
+      <input type="number" id="tc" value="520" min="1" style="width:90px">
+      <span id="tc-status" class="tc-status tc-manual">Manual</span>
+      <button onclick="fetchTC()" style="padding:4px 12px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);font-size:12px;cursor:pointer;font-family:var(--font-body);color:var(--text)">↻ Actualizar BCCR</button>
+      <span id="tc-note" style="font-size:11px;font-family:var(--font-mono);color:var(--muted)"></span>
+    </div>
+
+    <div class="date-row" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span>Diagnóstico guardado:</span>
+        <button class="btn-secondary" style="padding:7px 14px;font-size:12px" onclick="guardarDiagnostico()">💾 Guardar archivo</button>
+        <button class="btn-secondary" style="padding:7px 14px;font-size:12px" onclick="document.getElementById('load-file').click()">📂 Cargar archivo</button>
+        <input type="file" id="load-file" accept=".json,application/json" style="display:none" onchange="cargarDiagnostico(event)">
+      </div>
+      <span style="font-size:11px" id="save-status">Guardá el archivo para retomar el diagnóstico después o comparar avance</span>
+    </div>
+
+    <div class="date-row">
+      <span>Cliente:</span>
+      <input type="text" id="client-name" placeholder="Nombre y apellidos" style="width:230px">
+      <span style="margin-left:8px">Fecha del reporte:</span>
+      <input type="text" id="report-date" placeholder="Ej: Marzo 2026" style="width:150px">
+      <span style="font-size:11px">Ambos datos aparecen en el PDF</span>
+    </div>
+
+    <!-- BOLSA / BROKERS -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--accent)"></div> Bolsa · Portafolios y Brokers</div>
+      <div class="card-subtitle">Una línea por cada portafolio o cuenta de inversión que tengas abierta (IBKR, Schwab, Dominion, etc.)</div>
+      <div class="input-header row-bolsa">
+        <div class="col-lbl">Descripción</div><div class="col-lbl">Plataforma</div><div class="col-lbl">Valor ₡</div><div class="col-lbl">Valor $</div><div class="col-lbl">Aporte/mes $</div><div></div>
+      </div>
+      <div id="list-bolsa"></div>
+      <button class="btn-add" onclick="addRow('bolsa')">+ Agregar portafolio</button>
+    </div>
+
+    <!-- ESPP -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--purple)"></div> ESPP · Plan de Acciones de Empresa</div>
+      <div class="card-subtitle">Employee Stock Purchase Plan u otros planes de acciones ligados a tu empleador</div>
+      <div class="input-header row-espp">
+        <div class="col-lbl">Empresa / Plan</div><div class="col-lbl">% Salario Bruto</div><div class="col-lbl">Valor actual $</div><div></div>
+      </div>
+      <div id="list-espp"></div>
+      <button class="btn-add" onclick="addRow('espp')">+ Agregar ESPP</button>
+    </div>
+
+    <!-- PENSION -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--teal)"></div> Fondos de Pensión</div>
+      <div class="card-subtitle">ROP, pensión voluntaria u otros fondos de retiro (obligatorios o voluntarios)</div>
+      <div class="input-header row-single">
+        <div class="col-lbl">Fondo</div><div class="col-lbl">Saldo ₡</div><div></div>
+      </div>
+      <div id="list-pension"></div>
+      <button class="btn-add" onclick="addRow('pension')">+ Agregar fondo</button>
+    </div>
+
+    <!-- SOLIDARISTA -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--positive)"></div> Asociación Solidarista</div>
+      <div class="input-header row-sol">
+        <div class="col-lbl">Asociación</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Aporte/mes ₡</div><div></div>
+      </div>
+      <div id="list-solidarista"></div>
+      <button class="btn-add" onclick="addRow('solidarista')">+ Agregar solidarista</button>
+    </div>
+
+    <!-- BANCARIAS / CDPs -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--blue)"></div> Cuentas de Inversión Bancarias (CDPs, Fondos)</div>
+      <div class="card-subtitle">CDPs, fondos de inversión del banco u otros instrumentos conservadores</div>
+      <div class="input-header row-banc">
+        <div class="col-lbl">Descripción</div><div class="col-lbl">Valor ₡</div><div class="col-lbl">Valor $</div><div class="col-lbl">Tasa % anual</div><div></div>
+      </div>
+      <div id="list-bancarias"></div>
+      <button class="btn-add" onclick="addRow('bancarias')">+ Agregar cuenta</button>
+    </div>
+
+    <!-- OTRAS -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--warn)"></div> Otras Inversiones</div>
+      <div class="card-subtitle">Cripto, bienes raíces para renta u otro instrumento que no encaje arriba</div>
+      <div class="input-header row-otras">
+        <div class="col-lbl">Categoría</div><div class="col-lbl">Descripción</div><div class="col-lbl">Valor ₡</div><div class="col-lbl">Valor $</div><div></div>
+      </div>
+      <div id="list-otras"></div>
+      <button class="btn-add" onclick="addRow('otras')">+ Agregar inversión</button>
+      <div class="aporte-strip">
+        <span>Aporte mensual total a inversiones (Bolsa + Solidarista)</span>
+        <strong id="aporte-total">₡0</strong>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="calcular()">Calcular distribución de patrimonio →</button>
+  </div>
+
+  <!-- PANEL RESULTADO -->
+  <div class="panel" id="panel-resultado">
+
+    <div class="report-header" id="report-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.5px">Reporte de Inversiones</div>
+          <div style="font-size:15px;font-weight:600;margin-top:4px" id="rh-name"></div>
+          <div style="font-size:13px;color:var(--muted);margin-top:1px" id="rh-date"></div>
+        </div>
+        <div style="font-size:12px;text-align:right;color:var(--muted)">
+          <div style="font-weight:500;color:var(--accent)">Sistema GEM</div>
+          <div>Mentoría Financiera · Olger Díaz</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="client-bar" id="client-bar" style="display:none">
+      <div class="client-avatar" id="cb-initials"></div>
+      <div>
+        <div class="client-name" id="cb-name"></div>
+        <div class="client-meta">Reporte de inversiones · <span id="cb-date"></span></div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <div class="curr-toggle" style="margin-bottom:0">
+        <button class="curr-btn active" id="btn-crc" onclick="setCurrency('CRC')">₡ Colones</button>
+        <button class="curr-btn"        id="btn-usd" onclick="setCurrency('USD')">$ Dólares</button>
+      </div>
+      <button class="btn-secondary" onclick="exportPDF()">⬇ Descargar PDF</button>
+      <button class="btn-secondary" onclick="switchTab('datos')">← Editar datos</button>
+    </div>
+
+    <div class="summary-grid">
+      <div class="s-card"><div class="s-lbl">Patrimonio en inversiones</div><div class="s-val blue" id="s-total">—</div><div class="s-sub">Suma de todas las categorías</div></div>
+      <div class="s-card"><div class="s-lbl">Aporte mensual total</div><div class="s-val pos" id="s-aporte">—</div><div class="s-sub">Bolsa + Solidarista</div></div>
+      <div class="s-card"><div class="s-lbl">Mayor concentración</div><div class="s-val" id="s-conc">—</div><div class="s-sub" id="s-conc-sub">Categoría con más peso</div></div>
+      <div class="s-card"><div class="s-lbl">Diversificación</div><div class="s-val" id="s-divers">—</div><div class="s-sub">Categorías activas de 6</div></div>
+      <div class="s-card"><div class="s-lbl">Total en Bolsa</div><div class="s-val" id="s-bolsa">—</div><div class="s-sub">Portafolios / brokers</div></div>
+      <div class="s-card"><div class="s-lbl">Fuera de tu control directo</div><div class="s-val" id="s-institucional">—</div><div class="s-sub">Pensión + Solidarista</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title"><div class="dot" style="background:var(--blue)"></div> Desglose por categoría</div>
+        <div id="desglose"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="dot" style="background:var(--teal)"></div> Concentración de patrimonio</div>
+        <div id="concentracion"></div>
+      </div>
+    </div>
+
+    <div class="card" id="brokers-card" style="display:none">
+      <div class="card-title"><div class="dot" style="background:var(--accent)"></div> Distribución por plataforma</div>
+      <div id="brokers-breakdown"></div>
+    </div>
+
+    <div class="ai-panel">
+      <div class="ai-header">
+        <div class="ai-header-left">
+          <div class="dot" style="background:var(--accent)"></div>
+          <div class="ai-title">Análisis educativo · Sistema GEM</div>
+        </div>
+      </div>
+      <div id="ai-content" class="ai-content"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SECS = {
+  bolsa:       {ids:[],data:{},type:'bolsa'},
+  espp:        {ids:[],data:{},type:'espp'},
+  pension:     {ids:[],data:{},type:'single'},
+  solidarista: {ids:[],data:{},type:'sol'},
+  bancarias:   {ids:[],data:{},type:'banc'},
+  otras:       {ids:[],data:{},type:'otras'},
+};
+const BROKERS=['IBKR','Schwab','Dominion','Otro','N/A · Sin cuenta aún'];
+const PLATAFORMA_NA='N/A · Sin cuenta aún';
+const CATS_OTRAS=['Criptomonedas','Bienes raíces (renta)','Fondos de inversión','Arte / Colecionables','Otro'];
+let currency='CRC', resultData=null;
+
+async function fetchTC() {
+  const btn=document.querySelector('[onclick="fetchTC()"]');
+  btn.textContent='↻ Cargando…'; btn.disabled=true;
+  const note=document.getElementById('tc-note'), status=document.getElementById('tc-status');
+  try {
+    const res=await fetch('https://apis.gometa.org/tdc/tdc.json');
+    const d=await res.json();
+    if(d&&d.venta){
+      document.getElementById('tc').value=Math.round(d.venta);
+      status.textContent='✓ BCCR en vivo'; status.className='tc-status tc-live';
+      note.textContent=`TC venta hoy: ₡${d.venta}`;
+    } else throw new Error();
+  } catch(e){
+    status.textContent='Manual'; status.className='tc-status tc-manual';
+    note.textContent='No se pudo obtener el TC. Ingresalo manualmente.';
+  } finally { btn.textContent='↻ Actualizar BCCR'; btn.disabled=false; updateAporteTotal(); }
+}
+window.addEventListener('load',()=>{ fetchTC(); });
+
+function blankRow(){ return {name:'',broker:BROKERS[0],crc:'',usd:'',aporte:'',pct:'',tasa:'',cat:CATS_OTRAS[0]}; }
+
+function flush(sec){
+  document.querySelectorAll('#list-'+sec+' .data-row').forEach(row=>{
+    const id=row.dataset.id; if(!SECS[sec].data[id]) return;
+    const t=SECS[sec].type, ins=row.querySelectorAll('input'), sel=row.querySelectorAll('select');
+    const d=SECS[sec].data[id];
+    if(t==='bolsa'){ d.name=ins[0]?.value??''; d.broker=sel[0]?.value??BROKERS[0]; d.crc=ins[1]?.value??''; d.usd=ins[2]?.value??''; d.aporte=ins[3]?.value??''; }
+    else if(t==='espp'){ d.name=ins[0]?.value??''; d.pct=ins[1]?.value??''; d.usd=ins[2]?.value??''; }
+    else if(t==='single'){ d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; }
+    else if(t==='sol'){ d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; d.aporte=ins[2]?.value??''; }
+    else if(t==='banc'){ d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; d.usd=ins[2]?.value??''; d.tasa=ins[3]?.value??''; }
+    else if(t==='otras'){ d.cat=sel[0]?.value??CATS_OTRAS[0]; d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; d.usd=ins[2]?.value??''; }
+  });
+}
+function flushAll(){ Object.keys(SECS).forEach(flush); }
+
+function x(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+function selOpts(list,current){ return list.map(o=>`<option value="${x(o)}"${o===current?' selected':''}>${x(o)}</option>`).join(''); }
+
+function render(sec){
+  const s=SECS[sec], list=document.getElementById('list-'+sec);
+  const sy=window.scrollY; list.innerHTML='';
+  s.ids.forEach(id=>{
+    const d=s.data[id], div=document.createElement('div'), t=s.type;
+    let cls='data-row row-'+(t==='sol'?'sol':t);
+    div.className=cls; div.dataset.id=id;
+    let html='';
+    if(t==='bolsa') html=`<input type="text" placeholder="Nombre del portafolio" value="${x(d.name)}">
+      <select>${selOpts(BROKERS,d.broker)}</select>
+      <input type="number" placeholder="0" value="${x(d.crc)}" min="0">
+      <input type="number" placeholder="0" value="${x(d.usd)}" min="0">
+      <input type="number" placeholder="0" value="${x(d.aporte)}" min="0">
+      <button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='espp') html=`<input type="text" placeholder="Empresa / Plan" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.pct)}" min="0" max="100"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='single') html=`<input type="text" placeholder="Nombre del fondo" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='sol') html=`<input type="text" placeholder="Nombre asociación" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='banc') html=`<input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="%" value="${x(d.tasa)}" min="0" step="0.01"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    else if(t==='otras') html=`<select>${selOpts(CATS_OTRAS,d.cat)}</select><input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
+    div.innerHTML=html; list.appendChild(div);
+  });
+  window.scrollTo(0,sy);
+}
+function addRow(sec){
+  flush(sec);
+  const id='r'+Date.now()+Math.random().toString(36).slice(2,6);
+  SECS[sec].ids.push(id); SECS[sec].data[id]=blankRow();
+  render(sec);
+  updateAporteTotal();
+}
+function removeRow(sec,id){
+  flush(sec); SECS[sec].ids=SECS[sec].ids.filter(i=>i!==id); delete SECS[sec].data[id]; render(sec);
+  updateAporteTotal();
+}
+Object.keys(SECS).forEach(sec=>{
+  const id='init-'+sec; SECS[sec].ids.push(id); SECS[sec].data[id]=blankRow(); render(sec);
+});
+
+Object.keys(SECS).forEach(sec=>{
+  document.getElementById('list-'+sec).addEventListener('input',()=>{ flush(sec); updateAporteTotal(); });
+  document.getElementById('list-'+sec).addEventListener('change',()=>{ flush(sec); updateAporteTotal(); });
+});
+document.getElementById('tc').addEventListener('input',updateAporteTotal);
+
+function tc(){ return parseFloat(document.getElementById('tc').value)||520; }
+function n(v){ return parseFloat(v)||0; }
+function fmt(crc,cur){
+  if(cur==='USD') return '$'+(crc/tc()).toLocaleString('es-CR',{minimumFractionDigits:0,maximumFractionDigits:0});
+  return '₡'+Math.round(crc).toLocaleString('es-CR');
+}
+
+function updateAporteTotal(){
+  flush('bolsa'); flush('solidarista');
+  const aporteBolsaCRC=SECS.bolsa.ids.reduce((s,id)=>s+n(SECS.bolsa.data[id].aporte),0)*tc();
+  const aporteSolCRC=SECS.solidarista.ids.reduce((s,id)=>s+n(SECS.solidarista.data[id].aporte),0);
+  document.getElementById('aporte-total').textContent=fmt(aporteBolsaCRC+aporteSolCRC,'CRC');
+}
+
+function switchTab(tab){
+  ['datos','resultado'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
+  });
+}
+function setCurrency(cur){
+  currency=cur;
+  document.getElementById('btn-crc').classList.toggle('active',cur==='CRC');
+  document.getElementById('btn-usd').classList.toggle('active',cur==='USD');
+  if(resultData){ renderResult(resultData); }
+}
+
+function named(sec){ return SECS[sec].ids.map(id=>({...SECS[sec].data[id]})).filter(r=>(r.name||'').trim()); }
+
+function calcular(){
+  flushAll();
+  const tcv=tc();
+  const bolsaData=named('bolsa'), esppData=named('espp'), pensionData=named('pension'),
+        solData=named('solidarista'), bancData=named('bancarias'), otrasData=named('otras');
+
+  const totalBolsa=bolsaData.reduce((s,r)=>s+n(r.crc)+n(r.usd)*tcv,0);
+  const totalAporteBolsaUSD=bolsaData.reduce((s,r)=>s+n(r.aporte),0);
+  const totalESPP=esppData.reduce((s,r)=>s+n(r.usd)*tcv,0);
+  const totalPension=pensionData.reduce((s,r)=>s+n(r.crc),0);
+  const totalSol=solData.reduce((s,r)=>s+n(r.crc),0);
+  const totalAporteSolCRC=solData.reduce((s,r)=>s+n(r.aporte),0);
+  const totalBanc=bancData.reduce((s,r)=>s+n(r.crc)+n(r.usd)*tcv,0);
+  const totalOtras=otrasData.reduce((s,r)=>s+n(r.crc)+n(r.usd)*tcv,0);
+  const totalPatrimonio=totalBolsa+totalESPP+totalPension+totalSol+totalBanc+totalOtras;
+  const aporteMensualCRC=totalAporteBolsaUSD*tcv+totalAporteSolCRC;
+
+  const brokerMap={};
+  const sinCuentaList=[];
+  bolsaData.forEach(r=>{
+    if(r.broker===PLATAFORMA_NA){ sinCuentaList.push(r.name); return; }
+    const v=n(r.crc)+n(r.usd)*tcv; brokerMap[r.broker||'Otro']=(brokerMap[r.broker||'Otro']||0)+v;
+  });
+
+  const otrasCatMap={};
+  otrasData.forEach(r=>{ const v=n(r.crc)+n(r.usd)*tcv; otrasCatMap[r.cat||'Otro']=(otrasCatMap[r.cat||'Otro']||0)+v; });
+
+  resultData={
+    tcRate:tcv,totalPatrimonio,totalBolsa,totalAporteBolsaUSD,totalESPP,totalPension,
+    totalSol,totalAporteSolCRC,totalBanc,totalOtras,aporteMensualCRC,
+    bolsaData,esppData,pensionData,solData,bancData,otrasData,brokerMap,sinCuentaList,otrasCatMap,
+    clientName:document.getElementById('client-name').value.trim(),
+    reportDate:document.getElementById('report-date').value.trim(),
+  };
+  const rd=resultData.reportDate||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
+  document.getElementById('rh-date').textContent='Período: '+rd;
+  document.getElementById('rh-name').textContent=resultData.clientName||'';
+  const cb=document.getElementById('client-bar');
+  if(resultData.clientName){
+    cb.style.display='flex';
+    document.getElementById('cb-name').textContent=resultData.clientName;
+    document.getElementById('cb-initials').textContent=resultData.clientName.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    document.getElementById('cb-date').textContent=rd;
+  } else cb.style.display='none';
+  renderResult(resultData);
+  switchTab('resultado');
+  renderAnalysis(resultData);
+}
+
+function renderResult(d){
+  const cur=currency, tot=d.totalPatrimonio||0;
+  document.getElementById('s-total').textContent=fmt(d.totalPatrimonio,cur);
+  document.getElementById('s-aporte').textContent=fmt(d.aporteMensualCRC,cur);
+  document.getElementById('s-bolsa').textContent=fmt(d.totalBolsa,cur);
+  document.getElementById('s-institucional').textContent=fmt(d.totalPension+d.totalSol,cur);
+
+  const cats=[
+    {l:'Bolsa',v:d.totalBolsa},{l:'ESPP',v:d.totalESPP},{l:'Pensión',v:d.totalPension},
+    {l:'Solidarista',v:d.totalSol},{l:'Bancarias / CDPs',v:d.totalBanc},{l:'Otras',v:d.totalOtras},
+  ];
+  const activeCats=cats.filter(c=>c.v>0);
+  document.getElementById('s-divers').textContent=activeCats.length+' de 6';
+
+  const concEl=document.getElementById('s-conc'), concSubEl=document.getElementById('s-conc-sub');
+  if(tot>0 && activeCats.length){
+    const max=activeCats.reduce((a,b)=>b.v>a.v?b:a);
+    const pct=Math.round(max.v/tot*100);
+    concEl.textContent=pct+'%';
+    concEl.className='s-val '+(pct>70?'neg':'pos');
+    concSubEl.textContent=max.l;
+  } else { concEl.textContent='—'; concEl.className='s-val'; concSubEl.textContent='Sin datos'; }
+
+  document.getElementById('desglose').innerHTML=cats.map(r=>
+    `<div class="breakdown-item"><span class="b-name">${r.l}</span><span class="b-val ${r.v>0?'pos':''}">${fmt(r.v,cur)}</span></div>`
+  ).join('')+
+  `<div class="divider"></div><div class="breakdown-item"><span class="b-name b-total">Total en inversiones</span><span class="b-val b-total" style="color:var(--positive)">${fmt(tot,cur)}</span></div>`;
+
+  const colorMap={Bolsa:'#2f6fdf',ESPP:'#7c6fdf',Pensión:'#3aacca','Solidarista':'#2a8a5c','Bancarias / CDPs':'#3a82e8',Otras:'#c97b00'};
+  document.getElementById('concentracion').innerHTML=cats.filter(c=>c.v>0).map(c=>{
+    const pct=Math.max(0,Math.round(c.v/(tot||1)*100));
+    return `<div class="risk-item"><div class="risk-header"><span class="risk-name">${c.l}</span><span class="risk-pct">${pct}%</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${colorMap[c.l]}"></div></div></div>`;
+  }).join('') || '<div style="font-size:12px;color:var(--muted)">Sin datos para graficar todavía.</div>';
+
+  const bCard=document.getElementById('brokers-card'), bBody=document.getElementById('brokers-breakdown');
+  const brokerEntries=Object.entries(d.brokerMap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  if(brokerEntries.length){
+    bCard.style.display='block';
+    const bTot=d.totalBolsa||1;
+    bBody.innerHTML=brokerEntries.map(([name,v])=>{
+      const pct=Math.round(v/bTot*100);
+      return `<div class="risk-item"><div class="risk-header"><span class="risk-name">${name}</span><span class="risk-pct">${fmt(v,cur)} · ${pct}%</span></div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:var(--accent)"></div></div></div>`;
+    }).join('');
+  } else bCard.style.display='none';
+}
+
+// ══════════════════════════════════════════════
+// SISTEMA GEM — MOTOR DE ANÁLISIS DE INVERSIONES
+// ══════════════════════════════════════════════
+function pill(label,type){ return `<span class="metric-pill pill-${type}">${label}</span>`; }
+
+function renderAnalysis(d){
+  const tot=d.totalPatrimonio||0;
+  const sections=[];
+  const cats=[
+    {l:'Bolsa',v:d.totalBolsa},{l:'ESPP',v:d.totalESPP},{l:'Pensión',v:d.totalPension},
+    {l:'Solidarista',v:d.totalSol},{l:'Bancarias / CDPs',v:d.totalBanc},{l:'Otras',v:d.totalOtras},
+  ];
+  const activeCats=cats.filter(c=>c.v>0);
+
+  if(tot===0){
+    document.getElementById('ai-content').innerHTML=`<div class="ai-section"><p>Todavía no hay datos suficientes para generar el análisis. Agregá al menos un instrumento de inversión en la pestaña de Datos.</p></div>`;
+    return;
+  }
+
+  // 1. DIVERSIFICACIÓN
+  let divColor='var(--positive)',divPill='',divText='';
+  if(activeCats.length<=1){
+    divColor='var(--red)'; divPill=pill('⚠️ Todo el patrimonio en una sola categoría','red');
+    divText='El patrimonio invertido está concentrado en un único tipo de instrumento. Esto expone al cliente al riesgo específico de esa categoría (empresa, plataforma o instrumento). Diversificar entre categorías es uno de los primeros ajustes a conversar en el 1-1.';
+  } else if(activeCats.length<=2){
+    divColor='var(--warn)'; divPill=pill('🔶 Diversificación limitada — '+activeCats.length+' categorías','warn');
+    divText='Hay presencia en un par de categorías, pero todavía hay espacio para diversificar más. Revisar si tiene sentido abrir o fortalecer otras vías de inversión según el perfil del cliente.';
+  } else {
+    divPill=pill('✅ '+activeCats.length+' categorías activas','green');
+    divText='El patrimonio está repartido entre varias categorías de inversión, lo cual reduce la dependencia de un solo instrumento o institución.';
+  }
+  sections.push({icon:'🧩',label:'Diversificación',color:divColor,pill:divPill,text:divText});
+
+  // 2. CONCENTRACIÓN
+  const max=activeCats.length?activeCats.reduce((a,b)=>b.v>a.v?b:a):null;
+  if(max){
+    const maxPct=Math.round(max.v/tot*100);
+    let concColor='var(--positive)',concPill='';
+    if(maxPct>70){
+      concColor='var(--warn)'; concPill=pill('🔶 '+maxPct+'% del patrimonio en '+max.l,'warn');
+    } else {
+      concPill=pill('✅ Sin concentración excesiva — máximo '+maxPct+'% en '+max.l,'green');
+    }
+    sections.push({icon:'⚖️',label:'Concentración por categoría',color:concColor,pill:concPill,
+      text:maxPct>70
+        ? `Más de dos tercios del patrimonio invertido está en ${max.l}. No es necesariamente un problema si es una decisión consciente, pero vale la pena confirmar en el 1-1 que el cliente entiende y acepta ese nivel de exposición a una sola categoría.`
+        : `La distribución entre categorías está relativamente balanceada — ninguna concentra más del 70% del patrimonio invertido.`});
+  }
+
+  // 3. ESPP — riesgo de concentración en el empleador
+  if(d.totalESPP>0){
+    const esppPct=Math.round(d.totalESPP/tot*100);
+    let color='var(--positive)',pl='';
+    if(esppPct>15){
+      color='var(--warn)'; pl=pill('🔶 ESPP representa el '+esppPct+'% del patrimonio','warn');
+    } else {
+      pl=pill('ESPP: '+esppPct+'% del patrimonio','blue');
+    }
+    sections.push({icon:'🏢',label:'ESPP — riesgo de concentración en el empleador',color,pill:pl,
+      text:esppPct>15
+        ? `El cliente ya tiene una porción significativa de su patrimonio ligada al desempeño de una sola empresa (su empleador) a través del ESPP. Esto suma riesgo laboral y riesgo de inversión en el mismo lugar. Vale la pena revisar en el 1-1 si conviene vender periódicamente y redistribuir hacia el portafolio diversificado.`
+        : `El ESPP tiene un peso moderado dentro del patrimonio total. Sigue siendo bueno confirmar cada cierto tiempo si conviene liquidar parte y diversificar.`});
+  }
+
+  // 4. CONSISTENCIA DE APORTES (DCA)
+  let dcaColor='var(--positive)',dcaPill='',dcaText='';
+  if(d.totalBolsa>0 && d.totalAporteBolsaUSD===0){
+    dcaColor='var(--warn)'; dcaPill=pill('🔶 Sin aporte mensual recurrente registrado en Bolsa','warn');
+    dcaText='Hay saldo invertido en Bolsa pero no se registró un aporte mensual activo. Confirmar en el 1-1 si el cliente sigue aportando de forma recurrente (DCA) o si la inversión quedó estática.';
+  } else if(d.totalBolsa>0){
+    dcaPill=pill('✅ Aporte mensual activo en Bolsa','green');
+    dcaText=`El cliente mantiene un aporte mensual recurrente hacia Bolsa. La consistencia en el tiempo es lo que hace que el interés compuesto trabaje a favor — más importante que el monto exacto de cada aporte.`;
+  } else {
+    dcaPill=pill('Sin inversión en Bolsa todavía','warn');
+    dcaText='Todavía no hay saldo registrado en portafolios de Bolsa. Este suele ser el punto de partida de un plan de inversión pasivo con aportes mensuales fijos.';
+  }
+  sections.push({icon:'🔁',label:'Consistencia de aportes (DCA)',color:dcaColor,pill:dcaPill,text:dcaText});
+
+  // 5. PENSIÓN Y SOLIDARISTA — control y liquidez
+  const instTotal=d.totalPension+d.totalSol;
+  if(instTotal>0){
+    const instPct=Math.round(instTotal/tot*100);
+    let color='var(--accent)',pl=pill(instPct+'% en fondos institucionales','blue');
+    let text=`Fondos de pensión y solidarista suman el ${instPct}% del patrimonio invertido. Son instrumentos de bajo control directo y liquidez limitada — buena base, pero no reemplazan un portafolio activo donde el cliente define la estrategia.`;
+    if(instPct>40){ color='var(--warn)'; pl=pill('🔶 '+instPct+'% del patrimonio fuera de control directo','warn'); text+=' Con este peso, vale la pena conversar cuánto del patrimonio futuro debería ir hacia instrumentos donde el cliente tiene más flexibilidad y control de la estrategia.'; }
+    sections.push({icon:'🏦',label:'Fondos de pensión y solidarista',color,pill:pl,text});
+  }
+
+  // 6. BANCARIAS / CDPs — costo de oportunidad
+  if(d.totalBanc>0){
+    const bancPct=Math.round(d.totalBanc/tot*100);
+    let color='var(--positive)',pl=pill(bancPct+'% en cuentas bancarias / CDPs','blue');
+    let text=`El ${bancPct}% del patrimonio invertido está en instrumentos conservadores como CDPs o fondos de inversión bancarios.`;
+    if(bancPct>30){
+      color='var(--warn)'; pl=pill('🔶 '+bancPct+'% en instrumentos conservadores','warn');
+      text+=' Es un porcentaje considerable en instrumentos de bajo rendimiento relativo. Vale la pena revisar en el 1-1 el costo de oportunidad frente a un portafolio diversificado en Bolsa a largo plazo, sin dejar de reconocer que estos instrumentos aportan estabilidad y liquidez.';
+    } else {
+      text+=' Es un nivel razonable como colchón de estabilidad dentro del portafolio general.';
+    }
+    sections.push({icon:'🏛️',label:'Cuentas bancarias y CDPs',color,pill:pl,text});
+  }
+
+  // 7. PLATAFORMAS — contexto
+  const brokerEntries=Object.entries(d.brokerMap).filter(([,v])=>v>0);
+  if(brokerEntries.length){
+    const rows=brokerEntries.sort((a,b)=>b[1]-a[1]).map(([name,v])=>`<tr><td>${name}</td><td>${fmt(v,currency)}</td></tr>`).join('');
+    sections.push({icon:'💼',label:'Plataformas ya utilizadas',color:'var(--muted)',pill:'',
+      text:'Contexto para el 1-1: estas son las plataformas donde el cliente ya tiene cuentas de inversión abiertas.',
+      extra:`<table class="context-table">${rows}</table>`});
+  }
+
+  // 7b. OPORTUNIDAD — plataformas marcadas como "sin cuenta"
+  if(d.sinCuentaList && d.sinCuentaList.length){
+    const rows=d.sinCuentaList.map(name=>`<tr><td>${name||'Sin descripción'}</td><td>Sin cuenta aún</td></tr>`).join('');
+    sections.push({icon:'🔓',label:'Oportunidad de apertura de cuenta',color:'var(--accent)',pill:pill(d.sinCuentaList.length+' línea(s) marcadas como sin cuenta','blue'),
+      text:'El cliente todavía no tiene cuenta abierta en estos instrumentos. Es una oportunidad concreta para el 1-1: definir si conviene abrir la cuenta ahora como parte del plan de diversificación.',
+      extra:`<table class="context-table">${rows}</table>`});
+  }
+
+  // 8. OTRAS INVERSIONES — desglose por categoría
+  const otrasEntries=Object.entries(d.otrasCatMap).filter(([,v])=>v>0);
+  if(otrasEntries.length){
+    const rows=otrasEntries.sort((a,b)=>b[1]-a[1]).map(([name,v])=>`<tr><td>${name}</td><td>${fmt(v,currency)}</td></tr>`).join('');
+    sections.push({icon:'🧭',label:'Otras inversiones — detalle',color:'var(--muted)',pill:'',
+      text:'Instrumentos fuera de las categorías estándar. Revisar en el 1-1 si encajan dentro de la estrategia general o si son posiciones puntuales fuera del plan.',
+      extra:`<table class="context-table">${rows}</table>`});
+  }
+
+  // PRÓXIMOS PASOS PARA EL 1-1
+  const pasos=[];
+  if(activeCats.length<=1) pasos.push('Conversar sobre diversificar el patrimonio invertido fuera de la categoría única actual.');
+  pasos.push('Confirmar o construir el perfil de riesgo del cliente.');
+  pasos.push('Redactar o actualizar el Investment Policy Statement (IPS).');
+  pasos.push('Confirmar qué cuentas de inversión están abiertas y cuáles faltan por abrir.');
+  pasos.push('Definir o ajustar el plan de aportes mensuales (DCA) y automatizarlo.');
+  pasos.push('Establecer la fecha de la próxima revisión y rebalanceo del portafolio.');
+
+  const secHTML=sections.map(s=>`
+    <div class="ai-section">
+      <div class="ai-section-title" style="color:${s.color};border-color:${s.color}22;">${s.icon} ${s.label}</div>
+      ${s.pill?`<div style="margin-bottom:8px">${s.pill}</div>`:''}
+      <p>${s.text}</p>
+      ${s.extra||''}
+    </div>`).join('');
+  const pasosHTML=pasos.slice(0,6).map((p,i)=>`<li><div class="step-num">${i+1}</div><span>${p}</span></li>`).join('');
+
+  document.getElementById('ai-content').innerHTML=secHTML+
+    `<div class="ai-section">
+      <div class="ai-section-title" style="color:var(--accent)">🚀 Próximos pasos a revisar con Olger</div>
+      <ul class="next-steps">${pasosHTML}</ul>
+    </div>
+    <div class="disclosure">
+      <strong>⚠️ Aviso importante:</strong> Este análisis es educativo y orientativo, basado en el Sistema GEM. No constituye asesoría financiera, legal ni de inversión. Para decisiones específicas, consultá siempre con un profesional calificado.
+    </div>
+    <div class="mentor-cta">
+      <div class="mentor-icon">🎯</div>
+      <div>
+        <strong>Punto de partida para nuestro primer 1-1 · Sistema GEM</strong><br>
+        <span>Mentoría financiera personalizada · Este reporte es la base para diseñar tu plan de inversión</span>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// GUARDAR / CARGAR DIAGNÓSTICO
+// ══════════════════════════════════════════════
+function estadoActual(){
+  flushAll();
+  const secs={};
+  Object.keys(SECS).forEach(s=>{ secs[s]={ids:[...SECS[s].ids],data:JSON.parse(JSON.stringify(SECS[s].data))}; });
+  return {
+    version:1, guardadoEl:new Date().toISOString(),
+    clientName:document.getElementById('client-name').value,
+    reportDate:document.getElementById('report-date').value,
+    tc:document.getElementById('tc').value,
+    secs
+  };
+}
+function guardarDiagnostico(){
+  const est=estadoActual();
+  const cn=(est.clientName||'').trim();
+  const slug=cn?cn.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_'):'Cliente';
+  const fecha=new Date().toISOString().slice(0,10);
+  const blob=new Blob([JSON.stringify(est,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Diagnostico_Inversiones_GEM_${slug}_${fecha}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  setStatus('✓ Diagnóstico guardado');
+}
+function setStatus(msg){
+  const el=document.getElementById('save-status');
+  el.textContent=msg; el.style.color='var(--positive)';
+  setTimeout(()=>{ el.textContent='Guardá el archivo para retomar el diagnóstico después o comparar avance'; el.style.color=''; },4000);
+}
+function cargarDiagnostico(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const est=JSON.parse(reader.result);
+      if(!est.secs) throw new Error('formato');
+      document.getElementById('client-name').value=est.clientName||'';
+      document.getElementById('report-date').value=est.reportDate||'';
+      if(est.tc) document.getElementById('tc').value=est.tc;
+      Object.keys(SECS).forEach(s=>{
+        if(est.secs[s]){ SECS[s].ids=[...est.secs[s].ids]; SECS[s].data=est.secs[s].data; }
+        if(!SECS[s].ids.length){ const id='init-'+s; SECS[s].ids=[id]; SECS[s].data={[id]:blankRow()}; }
+        render(s);
+      });
+      updateAporteTotal();
+      setStatus('✓ Diagnóstico cargado'+(est.guardadoEl?' · guardado el '+new Date(est.guardadoEl).toLocaleDateString('es-CR'):''));
+    }catch(e){
+      const el=document.getElementById('save-status');
+      el.textContent='✕ El archivo no es un diagnóstico válido'; el.style.color='var(--red)';
+    }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function exportPDF(){
+  const rd=document.getElementById('report-date').value.trim()||new Date().toLocaleDateString('es-CR',{month:'long',year:'numeric'});
+  const cn=document.getElementById('client-name').value.trim();
+  document.getElementById('rh-date').textContent='Período: '+rd;
+  document.getElementById('rh-name').textContent=cn;
+  document.getElementById('report-header').style.display='block';
+  const el=document.getElementById('panel-resultado');
+  const ab=el.querySelector('.action-bar');
+  if(ab) ab.style.display='none';
+  const cbar=document.getElementById('client-bar');
+  const cbPrev=cbar.style.display; cbar.style.display='none';
+  const slug=(cn?cn.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_')+'_':'');
+  const opt={margin:[12,12,12,12],filename:`Reporte_Inversiones_GEM_${slug}${rd.replace(/\s/g,'_')}.pdf`,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:'avoid-all'}};
+  html2pdf().set(opt).from(el).save().then(()=>{ document.getElementById('report-header').style.display='none'; if(ab) ab.style.display=''; cbar.style.display=cbPrev; });
+}
+</script>
+</body>
+</html>

@@ -51,6 +51,17 @@
   .row-espp{grid-template-columns:1fr 90px 100px 30px;}
   .row-single{grid-template-columns:1fr 120px 30px;}
   .row-sol{grid-template-columns:1fr 110px 110px 30px;}
+  .sol-entry{border:1px solid var(--border);border-radius:var(--rs);padding:10px;margin-bottom:8px;background:var(--surface2);}
+  .sol-entry .row-sol{margin-bottom:0;}
+  .sol-toggle-wrap{margin-top:8px;}
+  .sol-toggle-btn{background:transparent;border:none;color:var(--accent);font-size:11px;font-family:var(--font-body);cursor:pointer;padding:2px 0;text-decoration:underline;}
+  .sol-toggle-btn:hover{color:#1a5cc8;}
+  .sol-detail{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2);}
+  .sol-detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .sol-detail-grid .col-lbl{margin-bottom:4px;}
+  .sol-detail-result{margin-top:8px;font-size:12px;color:var(--muted);background:var(--surface);border-radius:var(--rs);padding:8px 10px;}
+  .sol-detail-result strong{font-family:var(--font-mono);color:var(--accent);}
+  @media(max-width:700px){ .sol-detail-grid{grid-template-columns:1fr;} }
   .row-banc{grid-template-columns:1fr 95px 95px 80px 30px;}
   .row-otras{grid-template-columns:150px 1fr 90px 90px 30px;}
   .col-lbl{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.8px;text-transform:uppercase;}
@@ -225,6 +236,7 @@
     <!-- SOLIDARISTA -->
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--positive)"></div> Asociación Solidarista</div>
+      <div class="card-subtitle">Si no sabés el monto exacto del aporte mensual, podés calcularlo con tu salario y los porcentajes de aporte (personal + patronal)</div>
       <div class="input-header row-sol">
         <div class="col-lbl">Asociación</div><div class="col-lbl">Saldo ₡</div><div class="col-lbl">Aporte/mes ₡</div><div></div>
       </div>
@@ -366,9 +378,10 @@ async function fetchTC() {
 }
 window.addEventListener('load',()=>{ fetchTC(); });
 
-function blankRow(){ return {name:'',broker:BROKERS[0],crc:'',usd:'',aporte:'',pct:'',tasa:'',cat:CATS_OTRAS[0]}; }
+function blankRow(){ return {name:'',broker:BROKERS[0],crc:'',usd:'',aporte:'',pct:'',tasa:'',cat:CATS_OTRAS[0],salario:'',pctPersonal:'',pctPatronal:'',calcMode:false}; }
 
 function flush(sec){
+  if(sec==='solidarista'){ flushSolidarista(); return; }
   document.querySelectorAll('#list-'+sec+' .data-row').forEach(row=>{
     const id=row.dataset.id; if(!SECS[sec].data[id]) return;
     const t=SECS[sec].type, ins=row.querySelectorAll('input'), sel=row.querySelectorAll('select');
@@ -376,9 +389,25 @@ function flush(sec){
     if(t==='bolsa'){ d.name=ins[0]?.value??''; d.broker=sel[0]?.value??BROKERS[0]; d.crc=ins[1]?.value??''; d.usd=ins[2]?.value??''; d.aporte=ins[3]?.value??''; }
     else if(t==='espp'){ d.name=ins[0]?.value??''; d.pct=ins[1]?.value??''; d.usd=ins[2]?.value??''; }
     else if(t==='single'){ d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; }
-    else if(t==='sol'){ d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; d.aporte=ins[2]?.value??''; }
     else if(t==='banc'){ d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; d.usd=ins[2]?.value??''; d.tasa=ins[3]?.value??''; }
     else if(t==='otras'){ d.cat=sel[0]?.value??CATS_OTRAS[0]; d.name=ins[0]?.value??''; d.crc=ins[1]?.value??''; d.usd=ins[2]?.value??''; }
+  });
+}
+function flushSolidarista(){
+  document.querySelectorAll('#list-solidarista .sol-entry').forEach(entry=>{
+    const id=entry.dataset.id, d=SECS.solidarista.data[id]; if(!d) return;
+    const g=f=>entry.querySelector(`[data-f="${f}"]`);
+    d.name=g('name')?.value??'';
+    d.crc=g('crc')?.value??'';
+    d.salario=g('salario')?.value??d.salario??'';
+    d.pctPersonal=g('pctPersonal')?.value??d.pctPersonal??'';
+    d.pctPatronal=g('pctPatronal')?.value??d.pctPatronal??'';
+    if(d.calcMode){
+      const sal=n(d.salario), pct=n(d.pctPersonal)+n(d.pctPatronal);
+      d.aporte = sal>0 ? Math.round(sal*pct/100) : '';
+    } else {
+      d.aporte=g('aporte')?.value??'';
+    }
   });
 }
 function flushAll(){ Object.keys(SECS).forEach(flush); }
@@ -387,11 +416,12 @@ function x(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 function selOpts(list,current){ return list.map(o=>`<option value="${x(o)}"${o===current?' selected':''}>${x(o)}</option>`).join(''); }
 
 function render(sec){
+  if(sec==='solidarista'){ renderSolidarista(); return; }
   const s=SECS[sec], list=document.getElementById('list-'+sec);
   const sy=window.scrollY; list.innerHTML='';
   s.ids.forEach(id=>{
     const d=s.data[id], div=document.createElement('div'), t=s.type;
-    let cls='data-row row-'+(t==='sol'?'sol':t);
+    let cls='data-row row-'+t;
     div.className=cls; div.dataset.id=id;
     let html='';
     if(t==='bolsa') html=`<input type="text" placeholder="Nombre del portafolio" value="${x(d.name)}">
@@ -402,12 +432,50 @@ function render(sec){
       <button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='espp') html=`<input type="text" placeholder="Empresa / Plan" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.pct)}" min="0" max="100"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='single') html=`<input type="text" placeholder="Nombre del fondo" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
-    else if(t==='sol') html=`<input type="text" placeholder="Nombre asociación" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.aporte)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='banc') html=`<input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><input type="number" placeholder="%" value="${x(d.tasa)}" min="0" step="0.01"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     else if(t==='otras') html=`<select>${selOpts(CATS_OTRAS,d.cat)}</select><input type="text" placeholder="Descripción" value="${x(d.name)}"><input type="number" placeholder="0" value="${x(d.crc)}" min="0"><input type="number" placeholder="0" value="${x(d.usd)}" min="0"><button class="btn-remove" onclick="removeRow('${sec}','${id}')">×</button>`;
     div.innerHTML=html; list.appendChild(div);
   });
   window.scrollTo(0,sy);
+}
+
+function renderSolidarista(){
+  const s=SECS.solidarista, list=document.getElementById('list-solidarista');
+  const sy=window.scrollY; list.innerHTML='';
+  s.ids.forEach(id=>{
+    const d=s.data[id], calcMode=!!d.calcMode;
+    const wrap=document.createElement('div'); wrap.className='sol-entry'; wrap.dataset.id=id;
+    let html=`<div class="data-row row-sol">
+      <input type="text" data-f="name" placeholder="Nombre asociación" value="${x(d.name)}">
+      <input type="number" data-f="crc" placeholder="0" value="${x(d.crc)}" min="0">
+      <input type="number" data-f="aporte" placeholder="0" value="${x(d.aporte)}" min="0"${calcMode?' readonly style="opacity:.65;cursor:not-allowed"':''}>
+      <button class="btn-remove" onclick="removeRow('solidarista','${id}')">×</button>
+    </div>
+    <div class="sol-toggle-wrap">
+      <button type="button" class="sol-toggle-btn" onclick="toggleSolCalc('${id}')">${calcMode?'✕ Ocultar cálculo por % de salario':'🔢 ¿No sabés el monto? Calculalo por % de salario'}</button>
+    </div>`;
+    if(calcMode){
+      const sal=n(d.salario), pctP=n(d.pctPersonal), pctPat=n(d.pctPatronal), total=sal>0?(sal*(pctP+pctPat)/100):0;
+      html+=`<div class="sol-detail">
+        <div class="sol-detail-grid">
+          <div><div class="col-lbl">Salario bruto ₡</div><input type="number" data-f="salario" placeholder="0" value="${x(d.salario)}" min="0"></div>
+          <div><div class="col-lbl">% aporte personal</div><input type="number" data-f="pctPersonal" placeholder="0" value="${x(d.pctPersonal)}" min="0" max="100" step="0.1"></div>
+          <div><div class="col-lbl">% aporte patronal (match)</div><input type="number" data-f="pctPatronal" placeholder="0" value="${x(d.pctPatronal)}" min="0" max="100" step="0.1"></div>
+        </div>
+        <div class="sol-detail-result">Aporte mensual calculado: <strong>${fmt(total,'CRC')}</strong>${sal>0?` · vos: ${pctP||0}% + patrono: ${pctPat||0}% = ${(pctP+pctPat).toFixed(1)}% del salario`:''}</div>
+      </div>`;
+    }
+    wrap.innerHTML=html; list.appendChild(wrap);
+  });
+  window.scrollTo(0,sy);
+}
+
+function toggleSolCalc(id){
+  flush('solidarista');
+  const d=SECS.solidarista.data[id]; if(!d) return;
+  d.calcMode=!d.calcMode;
+  renderSolidarista();
+  updateAporteTotal();
 }
 function addRow(sec){
   flush(sec);
@@ -429,6 +497,19 @@ Object.keys(SECS).forEach(sec=>{
   document.getElementById('list-'+sec).addEventListener('change',()=>{ flush(sec); updateAporteTotal(); });
 });
 document.getElementById('tc').addEventListener('input',updateAporteTotal);
+
+// Actualiza en vivo el resultado del cálculo por % de salario en solidarista, sin re-renderizar (para no perder el foco al escribir)
+document.getElementById('list-solidarista').addEventListener('input',e=>{
+  const f=e.target.dataset.f;
+  if(!['salario','pctPersonal','pctPatronal'].includes(f)) return;
+  const entry=e.target.closest('.sol-entry'); if(!entry) return;
+  const id=entry.dataset.id, d=SECS.solidarista.data[id]; if(!d) return;
+  const sal=n(d.salario), pctP=n(d.pctPersonal), pctPat=n(d.pctPatronal), total=sal>0?(sal*(pctP+pctPat)/100):0;
+  const aporteInput=entry.querySelector('[data-f="aporte"]');
+  if(aporteInput) aporteInput.value = total?Math.round(total):'';
+  const resultEl=entry.querySelector('.sol-detail-result');
+  if(resultEl) resultEl.innerHTML = `Aporte mensual calculado: <strong>${fmt(total,'CRC')}</strong>${sal>0?` · vos: ${pctP||0}% + patrono: ${pctPat||0}% = ${(pctP+pctPat).toFixed(1)}% del salario`:''}`;
+});
 
 function tc(){ return parseFloat(document.getElementById('tc').value)||520; }
 function n(v){ return parseFloat(v)||0; }

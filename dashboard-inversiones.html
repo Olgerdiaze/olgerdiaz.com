@@ -576,14 +576,14 @@ function renderAnalysis(d){
   // 1. DIVERSIFICACIÓN
   let divColor='var(--positive)',divPill='',divText='';
   if(activeCats.length<=1){
-    divColor='var(--red)'; divPill=pill('⚠️ Todo el patrimonio en una sola categoría','red');
-    divText='El patrimonio invertido está concentrado en un único tipo de instrumento. Esto expone al cliente al riesgo específico de esa categoría (empresa, plataforma o instrumento). Diversificar entre categorías es uno de los primeros ajustes a conversar en el 1-1.';
+    divColor='var(--red)'; divPill=pill('⚠️ Todo tu patrimonio está en una sola categoría','red');
+    divText='Todo tu patrimonio invertido está concentrado en un único tipo de instrumento. Esto te expone al riesgo específico de esa categoría (empresa, plataforma o instrumento). Diversificar entre categorías es uno de los primeros ajustes a conversar en tu 1-1.';
   } else if(activeCats.length<=2){
-    divColor='var(--warn)'; divPill=pill('🔶 Diversificación limitada — '+activeCats.length+' categorías','warn');
-    divText='Hay presencia en un par de categorías, pero todavía hay espacio para diversificar más. Revisar si tiene sentido abrir o fortalecer otras vías de inversión según el perfil del cliente.';
+    divColor='var(--warn)'; divPill=pill('🔶 Tu diversificación es limitada — '+activeCats.length+' categorías','warn');
+    divText='Ya tenés presencia en un par de categorías, pero todavía tenés espacio para diversificar más. En el 1-1 revisamos si te conviene abrir o fortalecer otras vías de inversión según tu perfil.';
   } else {
     divPill=pill('✅ '+activeCats.length+' categorías activas','green');
-    divText='El patrimonio está repartido entre varias categorías de inversión, lo cual reduce la dependencia de un solo instrumento o institución.';
+    divText='Tu patrimonio está repartido entre varias categorías de inversión, lo cual reduce tu dependencia de un solo instrumento o institución.';
   }
   sections.push({icon:'🧩',label:'Diversificación',color:divColor,pill:divPill,text:divText});
 
@@ -593,14 +593,14 @@ function renderAnalysis(d){
     const maxPct=Math.round(max.v/tot*100);
     let concColor='var(--positive)',concPill='';
     if(maxPct>70){
-      concColor='var(--warn)'; concPill=pill('🔶 '+maxPct+'% del patrimonio en '+max.l,'warn');
+      concColor='var(--warn)'; concPill=pill('🔶 '+maxPct+'% de tu patrimonio está en '+max.l,'warn');
     } else {
       concPill=pill('✅ Sin concentración excesiva — máximo '+maxPct+'% en '+max.l,'green');
     }
     sections.push({icon:'⚖️',label:'Concentración por categoría',color:concColor,pill:concPill,
       text:maxPct>70
-        ? `Más de dos tercios del patrimonio invertido está en ${max.l}. No es necesariamente un problema si es una decisión consciente, pero vale la pena confirmar en el 1-1 que el cliente entiende y acepta ese nivel de exposición a una sola categoría.`
-        : `La distribución entre categorías está relativamente balanceada — ninguna concentra más del 70% del patrimonio invertido.`});
+        ? `Más de dos tercios de tu patrimonio invertido está en ${max.l}. No es necesariamente un problema si es una decisión consciente, pero vale la pena que confirmemos en el 1-1 que entendés y aceptás ese nivel de exposición a una sola categoría.`
+        : `La distribución entre tus categorías está relativamente balanceada — ninguna concentra más del 70% de tu patrimonio invertido.`});
   }
 
   // 3. ESPP — riesgo de concentración en el empleador
@@ -608,27 +608,27 @@ function renderAnalysis(d){
     const esppPct=Math.round(d.totalESPP/tot*100);
     let color='var(--positive)',pl='';
     if(esppPct>15){
-      color='var(--warn)'; pl=pill('🔶 ESPP representa el '+esppPct+'% del patrimonio','warn');
+      color='var(--warn)'; pl=pill('🔶 El ESPP representa el '+esppPct+'% de tu patrimonio','warn');
     } else {
-      pl=pill('ESPP: '+esppPct+'% del patrimonio','blue');
+      pl=pill('ESPP: '+esppPct+'% de tu patrimonio','blue');
     }
-    sections.push({icon:'🏢',label:'ESPP — riesgo de concentración en el empleador',color,pill:pl,
+    sections.push({icon:'🏢',label:'ESPP — riesgo de concentración en tu empleador',color,pill:pl,
       text:esppPct>15
-        ? `El cliente ya tiene una porción significativa de su patrimonio ligada al desempeño de una sola empresa (su empleador) a través del ESPP. Esto suma riesgo laboral y riesgo de inversión en el mismo lugar. Vale la pena revisar en el 1-1 si conviene vender periódicamente y redistribuir hacia el portafolio diversificado.`
-        : `El ESPP tiene un peso moderado dentro del patrimonio total. Sigue siendo bueno confirmar cada cierto tiempo si conviene liquidar parte y diversificar.`});
+        ? `Ya tenés una porción significativa de tu patrimonio ligada al desempeño de una sola empresa (tu empleador) a través del ESPP. Esto te suma riesgo laboral y riesgo de inversión en el mismo lugar. Vale la pena que revisemos en el 1-1 si te conviene vender periódicamente y redistribuir hacia tu portafolio diversificado.`
+        : `Tu ESPP tiene un peso moderado dentro de tu patrimonio total. Igual conviene revisar cada cierto tiempo si te conviene liquidar parte y diversificar.`});
   }
 
   // 4. CONSISTENCIA DE APORTES (DCA)
   let dcaColor='var(--positive)',dcaPill='',dcaText='';
   if(d.totalBolsa>0 && d.totalAporteBolsaUSD===0){
-    dcaColor='var(--warn)'; dcaPill=pill('🔶 Sin aporte mensual recurrente registrado en Bolsa','warn');
-    dcaText='Hay saldo invertido en Bolsa pero no se registró un aporte mensual activo. Confirmar en el 1-1 si el cliente sigue aportando de forma recurrente (DCA) o si la inversión quedó estática.';
+    dcaColor='var(--warn)'; dcaPill=pill('🔶 No tenés un aporte mensual recurrente registrado en Bolsa','warn');
+    dcaText='Tenés saldo invertido en Bolsa, pero no registraste un aporte mensual activo. Confirmemos en el 1-1 si seguís aportando de forma recurrente (DCA) o si tu inversión quedó estática.';
   } else if(d.totalBolsa>0){
     dcaPill=pill('✅ Aporte mensual activo en Bolsa','green');
-    dcaText=`El cliente mantiene un aporte mensual recurrente hacia Bolsa. La consistencia en el tiempo es lo que hace que el interés compuesto trabaje a favor — más importante que el monto exacto de cada aporte.`;
+    dcaText=`Mantenés un aporte mensual recurrente hacia Bolsa. La consistencia en el tiempo es lo que hace que el interés compuesto trabaje a tu favor — más importante que el monto exacto de cada aporte.`;
   } else {
-    dcaPill=pill('Sin inversión en Bolsa todavía','warn');
-    dcaText='Todavía no hay saldo registrado en portafolios de Bolsa. Este suele ser el punto de partida de un plan de inversión pasivo con aportes mensuales fijos.';
+    dcaPill=pill('Todavía no tenés inversión en Bolsa','warn');
+    dcaText='Todavía no registrás saldo en portafolios de Bolsa. Este suele ser el punto de partida de un plan de inversión pasivo con aportes mensuales fijos.';
   }
   sections.push({icon:'🔁',label:'Consistencia de aportes (DCA)',color:dcaColor,pill:dcaPill,text:dcaText});
 
@@ -637,8 +637,8 @@ function renderAnalysis(d){
   if(instTotal>0){
     const instPct=Math.round(instTotal/tot*100);
     let color='var(--accent)',pl=pill(instPct+'% en fondos institucionales','blue');
-    let text=`Fondos de pensión y solidarista suman el ${instPct}% del patrimonio invertido. Son instrumentos de bajo control directo y liquidez limitada — buena base, pero no reemplazan un portafolio activo donde el cliente define la estrategia.`;
-    if(instPct>40){ color='var(--warn)'; pl=pill('🔶 '+instPct+'% del patrimonio fuera de control directo','warn'); text+=' Con este peso, vale la pena conversar cuánto del patrimonio futuro debería ir hacia instrumentos donde el cliente tiene más flexibilidad y control de la estrategia.'; }
+    let text=`Tus fondos de pensión y solidarista suman el ${instPct}% de tu patrimonio invertido. Son instrumentos de bajo control directo y liquidez limitada — buena base, pero no reemplazan un portafolio activo donde vos definís la estrategia.`;
+    if(instPct>40){ color='var(--warn)'; pl=pill('🔶 '+instPct+'% de tu patrimonio está fuera de tu control directo','warn'); text+=' Con este peso, vale la pena que conversemos cuánto de tu patrimonio futuro debería ir hacia instrumentos donde tenés más flexibilidad y control de la estrategia.'; }
     sections.push({icon:'🏦',label:'Fondos de pensión y solidarista',color,pill:pl,text});
   }
 
@@ -646,12 +646,12 @@ function renderAnalysis(d){
   if(d.totalBanc>0){
     const bancPct=Math.round(d.totalBanc/tot*100);
     let color='var(--positive)',pl=pill(bancPct+'% en cuentas bancarias / CDPs','blue');
-    let text=`El ${bancPct}% del patrimonio invertido está en instrumentos conservadores como CDPs o fondos de inversión bancarios.`;
+    let text=`El ${bancPct}% de tu patrimonio invertido está en instrumentos conservadores como CDPs o fondos de inversión bancarios.`;
     if(bancPct>30){
       color='var(--warn)'; pl=pill('🔶 '+bancPct+'% en instrumentos conservadores','warn');
-      text+=' Es un porcentaje considerable en instrumentos de bajo rendimiento relativo. Vale la pena revisar en el 1-1 el costo de oportunidad frente a un portafolio diversificado en Bolsa a largo plazo, sin dejar de reconocer que estos instrumentos aportan estabilidad y liquidez.';
+      text+=' Es un porcentaje considerable en instrumentos de bajo rendimiento relativo. Vale la pena que revisemos en el 1-1 el costo de oportunidad frente a un portafolio diversificado en Bolsa a largo plazo, sin dejar de reconocer que estos instrumentos te dan estabilidad y liquidez.';
     } else {
-      text+=' Es un nivel razonable como colchón de estabilidad dentro del portafolio general.';
+      text+=' Es un nivel razonable como colchón de estabilidad dentro de tu portafolio general.';
     }
     sections.push({icon:'🏛️',label:'Cuentas bancarias y CDPs',color,pill:pl,text});
   }
@@ -660,8 +660,8 @@ function renderAnalysis(d){
   const brokerEntries=Object.entries(d.brokerMap).filter(([,v])=>v>0);
   if(brokerEntries.length){
     const rows=brokerEntries.sort((a,b)=>b[1]-a[1]).map(([name,v])=>`<tr><td>${name}</td><td>${fmt(v,currency)}</td></tr>`).join('');
-    sections.push({icon:'💼',label:'Plataformas ya utilizadas',color:'var(--muted)',pill:'',
-      text:'Contexto para el 1-1: estas son las plataformas donde el cliente ya tiene cuentas de inversión abiertas.',
+    sections.push({icon:'💼',label:'Plataformas que ya usás',color:'var(--muted)',pill:'',
+      text:'Contexto para tu 1-1: estas son las plataformas donde ya tenés cuentas de inversión abiertas.',
       extra:`<table class="context-table">${rows}</table>`});
   }
 
@@ -669,7 +669,7 @@ function renderAnalysis(d){
   if(d.sinCuentaList && d.sinCuentaList.length){
     const rows=d.sinCuentaList.map(name=>`<tr><td>${name||'Sin descripción'}</td><td>Sin cuenta aún</td></tr>`).join('');
     sections.push({icon:'🔓',label:'Oportunidad de apertura de cuenta',color:'var(--accent)',pill:pill(d.sinCuentaList.length+' línea(s) marcadas como sin cuenta','blue'),
-      text:'El cliente todavía no tiene cuenta abierta en estos instrumentos. Es una oportunidad concreta para el 1-1: definir si conviene abrir la cuenta ahora como parte del plan de diversificación.',
+      text:'Todavía no tenés cuenta abierta en estos instrumentos. Es una oportunidad concreta para tu 1-1: definir si te conviene abrir la cuenta ahora como parte de tu plan de diversificación.',
       extra:`<table class="context-table">${rows}</table>`});
   }
 
@@ -684,12 +684,12 @@ function renderAnalysis(d){
 
   // PRÓXIMOS PASOS PARA EL 1-1
   const pasos=[];
-  if(activeCats.length<=1) pasos.push('Conversar sobre diversificar el patrimonio invertido fuera de la categoría única actual.');
-  pasos.push('Confirmar o construir el perfil de riesgo del cliente.');
-  pasos.push('Redactar o actualizar el Investment Policy Statement (IPS).');
-  pasos.push('Confirmar qué cuentas de inversión están abiertas y cuáles faltan por abrir.');
-  pasos.push('Definir o ajustar el plan de aportes mensuales (DCA) y automatizarlo.');
-  pasos.push('Establecer la fecha de la próxima revisión y rebalanceo del portafolio.');
+  if(activeCats.length<=1) pasos.push('Conversar sobre diversificar tu patrimonio invertido fuera de la categoría única en la que estás hoy.');
+  pasos.push('Confirmar o construir tu perfil de riesgo.');
+  pasos.push('Redactar o actualizar tu Investment Policy Statement (IPS).');
+  pasos.push('Confirmar qué cuentas de inversión tenés abiertas y cuáles te faltan por abrir.');
+  pasos.push('Definir o ajustar tu plan de aportes mensuales (DCA) y automatizarlo.');
+  pasos.push('Establecer la fecha de tu próxima revisión y rebalanceo del portafolio.');
 
   const secHTML=sections.map(s=>`
     <div class="ai-section">

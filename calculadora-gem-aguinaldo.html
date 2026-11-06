@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Aguinaldo | Método GEM</title>
+<style>
+  :root {
+    --blue: #4A8FC4;
+    --dark: #2D3748;
+    --light: #EBF4FB;
+    --bg: #F7FAFC;
+    --card: #FFFFFF;
+    --text: #2D3748;
+    --muted: #718096;
+    --border: #E2E8F0;
+    --m1: #2D3748;
+    --m2: #4A8FC4;
+    --m3: #2F855A;
+    --m4: #C98A1E;
+    --ok: #2F855A;
+    --ok-bg: #F0FFF4;
+    --amber: #975A16;
+    --amber-bg: #FFFAF0;
+    --warn-bg: #FFF5F5;
+    --warn: #C53030;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: var(--dark);
+    color: #fff;
+    padding: 40px 16px 64px;
+    text-align: center;
+  }
+  header .brand { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+  header h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 700; letter-spacing: -0.01em; }
+  header p { max-width: 560px; margin: 10px auto 0; opacity: 0.85; font-size: 16px; }
+  main { max-width: 760px; margin: -40px auto 0; padding: 0 16px 48px; }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(45,55,72,0.08), 0 8px 24px rgba(45,55,72,0.06);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .step { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--blue); color: #fff; font-weight: 700; font-size: 14px;
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  h2 { font-size: 20px; font-weight: 700; }
+  .lead { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+  .privacy {
+    display: flex; gap: 10px; align-items: flex-start; background: var(--ok-bg); color: var(--ok);
+    border-radius: 10px; padding: 12px 14px; font-size: 13px; margin-bottom: 20px;
+  }
+  .privacy svg { flex-shrink: 0; margin-top: 1px; }
+  .privacy div { color: var(--text); }
+  .privacy strong { color: var(--ok); }
+  .tabs { display: flex; background: var(--light); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+  .tab {
+    flex: 1; border: none; background: transparent; padding: 10px; border-radius: 8px;
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer;
+  }
+  .tab.active { background: #fff; color: var(--dark); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
+  .field { margin-bottom: 16px; }
+  .money { position: relative; }
+  .money span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; }
+  input[type="text"], select {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px;
+    font: inherit; font-size: 16px; color: var(--text); background: #fff;
+  }
+  .money input { padding-left: 28px; }
+  input:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(74,143,196,0.18); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .months .field { margin-bottom: 0; }
+  .months label { font-size: 13px; }
+  .months input { font-size: 15px; padding: 9px 10px 9px 24px; }
+  .months .money span { left: 10px; font-size: 14px; }
+  .result {
+    margin-top: 22px; background: var(--light); border-radius: 12px; padding: 20px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .result .lbl { font-size: 14px; color: var(--muted); }
+  .result .big { font-size: clamp(28px, 6vw, 36px); font-weight: 800; color: var(--dark); letter-spacing: -0.02em; }
+  .chips { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--dark); }
+  .chips div::before { content: "✓"; color: var(--blue); font-weight: 700; margin-right: 6px; }
+
+  .situations { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .sit {
+    border: 1.5px solid var(--border); background: #fff; border-radius: 12px; padding: 14px 12px;
+    font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .sit strong { display: block; font-size: 14px; color: var(--dark); }
+  .sit small { color: var(--muted); font-size: 12px; }
+  .sit.active { border-color: var(--blue); background: var(--light); }
+
+  .guide { border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; }
+  .guide h3 { font-size: 15px; margin-bottom: 10px; }
+  .guide table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .guide td { padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .guide td:last-child { text-align: right; font-weight: 700; }
+  .guide tr:last-child td { border-bottom: none; }
+  .guide p { font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .btn-light {
+    border: 1px solid var(--blue); background: #fff; color: var(--blue); border-radius: 8px;
+    padding: 8px 14px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 10px;
+  }
+
+  .meta {
+    border: 1px solid var(--border); border-left: 5px solid var(--c); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 12px;
+  }
+  .meta-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .meta-title { font-weight: 700; font-size: 16px; }
+  .meta-title em { font-style: normal; color: var(--c); }
+  .meta-amt { font-weight: 800; font-size: 18px; white-space: nowrap; }
+  .meta > p { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+  .note {
+    background: var(--amber-bg); color: var(--amber); border-radius: 8px; padding: 10px 12px;
+    font-size: 13px; margin: 8px 0 4px;
+  }
+  .note strong { color: var(--amber); }
+  .row { display: grid; grid-template-columns: 1fr 180px 36px; gap: 8px; align-items: end; margin-bottom: 10px; }
+  .row .field { margin-bottom: 0; }
+  .row label { font-size: 13px; }
+  .row.fixed { grid-template-columns: 1fr 180px 36px; }
+  .row .static { padding: 11px 0; font-size: 15px; font-weight: 600; }
+  .del {
+    width: 36px; height: 44px; border: 1px solid var(--border); background: #fff; border-radius: 10px;
+    color: var(--muted); font-size: 18px; cursor: pointer;
+  }
+  .del:hover { color: var(--warn); border-color: var(--warn); }
+  .add {
+    border: 1.5px dashed var(--border); background: transparent; color: var(--blue); width: 100%;
+    padding: 10px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .add:hover { border-color: var(--blue); background: var(--light); }
+
+  .slider-row { display: flex; align-items: center; gap: 12px; }
+  input[type="range"] { flex: 1; accent-color: var(--c); height: 28px; }
+  .pct { font-weight: 700; width: 46px; text-align: right; font-size: 15px; }
+  .range-status { font-size: 12px; margin-top: 4px; font-weight: 600; }
+  .range-status.ok { color: var(--ok); }
+  .range-status.out { color: var(--amber); }
+
+  .bar { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: var(--border); margin: 18px 0 10px; }
+  .bar div { flex: none; transition: width .3s; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 6px; }
+  .alert { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-top: 12px; display: none; }
+  .tip { background: var(--light); border-radius: 10px; padding: 14px 16px; font-size: 14px; margin-top: 14px; }
+  .tip strong { color: var(--dark); }
+
+  .plan table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .plan td { padding: 11px 4px; border-bottom: 1px solid var(--border); }
+  .plan td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
+  .plan tr.sub td { padding: 6px 4px 6px 30px; font-size: 13px; color: var(--muted); border-bottom: none; }
+  .plan tr.sub td:last-child { font-weight: 500; }
+  .plan tr:last-child td { border-bottom: none; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; }
+  .btn {
+    display: inline-block; margin-top: 18px; background: var(--blue); color: #fff; border: none;
+    padding: 12px 22px; border-radius: 10px; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer;
+  }
+  .btn:hover { filter: brightness(0.95); }
+  footer { text-align: center; color: var(--muted); font-size: 12px; max-width: 640px; margin: 0 auto; padding: 0 16px 40px; }
+  @media (max-width: 600px) {
+    .card { padding: 20px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .months { grid-template-columns: repeat(2, 1fr); }
+    .situations { grid-template-columns: 1fr; }
+    .row, .row.fixed { grid-template-columns: 1fr 36px; }
+    .row .field:first-child, .row .static { grid-column: 1 / -1; }
+    .row .static { padding: 0; }
+  }
+  @media print {
+    header, .no-print, .tabs { display: none !important; }
+    main { margin-top: 0; }
+    .card { box-shadow: none; border: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Método GEM</div>
+  <h1>Calculadora de Aguinaldo</h1>
+  <p>Calcule cuánto va a recibir y decida qué hacer con cada colón antes de que llegue, con el Método de las 4 Metas.</p>
+</header>
+
+<main>
+
+  <!-- PASO 1 -->
+  <section class="card">
+    <div class="step"><div class="step-num">1</div><h2>¿Cuánto va a recibir?</h2></div>
+    <p class="lead">El aguinaldo es el promedio de los salarios brutos ganados del 1 de diciembre al 30 de noviembre.</p>
+
+    <div class="privacy">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <div><strong>Sus datos son solo suyos.</strong> No guardamos ni enviamos su información a ningún lado. Todos los cálculos se hacen en su propio dispositivo y se borran al cerrar la página.</div>
+    </div>
+
+    <div class="tabs no-print">
+      <button class="tab active" data-mode="simple">Mismo salario</button>
+      <button class="tab" data-mode="detalle">Mes a mes</button>
+    </div>
+
+    <div id="modo-simple">
+      <div class="grid2">
+        <div class="field">
+          <label for="salario">Salario bruto mensual</label>
+          <div class="money"><span>₡</span><input type="text" id="salario" inputmode="numeric" placeholder="0"></div>
+        </div>
+        <div class="field">
+          <label for="meses">Meses trabajados en el período</label>
+          <select id="meses"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="extras">Extras del período <span class="hint">(horas extra, comisiones, bonos)</span></label>
+        <div class="money"><span>₡</span><input type="text" id="extras" inputmode="numeric" placeholder="0"></div>
+      </div>
+    </div>
+
+    <div id="modo-detalle" style="display:none">
+      <p class="hint" style="margin-bottom:12px">Ingrese el salario bruto de cada mes, incluyendo horas extra y comisiones. Deje en blanco los meses que no trabajó.</p>
+      <div class="months" id="months"></div>
+    </div>
+
+    <div class="result">
+      <div>
+        <div class="lbl">Su aguinaldo estimado</div>
+        <div class="big" id="aguinaldo">₡0</div>
+      </div>
+      <div class="chips">
+        <div>Sin rebajos de CCSS ni de renta</div>
+        <div>Se paga a más tardar el 20 de diciembre</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASO 2 -->
+  <section class="card">
+    <div class="step"><div class="step-num">2</div><h2>El Método de las 4 Metas</h2></div>
+    <p class="lead">Primero se cubre lo que ya sabe que viene en enero. Lo que queda se reparte entre proteger, crecer y disfrutar.</p>
+
+    <!-- META 1 -->
+    <div class="meta" style="--c: var(--m1)">
+      <div class="meta-head">
+        <div class="meta-title"><em>Meta 1.</em> Cumplir</div>
+        <div class="meta-amt" id="amt1">₡0</div>
+      </div>
+      <p>Los gastos de enero que llegan sí o sí. Se apartan primero, antes de repartir el resto.</p>
+
+      <div class="row fixed">
+        <div class="static">Marchamo <span class="hint">(solo si aún no lo tiene ahorrado)</span></div>
+        <div class="money"><span>₡</span><input type="text" id="marchamo" inputmode="numeric" placeholder="0" aria-label="Marchamo"></div>
+        <div></div>
+      </div>
+      <div class="note" id="nota-marchamo" style="display:none"></div>
+
+      <div id="gastos"></div>
+      <button class="add no-print" id="add">+ Agregar otro gasto de enero</button>
+    </div>
+
+    <!-- SITUACION Y GUIA -->
+    <label style="margin:22px 0 10px">¿Cuál es su situación hoy?</label>
+    <div class="situations no-print">
+      <button class="sit active" data-sit="deudas"><strong>Tengo deudas</strong><small>Tarjetas, préstamos o saldos pendientes</small></button>
+      <button class="sit" data-sit="fondo"><strong>No tengo deudas</strong><small>Pero tampoco un fondo de emergencia</small></button>
+      <button class="sit" data-sit="estable"><strong>Estoy estable</strong><small>Sin deudas y con fondo de emergencia</small></button>
+    </div>
+
+    <div class="guide">
+      <h3 id="guide-title">Distribución recomendada</h3>
+      <table>
+        <tr><td><span class="dot" style="background:var(--m2)"></span>Proteger</td><td id="g2"></td></tr>
+        <tr><td><span class="dot" style="background:var(--m3)"></span>Crecer</td><td id="g3"></td></tr>
+        <tr><td><span class="dot" style="background:var(--m4)"></span>Disfrutar</td><td id="g4"></td></tr>
+      </table>
+      <p>Porcentajes sobre lo que queda después de la Meta 1. La regla de oro: disfrutar nunca más del 25%, y siempre algo para su futuro.</p>
+      <button class="btn-light no-print" id="aplicar">Aplicar distribución recomendada</button>
+    </div>
+
+    <!-- METAS 2 A 4 -->
+    <div class="meta" style="--c: var(--m2)">
+      <div class="meta-head">
+        <div class="meta-title"><em>Meta 2.</em> Proteger</div>
+        <div class="meta-amt" id="amt2">₡0</div>
+      </div>
+      <p>Pagar deudas caras o construir su fondo de emergencia.</p>
+      <div class="slider-row"><input type="range" id="p2" min="0" max="100" step="5" aria-label="Porcentaje Proteger"><div class="pct" id="pct2">0%</div></div>
+      <div class="range-status" id="s2"></div>
+    </div>
+
+    <div class="meta" style="--c: var(--m3)">
+      <div class="meta-head">
+        <div class="meta-title"><em>Meta 3.</em> Crecer</div>
+        <div class="meta-amt" id="amt3">₡0</div>
+      </div>
+      <p>Invertir o ahorrar para una meta grande: viaje, prima de casa, carro.</p>
+      <div class="slider-row"><input type="range" id="p3" min="0" max="100" step="5" aria-label="Porcentaje Crecer"><div class="pct" id="pct3">0%</div></div>
+      <div class="range-status" id="s3"></div>
+    </div>
+
+    <div class="meta" style="--c: var(--m4)">
+      <div class="meta-head">
+        <div class="meta-title"><em>Meta 4.</em> Disfrutar</div>
+        <div class="meta-amt" id="amt4">₡0</div>
+      </div>
+      <p>Regalos, salidas y gustos de diciembre. Sin culpa, porque ya está planeado.</p>
+      <div class="slider-row"><input type="range" id="p4" min="0" max="100" step="5" aria-label="Porcentaje Disfrutar"><div class="pct" id="pct4">0%</div></div>
+      <div class="range-status" id="s4"></div>
+    </div>
+
+    <div class="bar">
+      <div id="b1" style="background:var(--m1)"></div>
+      <div id="b2" style="background:var(--m2)"></div>
+      <div id="b3" style="background:var(--m3)"></div>
+      <div id="b4" style="background:var(--m4)"></div>
+    </div>
+    <div class="legend">
+      <span style="--c:var(--m1)">Cumplir</span>
+      <span style="--c:var(--m2)">Proteger</span>
+      <span style="--c:var(--m3)">Crecer</span>
+      <span style="--c:var(--m4)">Disfrutar</span>
+    </div>
+
+    <div class="alert" id="alerta"></div>
+    <div class="tip" id="tip"></div>
+  </section>
+
+  <!-- PASO 3 -->
+  <section class="card plan">
+    <div class="step"><div class="step-num">3</div><h2>Su plan de aguinaldo</h2></div>
+    <p class="lead">El mismo día que le deposite, mueva cada monto a su lugar antes de tocarlo.</p>
+    <table id="plan"></table>
+    <button class="btn no-print" onclick="window.print()">Guardar mi plan en PDF</button>
+  </section>
+
+</main>
+
+<footer>
+  <p>Esta calculadora no guarda, almacena ni envía ningún dato. Herramienta educativa del Método GEM. Los resultados son estimaciones con base en los datos ingresados y no constituyen asesoría financiera personalizada. Los porcentajes sugeridos son una guía general; ajústelos a su situación particular.</p>
+</footer>
+
+<script>
+(function () {
+  var MESES = ["Diciembre", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre"];
+  var fmt = new Intl.NumberFormat("es-CR", { maximumFractionDigits: 0 });
+  var money = function (n) { return "₡" + fmt.format(Math.max(0, Math.round(n))); };
+  var $ = function (id) { return document.getElementById(id); };
+  var parse = function (el) { return Number(String(el.value).replace(/[^\d]/g, "")) || 0; };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+
+  // Distribuciones recomendadas por situación: [min, max] y valor sugerido
+  var SIT = {
+    deudas: {
+      titulo: "Distribución recomendada: tengo deudas",
+      rangos: [[50, 70], [10, 25], [10, 20]],
+      sugerido: [60, 20, 20],
+      tip: "<strong>Tiene deudas:</strong> use la Meta 2 para atacar primero la deuda con la tasa de interés más alta, normalmente la tarjeta de crédito. Aun así, deje algo en Crecer: el hábito de construir futuro empieza hoy."
+    },
+    fondo: {
+      titulo: "Distribución recomendada: sin fondo de emergencia",
+      rangos: [[50, 70], [15, 30], [10, 20]],
+      sugerido: [55, 25, 20],
+      tip: "<strong>Sin deudas, sin fondo:</strong> use la Meta 2 para construir su fondo de emergencia, idealmente de 3 a 6 meses de gastos, en una cuenta separada que no vea todos los días."
+    },
+    estable: {
+      titulo: "Distribución recomendada: estoy estable",
+      rangos: [[0, 20], [50, 75], [10, 25]],
+      sugerido: [15, 65, 20],
+      tip: "<strong>Está estable:</strong> este es el momento de poner su aguinaldo a trabajar. La Meta 3 puede ir a su portafolio de inversión o a una meta grande con fecha definida."
+    }
+  };
+  var sitActual = "deudas";
+
+  // meses
+  for (var i = 12; i >= 1; i--) {
+    var o = document.createElement("option");
+    o.value = i; o.textContent = i === 12 ? "12 (período completo)" : String(i);
+    $("meses").appendChild(o);
+  }
+  MESES.forEach(function (m, idx) {
+    var d = document.createElement("div");
+    d.className = "field";
+    d.innerHTML = '<label for="mes' + idx + '">' + m + '</label><div class="money"><span>₡</span><input type="text" id="mes' + idx + '" class="mes" inputmode="numeric" placeholder="0"></div>';
+    $("months").appendChild(d);
+  });
+
+  // gastos de enero personalizables
+  var gid = 0;
+  function addGasto(nombre, ph) {
+    gid++;
+    var r = document.createElement("div");
+    r.className = "row gasto";
+    r.innerHTML =
+      '<div class="field"><label for="gn' + gid + '">Gasto</label><input type="text" id="gn' + gid + '" class="g-nombre" placeholder="' + esc(ph || "Ej: póliza del carro") + '" value="' + esc(nombre || "") + '"></div>' +
+      '<div class="field"><label for="gm' + gid + '">Monto</label><div class="money"><span>₡</span><input type="text" id="gm' + gid + '" class="g-monto" inputmode="numeric" placeholder="0"></div></div>' +
+      '<button class="del no-print" title="Eliminar" aria-label="Eliminar gasto">×</button>';
+    r.querySelector(".del").addEventListener("click", function () { r.remove(); calc(); });
+    $("gastos").appendChild(r);
+  }
+  addGasto("Matrícula y útiles", "Ej: matrícula y útiles");
+  addGasto("Seguros y pólizas", "Ej: seguros y pólizas");
+  $("add").addEventListener("click", function () {
+    addGasto("", "Ej: cita médica, mantenimiento del carro");
+    var last = $("gastos").lastElementChild.querySelector(".g-nombre");
+    if (last) last.focus();
+  });
+
+  document.addEventListener("input", function (e) {
+    if (e.target.matches(".money input")) {
+      var v = parse(e.target);
+      e.target.value = v ? fmt.format(v) : "";
+    }
+    calc();
+  });
+  $("meses").addEventListener("change", calc);
+
+  var modo = "simple";
+  document.querySelectorAll(".tab").forEach(function (t) {
+    t.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("active"); });
+      t.classList.add("active");
+      modo = t.dataset.mode;
+      $("modo-simple").style.display = modo === "simple" ? "" : "none";
+      $("modo-detalle").style.display = modo === "detalle" ? "" : "none";
+      calc();
+    });
+  });
+
+  // sliders que siempre suman 100
+  var sliders = [$("p2"), $("p3"), $("p4")];
+  function setPcts(arr) { sliders.forEach(function (s, k) { s.value = arr[k]; }); }
+  sliders.forEach(function (s, k) {
+    s.addEventListener("input", function () {
+      var val = Number(s.value);
+      var others = [0, 1, 2].filter(function (j) { return j !== k; });
+      var rest = 100 - val;
+      var a = Number(sliders[others[0]].value), b = Number(sliders[others[1]].value);
+      var sum = a + b;
+      var na = sum === 0 ? Math.round(rest / 10) * 5 : Math.round((a / sum) * rest / 5) * 5;
+      sliders[others[0]].value = na;
+      sliders[others[1]].value = rest - na;
+      calc();
+    });
+  });
+
+  function aplicarSit(key) {
+    sitActual = key;
+    document.querySelectorAll(".sit").forEach(function (x) { x.classList.toggle("active", x.dataset.sit === key); });
+    setPcts(SIT[key].sugerido);
+    calc();
+  }
+  document.querySelectorAll(".sit").forEach(function (b) {
+    b.addEventListener("click", function () { aplicarSit(b.dataset.sit); });
+  });
+  $("aplicar").addEventListener("click", function () { aplicarSit(sitActual); });
+
+  function calc() {
+    var ag;
+    if (modo === "simple") {
+      ag = (parse($("salario")) * Number($("meses").value) + parse($("extras"))) / 12;
+    } else {
+      var tot = 0;
+      document.querySelectorAll(".mes").forEach(function (m) { tot += parse(m); });
+      ag = tot / 12;
+    }
+
+    // Meta 1
+    var marchamo = parse($("marchamo"));
+    var items = [];
+    if (marchamo > 0) items.push(["Marchamo", marchamo]);
+    document.querySelectorAll(".gasto").forEach(function (r) {
+      var n = r.querySelector(".g-nombre").value.trim() || "Otro gasto";
+      var m = parse(r.querySelector(".g-monto"));
+      if (m > 0) items.push([n, m]);
+    });
+    var m1 = items.reduce(function (s, it) { return s + it[1]; }, 0);
+    var m1shown = Math.min(m1, ag);
+    var resto = Math.max(0, ag - m1);
+
+    var nm = $("nota-marchamo");
+    if (marchamo > 0) {
+      nm.style.display = "block";
+      nm.innerHTML = "<strong>Lo ideal es no depender del aguinaldo para el marchamo.</strong> Si este año le toca usarlo, para el próximo aparte " + money(marchamo / 12) + " cada mes y llegue a diciembre con el marchamo ya cubierto.";
+    } else {
+      nm.style.display = "none";
+    }
+
+    // Metas 2 a 4
+    var p = sliders.map(function (s) { return Number(s.value); });
+    var am = [resto * p[0] / 100, resto * p[1] / 100, resto * p[2] / 100];
+
+    $("aguinaldo").textContent = money(ag);
+    $("amt1").textContent = money(m1shown);
+    [2, 3, 4].forEach(function (n, k) {
+      $("amt" + n).textContent = money(am[k]);
+      $("pct" + n).textContent = p[k] + "%";
+    });
+
+    // guía y estado de rangos
+    var S = SIT[sitActual];
+    $("guide-title").textContent = S.titulo;
+    [2, 3, 4].forEach(function (n, k) {
+      var r = S.rangos[k];
+      $("g" + n).textContent = r[0] + "% a " + r[1] + "%";
+      var st = $("s" + n);
+      if (p[k] >= r[0] && p[k] <= r[1]) {
+        st.className = "range-status ok"; st.textContent = "✓ Dentro del rango recomendado (" + r[0] + "% a " + r[1] + "%)";
+      } else {
+        st.className = "range-status out"; st.textContent = "Fuera del rango recomendado (" + r[0] + "% a " + r[1] + "%)";
+      }
+    });
+
+    // barra
+    var w = ag > 0 ? [m1shown / ag, am[0] / ag, am[1] / ag, am[2] / ag] : [0.25, 0.25, 0.25, 0.25];
+    ["b1", "b2", "b3", "b4"].forEach(function (id, k) { $(id).style.width = (w[k] * 100) + "%"; });
+
+    // alertas
+    var al = $("alerta"), msg = "";
+    if (ag > 0 && m1 > ag) {
+      msg = "Sus gastos de enero (" + money(m1) + ") superan su aguinaldo por " + money(m1 - ag) + ". Empiece a apartar esa diferencia desde su salario de diciembre.";
+    } else if (ag > 0 && m1 / ag > 0.6) {
+      msg = "Más del 60% de su aguinaldo se va en gastos de enero. Para el próximo año, aparte una parte de su salario cada mes para estos gastos.";
+    } else if (p[2] > 25) {
+      msg = "Está destinando más del 25% a disfrutar. Está bien darse gustos, pero piense en su futuro: mueva una parte a Proteger o Crecer.";
+    } else if (p[0] + p[1] === 0) {
+      msg = "No está destinando nada a Proteger ni a Crecer. Aunque sea un porcentaje pequeño, que su aguinaldo le deje algo para el próximo año.";
+    }
+    al.style.display = msg ? "block" : "none";
+    al.textContent = msg;
+    $("tip").innerHTML = S.tip;
+
+    // plan
+    var html = '<tr><td>Aguinaldo estimado</td><td>' + money(ag) + '</td></tr>';
+    html += '<tr><td><span class="dot" style="background:var(--m1)"></span>Meta 1. Cumplir</td><td>' + money(m1shown) + '</td></tr>';
+    items.forEach(function (it) { html += '<tr class="sub"><td>' + esc(it[0]) + '</td><td>' + money(it[1]) + '</td></tr>'; });
+    var nombres = ["Meta 2. Proteger", "Meta 3. Crecer", "Meta 4. Disfrutar"];
+    var cols = ["--m2", "--m3", "--m4"];
+    nombres.forEach(function (n, k) {
+      html += '<tr><td><span class="dot" style="background:var(' + cols[k] + ')"></span>' + n + ' (' + p[k] + '%)</td><td>' + money(am[k]) + '</td></tr>';
+    });
+    $("plan").innerHTML = html;
+  }
+
+  aplicarSit("deudas");
+})();
+</script>
+</body>
+</html>

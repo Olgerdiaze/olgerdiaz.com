@@ -98,7 +98,12 @@
   .chips { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--dark); }
   .chips div::before { content: "✓"; color: var(--blue); font-weight: 700; margin-right: 6px; }
 
-  .situations { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .situations { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .split { background: var(--light); border-radius: 10px; padding: 12px 14px; margin-top: 12px; }
+  .split-head { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+  .split-head span:last-child { text-align: right; }
+  .split input[type="range"] { accent-color: var(--m2); width: 100%; }
+  .split small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
   .sit {
     border: 1.5px solid var(--border); background: #fff; border-radius: 12px; padding: 14px 12px;
     font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, background .15s;
@@ -279,8 +284,9 @@
     <!-- SITUACION Y GUIA -->
     <label style="margin:22px 0 10px">¿Cuál es su situación hoy?</label>
     <div class="situations no-print">
-      <button class="sit active" data-sit="deudas"><strong>Tengo deudas</strong><small>Tarjetas, préstamos o saldos pendientes</small></button>
-      <button class="sit" data-sit="fondo"><strong>No tengo deudas</strong><small>Pero tampoco un fondo de emergencia</small></button>
+      <button class="sit active" data-sit="deudasSinFondo"><strong>Tengo deudas y no tengo fondo</strong><small>Tarjetas o préstamos, sin respaldo para emergencias</small></button>
+      <button class="sit" data-sit="deudasConFondo"><strong>Tengo deudas, pero sí tengo fondo</strong><small>Ya tengo mi respaldo para emergencias</small></button>
+      <button class="sit" data-sit="fondo"><strong>No tengo deudas ni fondo</strong><small>Me falta construir mi fondo de emergencia</small></button>
       <button class="sit" data-sit="estable"><strong>Estoy estable</strong><small>Sin deudas y con fondo de emergencia</small></button>
     </div>
 
@@ -301,9 +307,14 @@
         <div class="meta-title"><em>Meta 2.</em> Proteger</div>
         <div class="meta-amt" id="amt2">₡0</div>
       </div>
-      <p>Pagar deudas caras o construir su fondo de emergencia.</p>
+      <p>Construir su fondo de emergencia y salir de deudas.</p>
       <div class="slider-row"><input type="range" id="p2" min="0" max="100" step="5" aria-label="Porcentaje Proteger"><div class="pct" id="pct2">0%</div></div>
       <div class="range-status" id="s2"></div>
+      <div class="split">
+        <div class="split-head"><span id="sp-fondo">Fondo de emergencia</span><span id="sp-deudas">Deudas</span></div>
+        <input type="range" id="split" min="0" max="100" step="5" aria-label="Reparto entre fondo de emergencia y deudas">
+        <small>Mueva la barra para repartir su Meta 2 entre el fondo de emergencia y sus deudas.</small>
+      </div>
     </div>
 
     <div class="meta" style="--c: var(--m3)">
@@ -367,27 +378,39 @@
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
 
   // Distribuciones recomendadas por situación: [min, max] y valor sugerido
+  // split = % de la Meta 2 que va al fondo de emergencia (el resto va a deudas)
+  var BOLA = " Para las deudas use el método bola de nieve: liquide primero la deuda con el <strong>saldo más pequeño</strong> y la cuota que libera súmela a la siguiente.";
   var SIT = {
-    deudas: {
-      titulo: "Distribución recomendada: tengo deudas",
+    deudasSinFondo: {
+      titulo: "Distribución recomendada: deudas y sin fondo",
+      rangos: [[55, 75], [10, 20], [10, 20]],
+      sugerido: [65, 15, 20],
+      split: 50,
+      tip: "<strong>Tiene deudas y no tiene fondo:</strong> impulse las dos cosas a la vez. Una parte de la Meta 2 arranca su fondo de emergencia, para que un imprevisto no lo devuelva a la tarjeta, y la otra ataca sus deudas." + BOLA
+    },
+    deudasConFondo: {
+      titulo: "Distribución recomendada: deudas con fondo",
       rangos: [[50, 70], [10, 25], [10, 20]],
       sugerido: [60, 20, 20],
-      tip: "<strong>Tiene deudas:</strong> use la Meta 2 para atacar primero la deuda con la tasa de interés más alta, normalmente la tarjeta de crédito. Aun así, deje algo en Crecer: el hábito de construir futuro empieza hoy."
+      split: 0,
+      tip: "<strong>Tiene deudas, pero ya tiene fondo:</strong> toda la Meta 2 puede ir a sus deudas." + BOLA + " Aun así, deje algo en Crecer: el hábito de construir futuro empieza hoy."
     },
     fondo: {
       titulo: "Distribución recomendada: sin fondo de emergencia",
       rangos: [[50, 70], [15, 30], [10, 20]],
       sugerido: [55, 25, 20],
+      split: 100,
       tip: "<strong>Sin deudas, sin fondo:</strong> use la Meta 2 para construir su fondo de emergencia, idealmente de 3 a 6 meses de gastos, en una cuenta separada que no vea todos los días."
     },
     estable: {
       titulo: "Distribución recomendada: estoy estable",
       rangos: [[0, 20], [50, 75], [10, 25]],
       sugerido: [15, 65, 20],
-      tip: "<strong>Está estable:</strong> este es el momento de poner su aguinaldo a trabajar. La Meta 3 puede ir a su portafolio de inversión o a una meta grande con fecha definida."
+      split: 100,
+      tip: "<strong>Está estable:</strong> este es el momento de poner su aguinaldo a trabajar. La Meta 3 puede ir a su portafolio de inversión o a una meta grande con fecha definida. Si usa algo de la Meta 2, que sea para reforzar su fondo."
     }
   };
-  var sitActual = "deudas";
+  var sitActual = "deudasSinFondo";
 
   // meses
   for (var i = 12; i >= 1; i--) {
@@ -465,6 +488,7 @@
     sitActual = key;
     document.querySelectorAll(".sit").forEach(function (x) { x.classList.toggle("active", x.dataset.sit === key); });
     setPcts(SIT[key].sugerido);
+    $("split").value = SIT[key].split;
     calc();
   }
   document.querySelectorAll(".sit").forEach(function (b) {
@@ -506,6 +530,10 @@
     // Metas 2 a 4
     var p = sliders.map(function (s) { return Number(s.value); });
     var am = [resto * p[0] / 100, resto * p[1] / 100, resto * p[2] / 100];
+    var sp = Number($("split").value);
+    var aFondo = am[0] * sp / 100, aDeudas = am[0] - aFondo;
+    $("sp-fondo").textContent = "Fondo de emergencia: " + money(aFondo) + " (" + sp + "%)";
+    $("sp-deudas").textContent = "Deudas: " + money(aDeudas) + " (" + (100 - sp) + "%)";
 
     $("aguinaldo").textContent = money(ag);
     $("amt1").textContent = money(m1shown);
@@ -555,11 +583,15 @@
     var cols = ["--m2", "--m3", "--m4"];
     nombres.forEach(function (n, k) {
       html += '<tr><td><span class="dot" style="background:var(' + cols[k] + ')"></span>' + n + ' (' + p[k] + '%)</td><td>' + money(am[k]) + '</td></tr>';
+      if (k === 0 && am[0] > 0) {
+        if (aFondo > 0) html += '<tr class="sub"><td>Fondo de emergencia</td><td>' + money(aFondo) + '</td></tr>';
+        if (aDeudas > 0) html += '<tr class="sub"><td>Deudas (bola de nieve)</td><td>' + money(aDeudas) + '</td></tr>';
+      }
     });
     $("plan").innerHTML = html;
   }
 
-  aplicarSit("deudas");
+  aplicarSit("deudasSinFondo");
 })();
 </script>
 </body>

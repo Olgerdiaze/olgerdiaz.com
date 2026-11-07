@@ -404,10 +404,11 @@
     },
     estable: {
       titulo: "Distribución recomendada: estoy estable",
-      rangos: [[0, 20], [50, 75], [10, 25]],
-      sugerido: [15, 65, 20],
+      rangos: [[0, 0], [75, 90], [10, 25]],
+      sugerido: [0, 80, 20],
       split: 100,
-      tip: "<strong>Está estable:</strong> este es el momento de poner su aguinaldo a trabajar. La Meta 3 puede ir a su portafolio de inversión o a una meta grande con fecha definida. Si usa algo de la Meta 2, que sea para reforzar su fondo."
+      sinProteger: true,
+      tip: "<strong>Está estable:</strong> su fondo ya está completo y no tiene deudas, así que no necesita la Meta 2. Este es el momento de poner su aguinaldo a trabajar: la Meta 3 puede ir a su portafolio de inversión o a una meta grande con fecha definida, y la Meta 4 a disfrutar sin culpa."
     }
   };
   var sitActual = "deudasSinFondo";
@@ -532,6 +533,7 @@
     var am = [resto * p[0] / 100, resto * p[1] / 100, resto * p[2] / 100];
     var sp = Number($("split").value);
     var aFondo = am[0] * sp / 100, aDeudas = am[0] - aFondo;
+    document.querySelector(".split").style.display = am[0] > 0 || p[0] > 0 ? "" : "none";
     $("sp-fondo").textContent = "Fondo de emergencia: " + money(aFondo) + " (" + sp + "%)";
     $("sp-deudas").textContent = "Deudas: " + money(aDeudas) + " (" + (100 - sp) + "%)";
 
@@ -547,12 +549,16 @@
     $("guide-title").textContent = S.titulo;
     [2, 3, 4].forEach(function (n, k) {
       var r = S.rangos[k];
-      $("g" + n).textContent = r[0] + "% a " + r[1] + "%";
+      var rt = r[0] === r[1] ? r[0] + "%" : r[0] + "% a " + r[1] + "%";
+      $("g" + n).textContent = n === 2 && S.sinProteger ? "No necesita" : rt;
       var st = $("s" + n);
-      if (p[k] >= r[0] && p[k] <= r[1]) {
-        st.className = "range-status ok"; st.textContent = "✓ Dentro del rango recomendado (" + r[0] + "% a " + r[1] + "%)";
+      if (n === 2 && S.sinProteger) {
+        if (p[0] === 0) { st.className = "range-status ok"; st.textContent = "✓ Su fondo ya está completo y no tiene deudas: no necesita esta meta"; }
+        else { st.className = "range-status out"; st.textContent = "Con su fondo completo y sin deudas, puede mover este porcentaje a Crecer"; }
+      } else if (p[k] >= r[0] && p[k] <= r[1]) {
+        st.className = "range-status ok"; st.textContent = "✓ Dentro del rango recomendado (" + rt + ")";
       } else {
-        st.className = "range-status out"; st.textContent = "Fuera del rango recomendado (" + r[0] + "% a " + r[1] + "%)";
+        st.className = "range-status out"; st.textContent = "Fuera del rango recomendado (" + rt + ")";
       }
     });
 

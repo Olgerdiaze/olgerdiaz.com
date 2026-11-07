@@ -102,7 +102,8 @@
   .split { background: var(--light); border-radius: 10px; padding: 12px 14px; margin-top: 12px; }
   .split-head { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
   .split-head span:last-child { text-align: right; }
-  .split input[type="range"] { accent-color: var(--m2); width: 100%; }
+  .split { --c: var(--m2); }
+  .split input[type="range"] { width: 100%; }
   .split small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
   .sit {
     border: 1.5px solid var(--border); background: #fff; border-radius: 12px; padding: 14px 12px;
@@ -155,7 +156,18 @@
   .add:hover { border-color: var(--blue); background: var(--light); }
 
   .slider-row { display: flex; align-items: center; gap: 12px; }
-  input[type="range"] { flex: 1; accent-color: var(--c); height: 28px; }
+  input[type="range"] {
+    flex: 1; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; margin: 10px 0; cursor: pointer;
+    background: linear-gradient(var(--c), var(--c)) 0 / var(--fill, 0%) 100% no-repeat, #E2E8F0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--c);
+    border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--c); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  input[type="range"]:focus-visible { outline: 2px solid var(--c); outline-offset: 4px; }
   .pct { font-weight: 700; width: 46px; text-align: right; font-size: 15px; }
   .range-status { font-size: 12px; margin-top: 4px; font-weight: 600; }
   .range-status.ok { color: var(--ok); }
@@ -357,7 +369,7 @@
   <!-- PASO 3 -->
   <section class="card plan">
     <div class="step"><div class="step-num">3</div><h2>Su plan de aguinaldo</h2></div>
-    <p class="lead">El mismo día que le deposite, mueva cada monto a su lugar antes de tocarlo.</p>
+    <p class="lead">El mismo día que le depositen, mueva cada monto a su lugar antes de tocarlo.</p>
     <table id="plan"></table>
     <button class="btn no-print" onclick="window.print()">Guardar mi plan en PDF</button>
   </section>
@@ -419,7 +431,9 @@
     o.value = i; o.textContent = i === 12 ? "12 (período completo)" : String(i);
     $("meses").appendChild(o);
   }
+  var anioFin = new Date().getFullYear();
   MESES.forEach(function (m, idx) {
+    m = m + " " + (idx === 0 ? anioFin - 1 : anioFin);
     var d = document.createElement("div");
     d.className = "field";
     d.innerHTML = '<label for="mes' + idx + '">' + m + '</label><div class="money"><span>₡</span><input type="text" id="mes' + idx + '" class="mes" inputmode="numeric" placeholder="0"></div>';
@@ -449,8 +463,13 @@
 
   document.addEventListener("input", function (e) {
     if (e.target.matches(".money input")) {
-      var v = parse(e.target);
-      e.target.value = v ? fmt.format(v) : "";
+      var el = e.target, pos = el.selectionStart || 0;
+      var digitsAfter = el.value.slice(pos).replace(/[^\d]/g, "").length;
+      var v = parse(el);
+      el.value = v ? fmt.format(v) : "";
+      var i = el.value.length, seen = 0;
+      while (i > 0 && seen < digitsAfter) { i--; if (/\d/.test(el.value[i])) seen++; }
+      try { el.setSelectionRange(i, i); } catch (err) {}
     }
     calc();
   });
@@ -474,13 +493,26 @@
   sliders.forEach(function (s, k) {
     s.addEventListener("input", function () {
       var val = Number(s.value);
+      var lock = SIT[sitActual].sinProteger && k !== 0 && Number(sliders[0].value) === 0;
+      if (lock) {
+        var otro = k === 1 ? 2 : 1;
+        sliders[otro].value = 100 - val;
+        calc();
+        return;
+      }
       var others = [0, 1, 2].filter(function (j) { return j !== k; });
       var rest = 100 - val;
       var a = Number(sliders[others[0]].value), b = Number(sliders[others[1]].value);
       var sum = a + b;
-      var na = sum === 0 ? Math.round(rest / 10) * 5 : Math.round((a / sum) * rest / 5) * 5;
-      sliders[others[0]].value = na;
-      sliders[others[1]].value = rest - na;
+      if (sum === 0) {
+        // si las otras dos están en 0, el sobrante va a Crecer (o a Proteger si se movió Crecer)
+        var destino = others.indexOf(1) !== -1 ? 1 : 0;
+        others.forEach(function (j) { sliders[j].value = j === destino ? rest : 0; });
+      } else {
+        var na = Math.round((a / sum) * rest / 5) * 5;
+        sliders[others[0]].value = na;
+        sliders[others[1]].value = rest - na;
+      }
       calc();
     });
   });
@@ -533,15 +565,17 @@
     var am = [resto * p[0] / 100, resto * p[1] / 100, resto * p[2] / 100];
     var sp = Number($("split").value);
     var aFondo = am[0] * sp / 100, aDeudas = am[0] - aFondo;
+    $("split").style.setProperty("--fill", sp + "%");
     document.querySelector(".split").style.display = am[0] > 0 || p[0] > 0 ? "" : "none";
     $("sp-fondo").textContent = "Fondo de emergencia: " + money(aFondo) + " (" + sp + "%)";
     $("sp-deudas").textContent = "Deudas: " + money(aDeudas) + " (" + (100 - sp) + "%)";
 
     $("aguinaldo").textContent = money(ag);
-    $("amt1").textContent = money(m1shown);
+    $("amt1").textContent = money(m1);
     [2, 3, 4].forEach(function (n, k) {
       $("amt" + n).textContent = money(am[k]);
       $("pct" + n).textContent = p[k] + "%";
+      sliders[k].style.setProperty("--fill", p[k] + "%");
     });
 
     // guía y estado de rangos
@@ -573,21 +607,29 @@
     } else if (ag > 0 && m1 / ag > 0.6) {
       msg = "Más del 60% de su aguinaldo se va en gastos de enero. Para el próximo año, aparte una parte de su salario cada mes para estos gastos.";
     } else if (p[2] > 25) {
-      msg = "Está destinando más del 25% a disfrutar. Está bien darse gustos, pero piense en su futuro: mueva una parte a Proteger o Crecer.";
+      msg = "Está destinando más del 25% a disfrutar. Está bien darse gustos, pero piense en su futuro: mueva una parte a " + (S.sinProteger ? "Crecer." : "Proteger o Crecer.");
     } else if (p[0] + p[1] === 0) {
       msg = "No está destinando nada a Proteger ni a Crecer. Aunque sea un porcentaje pequeño, que su aguinaldo le deje algo para el próximo año.";
+    } else if (!S.sinProteger && p[0] === 0) {
+      msg = sitActual === "fondo"
+        ? "Todavía no tiene fondo de emergencia: la Meta 2 es su prioridad. Sin ese respaldo, cualquier imprevisto termina en la tarjeta."
+        : "Con deudas pendientes, la Meta 2 es su prioridad. Cada colón que abona hoy le libera cuotas para el próximo año.";
     }
     al.style.display = msg ? "block" : "none";
     al.textContent = msg;
     $("tip").innerHTML = S.tip;
 
     // plan
-    var html = '<tr><td>Aguinaldo estimado</td><td>' + money(ag) + '</td></tr>';
-    html += '<tr><td><span class="dot" style="background:var(--m1)"></span>Meta 1. Cumplir</td><td>' + money(m1shown) + '</td></tr>';
+    var sitBtn = document.querySelector('.sit[data-sit="' + sitActual + '"] strong');
+    var html = '<tr class="sub"><td colspan="2" style="padding-left:4px;text-align:left">Situación: ' + (sitBtn ? sitBtn.textContent : "") + '</td></tr>';
+    html += '<tr><td>Aguinaldo estimado</td><td>' + money(ag) + '</td></tr>';
+    html += '<tr><td><span class="dot" style="background:var(--m1)"></span>Meta 1. Cumplir</td><td>' + money(m1) + '</td></tr>';
     items.forEach(function (it) { html += '<tr class="sub"><td>' + esc(it[0]) + '</td><td>' + money(it[1]) + '</td></tr>'; });
+    if (m1 > ag && ag > 0) html += '<tr class="sub"><td style="color:var(--warn)">Faltante a cubrir con su salario</td><td style="color:var(--warn)">' + money(m1 - ag) + '</td></tr>';
     var nombres = ["Meta 2. Proteger", "Meta 3. Crecer", "Meta 4. Disfrutar"];
     var cols = ["--m2", "--m3", "--m4"];
     nombres.forEach(function (n, k) {
+      if (k === 0 && S.sinProteger && p[0] === 0) return;
       html += '<tr><td><span class="dot" style="background:var(' + cols[k] + ')"></span>' + n + ' (' + p[k] + '%)</td><td>' + money(am[k]) + '</td></tr>';
       if (k === 0 && am[0] > 0) {
         if (aFondo > 0) html += '<tr class="sub"><td>Fondo de emergencia</td><td>' + money(aFondo) + '</td></tr>';

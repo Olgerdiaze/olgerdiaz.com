@@ -342,7 +342,7 @@
         <tr><td><span class="dot" style="background:var(--m3)"></span>Crecer</td><td id="g3"></td></tr>
         <tr><td><span class="dot" style="background:var(--m4)"></span>Disfrutar</td><td id="g4"></td></tr>
       </table>
-      <p>Porcentajes sobre lo que queda después de la Meta 1. La regla de oro: disfrutar nunca más del 25%, y siempre algo para su futuro.</p>
+      <p id="guide-rule"></p>
       <button class="btn-light no-print" id="aplicar">Aplicar distribución recomendada</button>
     </div>
 
@@ -449,7 +449,8 @@
     },
     estable: {
       titulo: "Distribución recomendada: estoy estable",
-      rangos: [[0, 0], [75, 90], [10, 25]],
+      rangos: [[0, 0], [50, 90], [10, 50]],
+      maxDisfrutar: 50,
       sugerido: [0, 80, 20],
       split: 100,
       sinProteger: true,
@@ -658,13 +659,19 @@
     ["b1", "b2", "b3", "b4"].forEach(function (id, k) { $(id).style.width = (w[k] * 100) + "%"; });
 
     // alertas
+    var maxD = S.maxDisfrutar || 25;
+    $("guide-rule").textContent = S.sinProteger
+      ? "Porcentajes sobre lo que queda después de la Meta 1. Con su situación estable puede disfrutar hasta el 50%, pero mi recomendación es que siempre invierta más de lo que disfruta, pensando en su futuro."
+      : "Porcentajes sobre lo que queda después de la Meta 1. La regla de oro: disfrutar nunca más del 25%, y siempre algo para su futuro.";
     var al = $("alerta"), msg = "";
     if (ag > 0 && m1 > ag) {
       msg = "Sus gastos de enero (" + money(m1) + ") superan su aguinaldo por " + money(m1 - ag) + ". Empiece a apartar esa diferencia desde su salario de diciembre.";
     } else if (ag > 0 && m1 / ag > 0.6) {
       msg = "Más del 60% de su aguinaldo se va en gastos de enero. Para el próximo año, aparte una parte de su salario cada mes para estos gastos.";
-    } else if (p[2] > 25) {
-      msg = "Está destinando más del 25% a disfrutar. Está bien darse gustos, pero piense en su futuro: mueva una parte a " + (S.sinProteger ? "Crecer." : "Proteger o Crecer.");
+    } else if (p[2] > maxD) {
+      msg = "Está destinando más del " + maxD + "% a disfrutar. Está bien darse gustos, pero piense en su futuro: mueva una parte a " + (S.sinProteger ? "Crecer." : "Proteger o Crecer.");
+    } else if (S.sinProteger && p[2] > p[1]) {
+      msg = "Está destinando más a disfrutar que a crecer. Puede darse sus gustos, pero la regla es invertir más de lo que disfruta: así su aguinaldo también trabaja para su futuro.";
     } else if (p[0] + p[1] === 0) {
       msg = "No está destinando nada a Proteger ni a Crecer. Aunque sea un porcentaje pequeño, que su aguinaldo le deje algo para el próximo año.";
     } else if (!S.sinProteger && p[0] === 0) {

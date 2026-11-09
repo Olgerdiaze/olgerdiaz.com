@@ -72,6 +72,24 @@
     font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer;
   }
   .tab.active { background: #fff; color: var(--dark); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .new-badge {
+    display: inline-block; background: #C98A1E; color: #fff; font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+    padding: 2px 6px; border-radius: 6px; margin-left: 4px; vertical-align: 2px;
+  }
+  .new-banner {
+    display: flex; gap: 10px; align-items: center; background: #FDF6E7; border: 1px solid #F3D9A4; color: #7B5A14;
+    border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px;
+  }
+  .new-banner strong { color: #7B5A14; }
+  .qhead, .qrow { display: grid; grid-template-columns: 1.1fr 1fr 1fr 1fr; gap: 8px; align-items: center; }
+  .qhead { font-size: 12px; font-weight: 700; color: var(--muted); padding: 0 2px 6px; }
+  .qhead span:last-child, .qtot { text-align: right; }
+  .qrow { padding: 6px 0; border-top: 1px solid var(--border); }
+  .qrow .mlabel { font-size: 13px; font-weight: 600; }
+  .qrow input { font-size: 15px; padding: 9px 8px 9px 22px; }
+  .qrow .money span { left: 8px; font-size: 13px; }
+  .qtot { font-size: 13px; font-weight: 700; color: var(--dark); white-space: nowrap; }
+  .qtools { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; margin-top: 10px; }
   label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
   .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
   .field { margin-bottom: 16px; }
@@ -198,6 +216,12 @@
     .card { padding: 20px; }
     .grid2 { grid-template-columns: 1fr; }
     .months { grid-template-columns: repeat(2, 1fr); }
+    .qhead { display: none; }
+    .qrow { grid-template-columns: 1fr 1fr; row-gap: 6px; padding: 10px 0; }
+    .qrow .mlabel { grid-column: 1 / 2; }
+    .qrow .qtot { grid-column: 2 / 3; grid-row: 1; }
+    .qrow .money::before { content: attr(data-q); position: absolute; top: -16px; left: 2px; font-size: 11px; color: var(--muted); }
+    .qrow .money { margin-top: 14px; }
     .situations { grid-template-columns: 1fr; }
     .row, .row.fixed { grid-template-columns: 1fr 36px; }
     .row .field:first-child, .row .static { grid-column: 1 / -1; }
@@ -230,9 +254,11 @@
       <div><strong>Sus datos son solo suyos.</strong> No guardamos ni enviamos su información a ningún lado. Todos los cálculos se hacen en su propio dispositivo y se borran al cerrar la página.</div>
     </div>
 
+    <div class="new-banner no-print"><strong>NUEVO:</strong> ¿Le pagan por quincena? Ahora puede ingresar su salario quincena por quincena.</div>
     <div class="tabs no-print">
       <button class="tab active" data-mode="simple">Mismo salario</button>
       <button class="tab" data-mode="detalle">Mes a mes</button>
+      <button class="tab" data-mode="quincena">Por quincena<span class="new-badge">NUEVO</span></button>
     </div>
 
     <div id="modo-simple">
@@ -255,6 +281,13 @@
     <div id="modo-detalle" style="display:none">
       <p class="hint" style="margin-bottom:12px">Ingrese el salario bruto de cada mes, incluyendo horas extra y comisiones. Deje en blanco los meses que no trabajó.</p>
       <div class="months" id="months"></div>
+    </div>
+
+    <div id="modo-quincena" style="display:none">
+      <p class="hint" style="margin-bottom:12px">Ingrese el salario bruto de cada quincena, incluyendo horas extra y comisiones. Las dos quincenas suman el mes completo. Deje en blanco las que no trabajó.</p>
+      <div class="qtools" style="justify-content:flex-start;margin:0 0 14px"><span class="hint" style="width:100%">¿Gana lo mismo cada quincena? Llene la primera quincena de diciembre y cópiela a todas con un clic.</span><button class="btn-light" id="copiarQ" type="button" style="margin-top:4px">Copiar a todas las quincenas</button></div>
+      <div class="qhead"><span>Mes</span><span>1.ª quincena</span><span>2.ª quincena</span><span>Total del mes</span></div>
+      <div id="quincenas"></div>
     </div>
 
     <div class="result">
@@ -438,6 +471,21 @@
     d.className = "field";
     d.innerHTML = '<label for="mes' + idx + '">' + m + '</label><div class="money"><span>₡</span><input type="text" id="mes' + idx + '" class="mes" inputmode="numeric" placeholder="0"></div>';
     $("months").appendChild(d);
+
+    var q = document.createElement("div");
+    q.className = "qrow";
+    q.innerHTML =
+      '<div class="mlabel">' + m + '</div>' +
+      '<div class="money" data-q="1.ª quincena"><span>₡</span><input type="text" class="qin" id="q' + idx + 'a" inputmode="numeric" placeholder="0" aria-label="' + m + ', primera quincena"></div>' +
+      '<div class="money" data-q="2.ª quincena"><span>₡</span><input type="text" class="qin" id="q' + idx + 'b" inputmode="numeric" placeholder="0" aria-label="' + m + ', segunda quincena"></div>' +
+      '<div class="qtot" id="qt' + idx + '">₡0</div>';
+    $("quincenas").appendChild(q);
+  });
+  $("copiarQ").addEventListener("click", function () {
+    var v = parse($("q0a"));
+    if (!v) { $("q0a").focus(); return; }
+    document.querySelectorAll(".qin").forEach(function (el) { el.value = fmt.format(v); });
+    calc();
   });
 
   // gastos de enero personalizables
@@ -483,6 +531,7 @@
       modo = t.dataset.mode;
       $("modo-simple").style.display = modo === "simple" ? "" : "none";
       $("modo-detalle").style.display = modo === "detalle" ? "" : "none";
+      $("modo-quincena").style.display = modo === "quincena" ? "" : "none";
       calc();
     });
   });
@@ -533,6 +582,14 @@
     var ag;
     if (modo === "simple") {
       ag = (parse($("salario")) * Number($("meses").value) + parse($("extras"))) / 12;
+    } else if (modo === "quincena") {
+      var totQ = 0;
+      for (var qi = 0; qi < 12; qi++) {
+        var mesTot = parse($("q" + qi + "a")) + parse($("q" + qi + "b"));
+        $("qt" + qi).textContent = money(mesTot);
+        totQ += mesTot;
+      }
+      ag = totQ / 12;
     } else {
       var tot = 0;
       document.querySelectorAll(".mes").forEach(function (m) { tot += parse(m); });
